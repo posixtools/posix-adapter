@@ -20,8 +20,8 @@ set -u  # prevent unset variable expansion
 
 # This is the only part where the code has to be prepared for the missing tool
 # capabilities. It is known that on MacOS readlink does not support the -f flag
-# by default.
-if target_path="$(readlink -f "$0")" 2>/dev/null
+# by default. https://stackoverflow.com/a/4031502/1565331
+if target_path="$(readlink -f "$0" 2>/dev/null)"
 then
   cd "$(dirname "$target_path")"
 else
@@ -32,7 +32,8 @@ else
     # If the current script is executed through a symlink, we are aout of luck,
     # because without readlink, there is no universal solution for this problem
     # that uses the default shell toolset.
-    echo "symlinked script won't work on this machine.."
+    echo "Symlinked script won't work on this machine.."
+    echo "Make sure you install a readlink version that supports the -f flag."
   else
     # If the current script is not executed through a symlink, we can determine
     # the path with dirname.
@@ -44,10 +45,7 @@ fi
 # DM TOOLS INTEGRATION
 #==============================================================================
 
-if ! dm_tools__check_availibility 2>/dev/null
-then
-  echo "imre"
-fi
+. ../dm.tools.sh
 
 # IMPORTANT: After this, every non shell built-in command should be called
 # through the provided dm_tools API to ensure the compatibility on different
@@ -62,29 +60,25 @@ fi
 # possibly missing color/modifier.
 if command -v tput >/dev/null && tput init >/dev/null 2>&1
 then
-  if ! RED="$(tput setaf 1)"
+  if ! RED="$(dm_tools__tput setaf 1)"
   then
     RED=''
   fi
-  if ! GREEN="$(tput setaf 2)"
+  if ! GREEN="$(dm_tools__tput setaf 2)"
   then
     GREEN=''
   fi
-  if ! BLUE="$(tput setaf 4)"
+  if ! BLUE="$(dm_tools__tput setaf 4)"
   then
     BLUE=''
   fi
-  if ! RESET="$(tput sgr0)"
+  if ! RESET="$(dm_tools__tput sgr0)"
   then
     RESET=''
   fi
-  if ! BOLD="$(tput bold)"
+  if ! BOLD="$(dm_tools__tput bold)"
   then
     BOLD=''
-  fi
-  if ! DIM="$(tput dim)"
-  then
-    DIM=''
   fi
 else
   RED=''
@@ -92,22 +86,21 @@ else
   BLUE=''
   RESET=''
   BOLD=''
-  DIM=''
 fi
 
 log_task() {
   message="$1"
-    echo "${BOLD}[ ${BLUE}..${RESET}${BOLD} ]${RESET} ${message}"
+    dm_tools__echo "${BOLD}[ ${BLUE}..${RESET}${BOLD} ]${RESET} ${message}"
 }
 
 log_success() {
   message="$1"
-    echo "${BOLD}[ ${GREEN}OK${RESET}${BOLD} ]${RESET} ${message}"
+    dm_tools__echo "${BOLD}[ ${GREEN}OK${RESET}${BOLD} ]${RESET} ${message}"
 }
 
 log_failure() {
   message="$1"
-    echo "${BOLD}[ ${RED}!!${RESET}${BOLD} ]${RESET} ${message}"
+    dm_tools__echo "${BOLD}[ ${RED}!!${RESET}${BOLD} ]${RESET} ${message}"
 }
 
 tool_assert() {
@@ -133,6 +126,9 @@ tool_failure() {
   log_failure "failed with status ${status}, possible unsupported parameter"
   exit 1
 }
+
+log_task 'Running test suite..'
+echo ''
 
 #==============================================================================
 # TOOL: BASENAME
@@ -165,7 +161,7 @@ tool_failure() {
 title='cut :: delimiter and field selection'
 data='one/two/three/four'
 expected='two/three/four'
-if result="$(echo "$data" | cut -d '/' -f '2-')"
+if result="$(dm_tools__echo "$data" | dm_tools__cut --delimiter '/' --fields '2-')"
 then
   tool_assert "$title" "$expected" "$result"
 else
@@ -176,7 +172,7 @@ fi
 title='cut :: character range selection'
 data='123456789'
 expected='12345'
-if result="$(echo "$data" | cut -c '1-5')"
+if result="$(dm_tools__echo "$data" | dm_tools__cut --characters '1-5')"
 then
   tool_assert "$title" "$expected" "$result"
 else
@@ -188,9 +184,9 @@ fi
 # TOOL: DATE
 #==============================================================================
 title='date :: generated timestamp is numbers only'
-if result="$(date +'%s%N')"
+if result="$(dm_tools__date +'%s%N')"
 then
-  if echo "$result" | grep --silent -E '[[:digit:]]+'
+  if dm_tools__echo "$result" | dm_tools__grep --silent -E '[[:digit:]]+'
   then
     log_success "$title"
   else
@@ -226,7 +222,7 @@ fi
 # TOOL: FIND
 #==============================================================================
 title='find :: basic file search by name'
-if find . -type 'f' -name '*' >/dev/null
+if dm_tools__find . -type 'f' -name '*' >/dev/null
 then
   log_success "$title"
 else
@@ -235,7 +231,7 @@ else
 fi
 
 title='find :: basic file search by name zero terminated'
-if find . -type 'f' -name '*' -print0 >/dev/null
+if dm_tools__find . -type 'f' -name '*' -print0 >/dev/null
 then
   log_success "$title"
 else
@@ -244,7 +240,7 @@ else
 fi
 
 title='find :: basic direcroty search by name'
-if find . -type 'd' -name '*' >/dev/null
+if dm_tools__find . -type 'd' -name '*' >/dev/null
 then
   log_success "$title"
 else
@@ -253,7 +249,7 @@ else
 fi
 
 title='find :: basic directory search by name zero terminated'
-if find . -type 'd' -name '*' -print0 >/dev/null
+if dm_tools__find . -type 'd' -name '*' -print0 >/dev/null
 then
   log_success "$title"
 else
@@ -266,7 +262,7 @@ fi
 #==============================================================================
 title='grep :: extended regexp mode'
 expected='hello'
-if result="$(echo "hello" | grep -E 'l+')"
+if result="$(dm_tools__echo "hello" | dm_tools__grep -E 'l+')"
 then
   if [ "$result" = "$expected" ]
   then
@@ -276,7 +272,7 @@ then
     log_failure 'ineffective extended regexp mode'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -285,7 +281,7 @@ fi
 
 title='grep :: silent mode'
 expected=''
-if result="$(echo "hello" | grep --silent '.')"
+if result="$(dm_tools__echo "hello" | dm_tools__grep --silent '.')"
 then
   if [ "$result" = "$expected" ]
   then
@@ -295,7 +291,7 @@ then
     log_failure 'ineffective --silent flag'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -304,7 +300,7 @@ fi
 
 title='grep :: inverted mode'
 expected='hello'
-if result="$(echo "hello" | grep --invert-match 'imre')"
+if result="$(dm_tools__echo "hello" | dm_tools__grep --invert-match 'imre')"
 then
   if [ "$result" = "$expected" ]
   then
@@ -314,7 +310,7 @@ then
     log_failure 'ineffective --invert-match flag'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -323,7 +319,7 @@ fi
 
 title='grep :: count mode'
 expected='1'
-if result="$(echo "hello" | grep --count 'l')"
+if result="$(dm_tools__echo "hello" | dm_tools__grep --count 'l')"
 then
   if [ "$result" = "$expected" ]
   then
@@ -333,7 +329,7 @@ then
     log_failure 'ineffective --count flag'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -342,7 +338,7 @@ fi
 
 title='grep :: only matching mode'
 expected='ll'
-if result="$(echo "imre hello" | grep --only-matching 'll')"
+if result="$(dm_tools__echo "imre hello" | dm_tools__grep --only-matching 'll')"
 then
   if [ "$result" = "$expected" ]
   then
@@ -352,7 +348,7 @@ then
     log_failure 'ineffective --only-matching flag'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -363,7 +359,7 @@ fi
 # TOOL: MKDIR
 #==============================================================================
 title='mkdir :: parents flag'
-if mkdir --parents tests
+if dm_tools__mkdir --parents ../tests
 then
   log_success "$title"
 else
@@ -388,7 +384,7 @@ fi
 #==============================================================================
 title='printf :: minimum width specifier'
 expected=' 42'
-if result="$(printf '%*s' 3 '42')"
+if result="$(dm_tools__printf '%*s' 3 '42')"
 then
   if [ "$result" = "$expected" ]
   then
@@ -398,7 +394,7 @@ then
     log_failure 'unsupported feature'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -407,7 +403,7 @@ fi
 
 title='printf :: precision specifier'
 expected='123'
-if result="$(printf '%.*s' 3 '123456')"
+if result="$(dm_tools__printf '%.*s' 3 '123456')"
 then
   if [ "$result" = "$expected" ]
   then
@@ -417,7 +413,7 @@ then
     log_failure 'unsupported feature'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -426,7 +422,7 @@ fi
 
 title='printf :: combined minimum width and precision specifier'
 expected=' 123'
-if result="$(printf '%*.*s' 4 3 '123456')"
+if result="$(dm_tools__printf '%*.*s' 4 3 '123456')"
 then
   if [ "$result" = "$expected" ]
   then
@@ -436,7 +432,7 @@ then
     log_failure 'unsupported feature'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -453,7 +449,7 @@ fi
 # TOOL: READLINK
 #==============================================================================
 title='readlink :: canonicalize mode'
-if readlink -f . >/dev/null 2>&1
+if dm_tools__readlink -f . >/dev/null 2>&1
 then
   log_success "$title"
 else
@@ -465,7 +461,7 @@ fi
 # TOOL: REALPATH
 #==============================================================================
 title='realpath :: no symlink mode'
-if realpath --no-symlink . >/dev/null 2>&1
+if dm_tools__realpath --no-symlink . >/dev/null 2>&1
 then
   log_success "$title"
 else
@@ -478,7 +474,7 @@ fi
 #==============================================================================
 title='rm :: recursive and force mode'
 expected=''
-if result="$(rm --recursive --force 'something-that-surely-does-not-exist-123456789')"
+if result="$(dm_tools__rm --recursive --force 'something-that-surely-does-not-exist-123456789')"
 then
   if [ "$result" = "$expected" ]
   then
@@ -488,7 +484,7 @@ then
     log_failure 'unsupported feature'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -500,7 +496,7 @@ fi
 #==============================================================================
 title='sed :: append prefix before line'
 expected='prefix - hello'
-if result="$(echo 'hello' | sed 's/^/prefix - /')"
+if result="$(dm_tools__echo 'hello' | dm_tools__sed 's/^/prefix - /')"
 then
   if [ "$result" = "$expected" ]
   then
@@ -510,7 +506,7 @@ then
     log_failure 'unsupported feature'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -519,7 +515,7 @@ fi
 
 title='sed :: remove digits only'
 expected='and other text'
-if result="$(echo '42 and other text' | sed -E 's/^[[:digit:]]+\s//')"
+if result="$(dm_tools__echo '42 and other text' | dm_tools__sed -Ee 's/^[[:digit:]]+[[:space:]]*//')"
 then
   if [ "$result" = "$expected" ]
   then
@@ -529,7 +525,7 @@ then
     log_failure 'unsupported feature'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -538,7 +534,7 @@ fi
 
 title='sed :: select line'
 expected='line 2'
-if result="$( ( echo 'line 1'; echo 'line 2'; echo 'line 3' ) | sed '2q;d')"
+if result="$( ( dm_tools__echo 'line 1'; dm_tools__echo 'line 2'; dm_tools__echo 'line 3' ) | dm_tools__sed '2q;d')"
 then
   if [ "$result" = "$expected" ]
   then
@@ -548,7 +544,7 @@ then
     log_failure 'unsupported feature'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -559,7 +555,7 @@ fi
 # TOOL: SORT
 #==============================================================================
 title='sort :: parameter checking'
-if echo 'hello' | sort --zero-terminated --dictionary-order >/dev/null 2>&1
+if dm_tools__echo 'hello' | dm_tools__sort --zero-terminated --dictionary-order >/dev/null 2>&1
 then
   log_success "$title"
 else
@@ -584,7 +580,7 @@ fi
 #==============================================================================
 title='tr :: delete newline'
 expected='abc'
-if result="$( ( echo 'a'; echo 'b'; echo 'c' ) | tr --delete '\n')"
+if result="$( ( dm_tools__echo 'a'; dm_tools__echo 'b'; dm_tools__echo 'c' ) | dm_tools__tr --delete '\n')"
 then
   if [ "$result" = "$expected" ]
   then
@@ -594,7 +590,7 @@ then
     log_failure 'unsupported feature'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -602,22 +598,11 @@ else
 fi
 
 #==============================================================================
-# TOOL: TRAP
-#==============================================================================
-# The trap built-in is specified under the POSIX standard, the used -r flag
-# should be supported on all platforms.
-
-#==============================================================================
-# TOOL: TRUE
-#==============================================================================
-# No flags were used with this tool, assuming the base behavior is always
-# present.
-
-#==============================================================================
 # TOOL: UNAME
 #==============================================================================
 title='uname :: parameter checking'
-if uname --kernel-name --kernel-release --machine --operating-system >/dev/null 2>&1
+# if dm_tools__uname -s -r -m >/dev/null 2>&1
+if dm_tools__uname --kernel-name --kernel-release --machine >/dev/null 2>&1
 then
   log_success "$title"
 else
@@ -626,17 +611,11 @@ else
 fi
 
 #==============================================================================
-# TOOL: WAIT
-#==============================================================================
-# The wait built-in is specified under the POSIX standard, the used -r flag
-# should be supported on all platforms.
-
-#==============================================================================
 # TOOL: WC
 #==============================================================================
 title='wc :: lines'
 expected='3'
-if result="$( ( echo 'a'; echo 'b'; echo 'c' ) | wc --lines)"
+if result="$( ( dm_tools__echo 'a'; dm_tools__echo 'b'; dm_tools__echo 'c' ) | dm_tools__wc --lines)"
 then
   if [ "$result" = "$expected" ]
   then
@@ -646,7 +625,7 @@ then
     log_failure 'unsupported feature'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -655,7 +634,7 @@ fi
 
 title='wc :: chars'
 expected='12' # 11 character + 1 newline
-if result="$( echo 'this is ok!' | wc --chars)"
+if result="$( dm_tools__echo 'this is ok!' | dm_tools__wc --chars)"
 then
   if [ "$result" = "$expected" ]
   then
@@ -665,7 +644,7 @@ then
     log_failure 'unsupported feature'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -677,7 +656,7 @@ fi
 #==============================================================================
 title='xargs :: placeholder and additional parameters'
 expected='hello'
-if result="$( echo 'hello' | xargs --no-run-if-empty -I {} echo {})"
+if result="$( dm_tools__echo 'hello' | dm_tools__xargs -I {} echo {} )"
 then
   if [ "$result" = "$expected" ]
   then
@@ -687,7 +666,7 @@ then
     log_failure 'unsupported feature'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -696,7 +675,7 @@ fi
 
 title='xargs :: null terminated'
 expected='hello'
-if result="$( echo 'hello' | xargs --null)"
+if result="$( dm_tools__echo 'hello' | dm_tools__xargs --null)"
 then
   if [ "$result" = "$expected" ]
   then
@@ -706,7 +685,7 @@ then
     log_failure 'unsupported feature'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -715,7 +694,7 @@ fi
 
 title='xargs :: arg length 1'
 expected='hello'
-if result="$( echo 'hello' | xargs -n1)"
+if result="$( dm_tools__echo 'hello' | dm_tools__xargs --max-args 1)"
 then
   if [ "$result" = "$expected" ]
   then
@@ -725,7 +704,7 @@ then
     log_failure 'unsupported feature'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -734,7 +713,7 @@ fi
 
 title='xargs :: arg length 2'
 expected='hello'
-if result="$( echo 'hello' | xargs --max-args=1)"
+if result="$( dm_tools__echo 'hello' | dm_tools__xargs --max-args 1)"
 then
   if [ "$result" = "$expected" ]
   then
@@ -744,7 +723,7 @@ then
     log_failure 'unsupported feature'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -756,7 +735,7 @@ fi
 #==============================================================================
 title='xxd :: encode'
 expected='68656c6c6f0a'
-if result="$( echo 'hello' | xxd -plain)"
+if result="$( dm_tools__echo 'hello' | dm_tools__xxd -plain)"
 then
   if [ "$result" = "$expected" ]
   then
@@ -766,7 +745,7 @@ then
     log_failure 'unsupported feature'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
@@ -775,7 +754,7 @@ fi
 
 title='xxd :: decode'
 expected='hello'
-if result="$( echo '68656c6c6f0a' | xxd -plain -reverse)"
+if result="$( dm_tools__echo '68656c6c6f0a' | dm_tools__xxd -plain -reverse)"
 then
   if [ "$result" = "$expected" ]
   then
@@ -785,9 +764,14 @@ then
     log_failure 'unsupported feature'
     log_failure "expected: '${expected}'"
     log_failure "result:   '${result}'"
-    exit
+    exit 1
   fi
 else
   status="$?"
   tool_failure "$title" "$status"
 fi
+
+#==============================================================================
+
+echo ''
+log_success 'Test suite finished'

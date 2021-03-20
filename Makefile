@@ -25,4 +25,4 @@ help:
 #
 .PHONY: test
 test:
-	@./tests/test_tools.sh
+	@./tests/runner.sh

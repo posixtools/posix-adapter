@@ -1,7 +1,6 @@
 #==============================================================================
-# TOOL: DATE
-#==============================================================================
 title='date :: generated timestamp is numbers only'
+
 if result="$(dm_tools__date +'%s%N')"
 then
   if dm_tools__echo "$result" | dm_tools__grep --silent -E '[[:digit:]]+'

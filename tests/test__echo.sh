@@ -30,7 +30,9 @@ title='echo :: omitting trailing newline'
 
 expected='1'
 
-if result="$( ( dm_tools__echo -n ''; dm_tools__echo '' ) | dm_tools__wc --lines)"
+if result="$( \
+  ( dm_tools__echo -n 'a'; dm_tools__echo 'b' ) | dm_tools__wc --lines
+)"
 then
   dm_tools__assert "$title" "$expected" "$result"
 else

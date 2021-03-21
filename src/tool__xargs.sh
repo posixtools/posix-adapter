@@ -8,7 +8,7 @@
 # TOOL: XARGS
 #==============================================================================
 dm_tools__xargs() {
-  case "$DM_TOOLS__RUNTIME__OS" in 
+  case "$DM_TOOLS__RUNTIME__OS" in
 
     "$DM_TOOLS__CONSTANT__OS__LINUX")
       xargs "$@"

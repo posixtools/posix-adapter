@@ -8,7 +8,7 @@
 # TOOL: READLINK
 #==============================================================================
 dm_tools__readlink() {
-  case "$DM_TOOLS__RUNTIME__OS" in 
+  case "$DM_TOOLS__RUNTIME__OS" in
 
     "$DM_TOOLS__CONSTANT__OS__LINUX")
       readlink "$@"
@@ -41,6 +41,7 @@ _dm_tools__readlink__darwin() {
       fi
       ;;
     *)
+      >&2 echo "dm_tools__realink - Unexpected readlink parameter count: '$#'"
       exit 1
       ;;
   esac

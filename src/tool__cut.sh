@@ -33,7 +33,7 @@
 #   .. - Invalid call or mapping run out of options.
 #==============================================================================
 dm_tools__cut() {
-  case "$DM_TOOLS__RUNTIME__OS" in 
+  case "$DM_TOOLS__RUNTIME__OS" in
 
     "$DM_TOOLS__CONSTANT__OS__LINUX")
       cut "$@"

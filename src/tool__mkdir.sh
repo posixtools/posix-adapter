@@ -8,7 +8,7 @@
 # TOOL: MKDIR
 #==============================================================================
 dm_tools__mkdir() {
-  case "$DM_TOOLS__RUNTIME__OS" in 
+  case "$DM_TOOLS__RUNTIME__OS" in
 
     "$DM_TOOLS__CONSTANT__OS__LINUX")
       mkdir "$@"
@@ -29,8 +29,6 @@ _dm_tools__mkdir__darwin() {
   # Collecting the optional parameters and its values.
   dm_tools__parents__present='0'
 
-  dm_tools__positional=''
-
   while [ "$#" -gt '0' ]
   do
     dm_tools__param="$1"
@@ -41,8 +39,11 @@ _dm_tools__mkdir__darwin() {
         shift
         ;;
       *)
-        dm_tools__positional="${dm_tools__positional} '${dm_tools__param}'"
-        shift
+        # We have to assume that the following params are only positional, as
+        # this is the only way to be able to use the special "$@" expansion to
+        # avoid using the eval command..
+        # If we reach this point, we simply finish the parameter iteration.
+        break
         ;;
     esac
   done
@@ -55,15 +56,11 @@ _dm_tools__mkdir__darwin() {
 
   # Execution based on the decision string.
   case "$dm_tools__decision" in
-    1)
-      # We want here word splitting for the positional parameters.
-      # shellcheck disable=SC2086,SC2090
-      mkdir -p $dm_tools__positional
-      ;;
     0)
-      # We want here also word splitting for the positional parameters.
-      # shellcheck disable=SC2086,SC2090
-      mkdir $dm_tools__positional
+      mkdir "$@"
+      ;;
+    1)
+      mkdir -p "$@"
       ;;
     *)
       >&2 echo "dm_tools__mkdir - Unexpected combination: '${dm_tools__decision}'"

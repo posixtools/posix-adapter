@@ -8,7 +8,7 @@
 # TOOL: RM
 #==============================================================================
 dm_tools__rm() {
-  case "$DM_TOOLS__RUNTIME__OS" in 
+  case "$DM_TOOLS__RUNTIME__OS" in
 
     "$DM_TOOLS__CONSTANT__OS__LINUX")
       rm "$@"
@@ -30,8 +30,6 @@ _dm_tools__rm__darwin() {
   dm_tools__recursive__present='0'
   dm_tools__force__present='0'
 
-  dm_tools__positional=''
-
   while [ "$#" -gt '0' ]
   do
     dm_tools__param="$1"
@@ -45,8 +43,11 @@ _dm_tools__rm__darwin() {
         shift
         ;;
       *)
-        dm_tools__positional="${dm_tools__positional} '${dm_tools__param}'"
-        shift
+        # We have to assume that the following params are only positional, as
+        # this is the only way to be able to use the special "$@" expansion to
+        # avoid using the eval command..
+        # If we reach this point, we simply finish the parameter iteration.
+        break
         ;;
     esac
   done
@@ -62,24 +63,16 @@ _dm_tools__rm__darwin() {
   # Execution based on the decision string.
   case "$dm_tools__decision" in
     00)
-      # We want here word splitting for the positional parameters.
-      # shellcheck disable=SC2086,SC2090
-      rm $dm_tools__positional
+      rm "$@"
       ;;
     01)
-      # We want here word splitting for the positional parameters.
-      # shellcheck disable=SC2086,SC2090
-      rm -f $dm_tools__positional
+      rm -f "$@"
       ;;
     10)
-      # We want here word splitting for the positional parameters.
-      # shellcheck disable=SC2086,SC2090
-      rm -r $dm_tools__positional
+      rm -r "$@"
       ;;
     11)
-      # We want here word splitting for the positional parameters.
-      # shellcheck disable=SC2086,SC2090
-      rm -r -f $dm_tools__positional
+      rm -r -f "$@"
       ;;
     *)
       >&2 echo "dm_tools__rm - Unexpected combination: '${dm_tools__decision}'"

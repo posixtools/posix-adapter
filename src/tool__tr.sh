@@ -8,7 +8,7 @@
 # TOOL: TR
 #==============================================================================
 dm_tools__tr() {
-  case "$DM_TOOLS__RUNTIME__OS" in 
+  case "$DM_TOOLS__RUNTIME__OS" in
 
     "$DM_TOOLS__CONSTANT__OS__LINUX")
       tr "$@"
@@ -41,7 +41,7 @@ _dm_tools__tr__darwin() {
         shift
         ;;
       *)
-        echo "Unexpected tr parameter: '${dm_tools__param}'"
+        >&2 echo "dm_tools__tr - Unexpected tr parameter: '${dm_tools__param}'"
         exit 1
         ;;
     esac

@@ -8,6 +8,8 @@
 # TOOL: PRINTF
 #==============================================================================
 dm_tools__printf() {
+  # We are proxiing all the parameters here, hence ignoring the warning.
+  # shellcheck disable=SC2059
   printf "$@"
 }
 

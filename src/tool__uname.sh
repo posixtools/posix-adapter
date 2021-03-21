@@ -8,7 +8,7 @@
 # TOOL: UNAME
 #==============================================================================
 dm_tools__uname() {
-  case "$DM_TOOLS__RUNTIME__OS" in 
+  case "$DM_TOOLS__RUNTIME__OS" in
 
     "$DM_TOOLS__CONSTANT__OS__LINUX")
       uname "$@"

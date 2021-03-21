@@ -10,9 +10,9 @@ if result="$( \
     'something-that-surely-does-not-exist-123456789'
 )"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi
 

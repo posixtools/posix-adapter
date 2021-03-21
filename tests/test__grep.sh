@@ -5,10 +5,10 @@ expected='hello'
 
 if result="$(dm_tools__echo "hello" | dm_tools__grep -E 'l+')"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi
 
 #==============================================================================
@@ -18,10 +18,10 @@ expected=''
 
 if result="$(dm_tools__echo "hello" | dm_tools__grep --silent '.')"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi
 
 #==============================================================================
@@ -31,10 +31,10 @@ expected='hello'
 
 if result="$(dm_tools__echo "hello" | dm_tools__grep --invert-match 'imre')"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi
 
 #==============================================================================
@@ -44,10 +44,10 @@ expected='1'
 
 if result="$(dm_tools__echo "hello" | dm_tools__grep --count 'l')"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi
 
 #==============================================================================
@@ -59,8 +59,8 @@ if result="$( \
   dm_tools__echo "imre hello" | dm_tools__grep --only-matching 'll' \
 )"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi

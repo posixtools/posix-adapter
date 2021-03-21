@@ -5,10 +5,10 @@ expected=' 42'
 
 if result="$(dm_tools__printf '%*s' 3 '42')"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi
 
 #==============================================================================
@@ -18,10 +18,10 @@ expected='123'
 
 if result="$(dm_tools__printf '%.*s' 3 '123456')"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi
 
 #==============================================================================
@@ -31,8 +31,8 @@ expected=' 123'
 
 if result="$(dm_tools__printf '%*.*s' 4 3 '123456')"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi

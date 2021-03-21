@@ -6,8 +6,8 @@ expected='path'
 
 if result="$(dm_tools__basename "$data")"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi

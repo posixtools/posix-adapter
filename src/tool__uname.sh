@@ -8,27 +8,24 @@
 # TOOL: UNAME
 #==============================================================================
 dm_tools__uname() {
-  # Default execution
-  #----------------------------------------------------------------------------
-  if uname "$@" 2>/dev/null
-  then
-    return 0
-  fi
+  case "$DM_TOOLS__RUNTIME__OS" in 
 
-  # Special execution case 1
-  #----------------------------------------------------------------------------
-  if _dm_tools__uname__special_execution_case_1 "$@" 2>/dev/null
-  then
-    return 0
-  fi
+    "$DM_TOOLS__CONSTANT__OS__LINUX")
+      uname "$@"
+      ;;
 
-  # Giving up..
-  #----------------------------------------------------------------------------
-  >&2 echo 'dm_tools__uname - No compatible call style was found! Giving up..'
-  exit 1
+    "$DM_TOOLS__CONSTANT__OS__MACOS")
+      _dm_tools__uname__darwin "$@"
+      ;;
+
+    *)
+      >&2 echo 'dm_tools__uname - No compatible call style was found! Giving up..'
+      exit 1
+
+  esac
 }
 
-_dm_tools__uname__special_execution_case_1() {
+_dm_tools__uname__darwin() {
   # Collecting the optional parameters and its values.
   dm_tools__kernel_name__present='0'
   dm_tools__kernel_release__present='0'

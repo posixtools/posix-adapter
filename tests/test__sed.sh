@@ -5,10 +5,10 @@ expected='prefix - hello'
 
 if result="$(dm_tools__echo 'hello' | dm_tools__sed 's/^/prefix - /')"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi
 
 #==============================================================================
@@ -21,10 +21,10 @@ if result="$( \
   dm_tools__sed -Ee 's/^[[:digit:]]+[[:space:]]*//' \
 )"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi
 
 #==============================================================================
@@ -40,8 +40,8 @@ if result="$( \
   ) | dm_tools__sed '2q;d' \
 )"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi

@@ -39,17 +39,17 @@ fi
 # PRETTY PRINTING
 #==============================================================================
 
-log_task() {
+dm_tools__log_task() {
   message="$1"
     dm_tools__echo "${BOLD}[ ${BLUE}>>${RESET}${BOLD} ]${RESET} ${message}"
 }
 
-log_success() {
+dm_tools__log_success() {
   message="$1"
     dm_tools__echo "${BOLD}[ ${GREEN}OK${RESET}${BOLD} ]${RESET} ${message}"
 }
 
-log_failure() {
+dm_tools__log_failure() {
   message="$1"
     dm_tools__echo "${BOLD}[ ${RED}!!${RESET}${BOLD} ]${RESET} ${message}"
 }
@@ -58,26 +58,26 @@ log_failure() {
 # ASSERTIONS
 #==============================================================================
 
-tool_assert() {
+dm_tools__assert() {
   title="$1"
   expected="$2"
   result="$3"
 
   if [ "$result" = "$expected"  ]
   then
-    log_success "$title"
+    dm_tools__log_success "$title"
   else
-    log_failure "$title"
-    log_failure "expected: '${expected}'"
-    log_failure "result:   '${result}'"
+    dm_tools__log_failure "$title"
+    dm_tools__log_failure "expected: '${expected}'"
+    dm_tools__log_failure "result:   '${result}'"
     exit 1
   fi
 }
 
-tool_failure() {
+dm_tools__failure() {
   title="$1"
   status="$2"
-  log_failure "$title"
-  log_failure "failed with status ${status}, possible unsupported parameter"
+  dm_tools__log_failure "$title"
+  dm_tools__log_failure "failed with status ${status}, possible unsupported parameter"
   exit 1
 }

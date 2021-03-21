@@ -5,10 +5,10 @@ expected='hello'
 
 if result="$( dm_tools__echo 'hello' | dm_tools__xargs -I {} echo {} )"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi
 
 #==============================================================================
@@ -18,10 +18,10 @@ expected='hello'
 
 if result="$( dm_tools__echo 'hello' | dm_tools__xargs --null)"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi
 
 #==============================================================================
@@ -31,10 +31,10 @@ expected='hello'
 
 if result="$( dm_tools__echo 'hello' | dm_tools__xargs --max-args 1)"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi
 
 #==============================================================================
@@ -44,8 +44,8 @@ expected='hello'
 
 if result="$( dm_tools__echo 'hello' | dm_tools__xargs --max-args 1)"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi

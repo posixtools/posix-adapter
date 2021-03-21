@@ -11,10 +11,10 @@ if result="$( \
   ) | dm_tools__wc --lines \
 )"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi
 
 #==============================================================================
@@ -24,8 +24,8 @@ expected='12' # 11 character + 1 newline
 
 if result="$( dm_tools__echo 'this is ok!' | dm_tools__wc --chars)"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi

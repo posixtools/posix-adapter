@@ -62,7 +62,10 @@ fi
 # TEST SUITE EXECUTION
 #==============================================================================
 
-log_task 'Running test suite..'
+dm_tools__log_task 'Running test suite..'
+
+dm_tools__echo -n '-------------------------------------------------------'
+dm_tools__echo '------------------------'
 
 . './test__basename.sh'
 . './test__cat.sh'
@@ -89,4 +92,7 @@ log_task 'Running test suite..'
 . './test__xargs.sh'
 . './test__xxd.sh'
 
-log_success 'Test suite finished'
+dm_tools__echo -n '-------------------------------------------------------'
+dm_tools__echo '------------------------'
+
+dm_tools__log_success 'Test suite finished'

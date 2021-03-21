@@ -8,10 +8,10 @@ if result="$( \
   dm_tools__echo "$data" | dm_tools__cut --delimiter '/' --fields '2-' \
 )"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi
 
 #==============================================================================
@@ -22,9 +22,9 @@ expected='12345'
 
 if result="$(dm_tools__echo "$data" | dm_tools__cut --characters '1-5')"
 then
-  tool_assert "$title" "$expected" "$result"
+  dm_tools__assert "$title" "$expected" "$result"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi
 

@@ -154,8 +154,17 @@ dm_tools__path_prefix="${DM_TOOLS__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX}"
 
 
 #==============================================================================
-# SETTING THE READY VARIABLE
+# SETTING THE ENVIRONMENT VARIABLES
 #==============================================================================
+
+DM_TOOLS__CONSTANT__OS__LINUX="Linux"
+DM_TOOLS__CONSTANT__OS__MACOS="Darwin"
+
+# This variable is used by almost every tool mapping function internally. It
+# was aquired with the non-mapped style to be able to use it in the mapped
+# version of uname too. The -s flag should be supported in every release.
+# shellcheck disable=SC2034
+DM_TOOLS__RUNTIME__OS="$(uname -s)"
 
 # This file will be sourced to the user code-base so exporting the variable is
 # not necessary here.

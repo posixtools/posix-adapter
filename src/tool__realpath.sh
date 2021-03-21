@@ -8,27 +8,24 @@
 # TOOL: REALPATH
 #==============================================================================
 dm_tools__realpath() {
-  # Default execution
-  #----------------------------------------------------------------------------
-  if realpath "$@" 2>/dev/null
-  then
-    return 0
-  fi
+  case "$DM_TOOLS__RUNTIME__OS" in 
 
-  # Special execution case 1
-  #----------------------------------------------------------------------------
-  if _dm_tools__realpath__special_execution_case_1 "$@"
-  then
-    return 0
-  fi
+    "$DM_TOOLS__CONSTANT__OS__LINUX")
+      realpath "$@"
+      ;;
 
-  # Giving up..
-  #----------------------------------------------------------------------------
-  >&2 echo 'dm_tools__realpath - No compatible call style was found! Giving up..'
-  exit 1
+    "$DM_TOOLS__CONSTANT__OS__MACOS")
+      _dm_tools__realpath__darwin "$@"
+      ;;
+
+    *)
+      >&2 echo 'dm_tools__readlink - No compatible call style was found! Giving up..'
+      exit 1
+
+  esac
 }
 
-_dm_tools__realpath__special_execution_case_1() {
+_dm_tools__realpath__darwin() {
   # Collecting the optional parameters and its values.
   dm_tools__no_symlink__present='0'
 

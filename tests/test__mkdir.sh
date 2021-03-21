@@ -3,8 +3,8 @@ title='mkdir :: parents flag'
 
 if dm_tools__mkdir --parents ../tests
 then
-  log_success "$title"
+  dm_tools__log_success "$title"
 else
   status="$?"
-  tool_failure "$title" "$status"
+  dm_tools__failure "$title" "$status"
 fi

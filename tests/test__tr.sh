@@ -1,5 +1,7 @@
 #==============================================================================
-title='tr :: delete newline'
+# VALID CASES
+#==============================================================================
+dm_tools__test__valid_case 'tr - delete newline'
 
 expected='abc'
 
@@ -11,8 +13,58 @@ if result="$( \
   ) | dm_tools__tr --delete '\n' \
 )"
 then
-  dm_tools__assert "$title" "$expected" "$result"
+  dm_tools__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__failure "$title" "$status"
+  dm_tools__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+# ERROR CASES
+#==============================================================================
+dm_tools__test__error_case 'tr - invalid parameter count 1'
+
+if error_message="$(dm_tools__tr 'one' 2>&1)"
+then
+  status="$?"
+  dm_tools__test__test_case_failed "$status"
+else
+  status="$?"
+  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+fi
+
+#==============================================================================
+dm_tools__test__error_case 'tr - invalid parameter count 2'
+
+if error_message="$(dm_tools__tr 'one' 'two' 2>&1)"
+then
+  status="$?"
+  dm_tools__test__test_case_failed "$status"
+else
+  status="$?"
+  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+fi
+
+#==============================================================================
+dm_tools__test__error_case 'tr - invalid options'
+
+if error_message="$(dm_tools__tr --option 2>&1)"
+then
+  status="$?"
+  dm_tools__test__test_case_failed "$status"
+else
+  status="$?"
+  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+fi
+
+#==============================================================================
+dm_tools__test__error_case 'tr - invalid option style'
+
+if error_message="$(dm_tools__tr -option 2>&1)"
+then
+  status="$?"
+  dm_tools__test__test_case_failed "$status"
+else
+  status="$?"
+  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
 fi

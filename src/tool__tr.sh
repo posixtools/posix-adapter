@@ -7,61 +7,120 @@
 #==============================================================================
 # TOOL: TR
 #==============================================================================
+
+#==============================================================================
+#
+#  dm_tools__tr [--delete <char>]
+#
+#------------------------------------------------------------------------------
+# Execution mapping function for the 'tr' command line tool with a uniform
+# interface.
+#------------------------------------------------------------------------------
+# Globals:
+#   None
+# Options:
+#   --delete <char> - tr compatible --delete flag.
+# Arguments:
+#   None
+# STDIN:
+#   Input passed to the mapped command.
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   Mapped command's output.
+# STDERR:
+#   Mapped command's error output. Mapping error output.
+# Status:
+#   0  - Call was successful.
+#   .. - Call failed with it's error status
+#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#==============================================================================
 dm_tools__tr() {
-  case "$DM_TOOLS__RUNTIME__OS" in
-
-    "$DM_TOOLS__CONSTANT__OS__LINUX")
-      tr "$@"
-      ;;
-
-    "$DM_TOOLS__CONSTANT__OS__MACOS")
-      _dm_tools__tr__darwin "$@"
-      ;;
-
-    *)
-      >&2 echo 'dm_tools__tr - No compatible call style was found! Giving up..'
-      exit 1
-
-  esac
-}
-
-_dm_tools__tr__darwin() {
-  # Collecting the optional parameters and its values.
-  dm_tools__delete__present='0'
-  dm_tools__delete__value=''
+  dm_tools__flag__delete='0'
+  dm_tools__value__delete=''
 
   while [ "$#" -gt '0' ]
   do
     dm_tools__param="$1"
     case "$dm_tools__param" in
       --delete)
-        dm_tools__delete__present='1'
-        dm_tools__delete__value="$2"
+        dm_tools__flag__delete='1'
+        dm_tools__value__delete="$2"
         shift
         shift
         ;;
+    --[^-]*)
+        dm_tools__report_invalid_parameters \
+          'dm_tools__tr' \
+          "Unexpected option '${1}'!" \
+          'This function does not take options.'
+        ;;
+    -[^-]*)
+        dm_tools__report_invalid_parameters \
+          'dm_tools__tr' \
+          "Invalid single dashed option '${1}'!" \
+          "dm_tools only uses double dashed options like '--option'."
+        ;;
       *)
-        >&2 echo "dm_tools__tr - Unexpected tr parameter: '${dm_tools__param}'"
-        exit 1
+        dm_tools__report_invalid_parameters \
+          'dm_tools__tr' \
+          'Unexpected parameter!' \
+          'Only options are available.'
         ;;
     esac
   done
 
   # Assembling the decision string.
+  # ,-- delete
   # 0
-  # `---- delete
+  dm_tools__decision="${dm_tools__flag__delete}"
 
-  dm_tools__decision="${dm_tools__delete__present}"
+  _dm_tools__tr__common \
+    "$dm_tools__decision" \
+    "$dm_tools__value__delete"
+}
 
-  # Execution based on the decision string.
-  case "$dm_tools__decision" in
+#==============================================================================
+# Common call mapping function.
+#------------------------------------------------------------------------------
+# Globals:
+#   None
+# Options:
+#   None
+# Arguments:
+#   [1] decision_string - String that decodes the optional parameter presence.
+#   [2] value_delete -  Value passed with the delete flag.
+# STDIN:
+#   Input passed to the mapped command.
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   Mapped command's output.
+# STDERR:
+#   Mapped command's error output. Mapping error output.
+# Status:
+#   0  - Call succeeded.
+#   .. - Call failed with it's error status
+#==============================================================================
+_dm_tools__tr__common() {
+  dm_tools__decision_string="$1"
+  dm_tools__value__delete="$2"
+
+  case "$dm_tools__decision_string" in
+  # ,-- delete
     1)
-      tr -d "$dm_tools__delete__value"
+      tr \
+        --delete "$dm_tools__value__delete" \
+
       ;;
     *)
-      >&2 echo "dm_tools__tr - Unexpected combination: '${dm_tools__decision}'"
-      exit 1
+      dm_tools__report_invalid_parameters \
+        'dm_tools__tr' \
+        'Unexpected parameter combination!' \
+        'Only --delete is available.'
       ;;
   esac
 }
-

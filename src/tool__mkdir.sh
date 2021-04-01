@@ -7,65 +7,142 @@
 #==============================================================================
 # TOOL: MKDIR
 #==============================================================================
+
+#==============================================================================
+#
+#  dm_tools__mkdir [--parents] <path>
+#
+#------------------------------------------------------------------------------
+# Execution mapping function for the 'mkdir' command line tool with a uniform
+# interface.
+#------------------------------------------------------------------------------
+# Globals:
+#   None
+# Options:
+#   --parents - mkdir compatible alias for the -p flag.
+# Arguments:
+#   [1] path - Path that should be created.
+# STDIN:
+#   Input passed to the mapped command.
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   Mapped command's output.
+# STDERR:
+#   Mapped command's error output. Mapping error output.
+# Status:
+#   0  - Call was successful.
+#   .. - Call failed with it's error status
+#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#==============================================================================
 dm_tools__mkdir() {
-  case "$DM_TOOLS__RUNTIME__OS" in
+  dm_tools__flag__parents='0'
 
-    "$DM_TOOLS__CONSTANT__OS__LINUX")
-      mkdir "$@"
-      ;;
-
-    "$DM_TOOLS__CONSTANT__OS__MACOS")
-      _dm_tools__mkdir__darwin "$@"
-      ;;
-
-    *)
-      >&2 echo 'dm_tools__mkdir - No compatible call style was found! Giving up..'
-      exit 1
-
-  esac
-}
-
-_dm_tools__mkdir__darwin() {
-  # Collecting the optional parameters and its values.
-  dm_tools__parents__present='0'
+  dm_tools__flag__path='0'
+  dm_tools__value__path=''
 
   while [ "$#" -gt '0' ]
   do
-    dm_tools__param="$1"
-    case "$dm_tools__param" in
+    case "$1" in
       --parents)
-        # Only a flag, no value assigned to it.
-        dm_tools__parents__present='1'
+        dm_tools__flag__parents='1'
         shift
         ;;
+      --[^-]*)
+        dm_tools__report_invalid_parameters \
+          'dm_tools__mkdir' \
+          "Unexpected option '${1}'!" \
+          'You can only use --parents.'
+        ;;
+      -[^-]*)
+        dm_tools__report_invalid_parameters \
+          'dm_tools__mkdir' \
+          "Invalid single dashed option '${1}'!" \
+          "dm_tools only uses double dashed options like '--option'."
+        ;;
       *)
-        # We have to assume that the following params are only positional, as
-        # this is the only way to be able to use the special "$@" expansion to
-        # avoid using the eval command..
-        # If we reach this point, we simply finish the parameter iteration.
-        break
+        if [ "$dm_tools__flag__path" -eq '0' ]
+        then
+          dm_tools__flag__path='1'
+          dm_tools__value__path="$1"
+          shift
+        else
+          dm_tools__report_invalid_parameters \
+            'dm_tools__mkdir' \
+            'Unexpected parameter!' \
+            "Parameter '${1}' is unexpected!"
+        fi
         ;;
     esac
   done
 
+  if [ "$dm_tools__flag__path" -eq '0' ]
+  then
+    dm_tools__report_invalid_parameters \
+      'dm_tools__mkdir' \
+      'Missing <path> argument!' \
+      'A directory can only be createdif you pass a path for it.'
+  fi
+
   # Assembling the decision string.
+  # ,-- parents
   # 0
-  # `-- parents
+  dm_tools__decision="${dm_tools__flag__parents}"
 
-  dm_tools__decision="${dm_tools__parents__present}"
+  _dm_tools__mkdir__common \
+    "$dm_tools__decision" \
+    "$dm_tools__value__path"
+}
 
-  # Execution based on the decision string.
-  case "$dm_tools__decision" in
+#==============================================================================
+# Common call mapping function
+#------------------------------------------------------------------------------
+# Globals:
+#   None
+# Options:
+#   None
+# Arguments:
+#   [1] decision_string - String that decodes the optional parameter presence.
+#   [2] value_path - Path for the mkdir command.
+# STDIN:
+#   Input passed to the mapped command.
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   Mapped command's output.
+# STDERR:
+#   Mapped command's error output. Mapping error output.
+# Status:
+#   0  - Call succeeded.
+#   .. - Call failed with it's error status
+#==============================================================================
+_dm_tools__mkdir__common() {
+  dm_tools__decision_string="$1"
+  dm_tools__value__path="$2"
+
+  case "$dm_tools__decision_string" in
+  # ,-- parents
     0)
-      mkdir "$@"
+      mkdir \
+        \
+        "$dm_tools__value__path" \
+
       ;;
+  # ,-- parents
     1)
-      mkdir -p "$@"
+      mkdir \
+        -p \
+        "$dm_tools__value__path" \
+
       ;;
     *)
-      >&2 echo "dm_tools__mkdir - Unexpected combination: '${dm_tools__decision}'"
-      exit 1
+      dm_tools__report_invalid_parameters \
+        'dm_tools__mkdir' \
+        'Unexpected parameter combination!' \
+        'You can only have (--delimiter --fields) or (--characters).'
       ;;
   esac
 }
-

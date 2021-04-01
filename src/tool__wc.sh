@@ -7,75 +7,190 @@
 #==============================================================================
 # TOOL: WC
 #==============================================================================
+
+#==============================================================================
+#
+#  dm_tools__wc [--chars] [--lines] [<path>]
+#
+#------------------------------------------------------------------------------
+# Execution mapping function for the 'wc' command line tool with a
+# uniform interface.
+#------------------------------------------------------------------------------
+# Globals:
+#   None
+# Options:
+#   --chars - Use the wc compatible -c flag.
+#   --lines - Use the wc compatible -l flag.
+# Arguments:
+#   [1] [path] - Optional file path.
+# STDIN:
+#   Input passed to the mapped command.
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   Mapped command's output.
+# STDERR:
+#   Mapped command's error output. Mapping error output.
+# Status:
+#   0  - Call was successful.
+#   .. - Call failed with it's error status
+#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#==============================================================================
 dm_tools__wc() {
-  case "$DM_TOOLS__RUNTIME__OS" in
+  dm_tools__flag__chars='0'
+  dm_tools__flag__lines='0'
 
-    "$DM_TOOLS__CONSTANT__OS__LINUX")
-      wc "$@"
-      ;;
-
-    "$DM_TOOLS__CONSTANT__OS__MACOS")
-      _dm_tools__wc__darwin "$@"
-      ;;
-
-    *)
-      >&2 echo 'dm_tools__wc - No compatible call style was found! Giving up..'
-      exit 1
-
-  esac
-}
-
-_dm_tools__wc__darwin() {
-  # Collecting the optional parameters and its values.
-  dm_tools__lines__present='0'
-  dm_tools__chars__present='0'
+  dm_tools__flag__path='0'
+  dm_tools__value__path=''
 
   while [ "$#" -gt '0' ]
   do
-    dm_tools__param="$1"
-    case "$dm_tools__param" in
-      --lines)
-        dm_tools__lines__present='1'
+    case "$1" in
+      --chars)
+        dm_tools__flag__chars='1'
         shift
         ;;
-      --chars)
-        dm_tools__chars__present='1'
+      --lines)
+        dm_tools__flag__lines='1'
         shift
+        ;;
+      --[^-]*)
+        dm_tools__report_invalid_parameters \
+          'dm_tools__wc' \
+          "Unexpected option '${1}'!" \
+          'You can only use --chars and --lines.'
+        ;;
+      -[^-]*)
+        dm_tools__report_invalid_parameters \
+          'dm_tools__wc' \
+          "Invalid single dashed option '${1}'!" \
+          "dm_tools only uses double dashed options like '--option'."
         ;;
       *)
-        >&2 echo "dm_tools__wc - Unexpected parameter: '${dm_tools__param}'"
-        exit 1
+        if [ "$dm_tools__flag__path" -eq '0' ]
+        then
+          dm_tools__flag__path='1'
+          dm_tools__value__path="$1"
+          shift
+        else
+          dm_tools__report_invalid_parameters \
+            'dm_tools__wc' \
+            'Unexpected parameter!' \
+            "Parameter '${1}' is unexpected!"
+        fi
         ;;
     esac
   done
 
   # Assembling the decision string.
-  # 00
-  # |`--- chars
-  # `---- lines
+  # ,----- chars
+  # |,---- lines
+  # ||,--- path
+  # 000
+  dm_tools__decision="${dm_tools__flag__chars}"
+  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__lines}"
+  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__path}"
 
-  dm_tools__decision="${dm_tools__lines__present}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__chars__present}"
+  _dm_tools__wc__common \
+    "$dm_tools__decision" \
+    "$dm_tools__value__path"
+}
 
-  # Execution based on the decision string.
-  case "$dm_tools__decision" in
-    00)
-      wc
+#==============================================================================
+# Common call mapping function.
+#------------------------------------------------------------------------------
+# Globals:
+#   None
+# Options:
+#   None
+# Arguments:
+#   [1] decision_string - String that decodes the optional parameter presence.
+#   [2] value_path - Value for the positional path argument.
+# STDIN:
+#   Input passed to the mapped command.
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   Mapped command's output.
+# STDERR:
+#   Mapped command's error output. Mapping error output.
+# Status:
+#   0  - Call succeeded.
+#   .. - Call failed with it's error status
+#==============================================================================
+_dm_tools__wc__common() {
+  dm_tools__decision_string="$1"
+  dm_tools__value__path="$2"
+
+  case "$dm_tools__decision_string" in
+  # ,----- chars
+  # |,---- lines
+  # ||,--- path
+    000)
+      wc \
+        \
+        \
+        \
+
       ;;
-    01)
-      # Some old BSD based wc implementations pads these results with empty
-      # spaces, hence the additional xargs call.
-      wc    -c | xargs
+  # ,----- chars
+  # |,---- lines
+  # ||,--- path
+    001)
+      wc \
+        \
+        \
+        "$dm_tools__value__path" \
+
       ;;
-    10)
-      wc -l    | xargs
+  # ,----- chars
+  # |,---- lines
+  # ||,--- path
+    010)
+      wc \
+        \
+        -l \
+        \
+
       ;;
-    11)
-      wc -l -c | xargs
+  # ,----- chars
+  # |,---- lines
+  # ||,--- path
+    011)
+      wc \
+        \
+        -l \
+        "$dm_tools__value__path" \
+
+      ;;
+  # ,----- chars
+  # |,---- lines
+  # ||,--- path
+    100)
+      wc \
+        -c \
+        \
+        \
+
+      ;;
+  # ,----- chars
+  # |,---- lines
+  # ||,--- path
+    101)
+      wc \
+        -c \
+        \
+        "$dm_tools__value__path" \
+
       ;;
     *)
-      >&2 echo "dm_tools__wc - Unexpected combination: '${dm_tools__decision}'"
-      exit 1
+      dm_tools__report_invalid_parameters \
+        'dm_tools__sed' \
+        'Unexpected parameter combination!' \
+        'You can only have either --chars or --lines'
       ;;
   esac
 }

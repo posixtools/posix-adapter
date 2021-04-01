@@ -7,102 +7,233 @@
 #================|___/=========================================================
 # TOOL: XARGS
 #==============================================================================
+
+#==============================================================================
+#
+#  dm_tools__xargs
+#    [--null]
+#    [--replace <replace_string>]
+#    [--max-args <arg_count>]
+#    [..]
+#
+#------------------------------------------------------------------------------
+# Execution mapping function for the 'xargs' command line tool with a uniform
+# interface.
+#------------------------------------------------------------------------------
+# Globals:
+#   None
+# Options:
+#   --null - xargs compatible -0 flag.
+#   --replace <replace_string> - xargs compatible -I flag.
+#   --max-args - xargs compatible -n flag.
+# Arguments:
+#   None
+# STDIN:
+#   Standard input for the command.
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   Mapped command's output.
+# STDERR:
+#   Mapped command's error output. Mapping error output.
+# Status:
+#   0  - Call was successful.
+#   .. - Call failed with it's error status
+#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#==============================================================================
 dm_tools__xargs() {
-  case "$DM_TOOLS__RUNTIME__OS" in
+  dm_tools__flag__null='0'
 
-    "$DM_TOOLS__CONSTANT__OS__LINUX")
-      xargs "$@"
-      ;;
+  dm_tools__flag__replace='0'
+  dm_tools__value__replace='0'
 
-    "$DM_TOOLS__CONSTANT__OS__MACOS")
-      _dm_tools__xargs__darwin "$@"
-      ;;
-
-    *)
-      >&2 echo 'dm_tools__xargs - No compatible call style was found! Giving up..'
-      exit 1
-
-  esac
-}
-
-_dm_tools__xargs__darwin() {
-  # Collecting the optional parameters and its values.
-  dm_tools__null__present='0'
-  dm_tools__pattern__present='0'
-  dm_tools__pattern__value=''
-  dm_tools__max_args__present='0'
-  dm_tools__max_args__value=''
+  dm_tools__flag__max_args='0'
+  dm_tools__value__max_args='0'
 
   while [ "$#" -gt '0' ]
   do
-    dm_tools__param="$1"
-    case "$dm_tools__param" in
+    case "$1" in
       --null)
-        dm_tools__null__present='1'
+        dm_tools__flag__null='1'
         shift
         ;;
-      -I)
-        dm_tools__pattern__present='1'
-        dm_tools__pattern__value="$2"
+      --replace)
+        dm_tools__flag__replace='1'
+        dm_tools__value__replace="$2"
         shift
         shift
         ;;
       --max-args)
-        dm_tools__max_args__present='1'
-        dm_tools__max_args__value="$2"
+        dm_tools__flag__max_args='1'
+        dm_tools__value__max_args="$2"
         shift
         shift
         ;;
+      --[^-]*)
+        dm_tools__report_invalid_parameters \
+          'dm_tools__xargs' \
+          "Unexpected option '${1}'!" \
+          'You can only use --null --replace --max-args.'
+        ;;
+      -[^-]*)
+        dm_tools__report_invalid_parameters \
+          'dm_tools__xargs' \
+          "Invalid single dashed option '${1}'!" \
+          "dm_tools only uses double dashed options like '--option'."
+        ;;
       *)
-        # We have to assume that the following params are only positional, as
-        # this is the only way to be able to use the special "$@" expansion to
-        # avoid using the eval command..
-        # If we reach this point, we simply finish the parameter iteration.
+        # We are breaking here to have all the additional parameters available
+        # in the '@' variable.
         break
         ;;
     esac
   done
 
   # Assembling the decision string.
+  # ,------ null
+  # |,----- replace
+  # ||,---- max_args
   # 000
-  # ||`- max-args
-  # |`-- pattern
-  # `--- null
+  dm_tools__decision="${dm_tools__flag__null}"
+  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__replace}"
+  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__max_args}"
 
-  dm_tools__decision="${dm_tools__null__present}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__pattern__present}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__max_args__present}"
+  _dm_tools__xargs__common \
+    "$dm_tools__decision" \
+    "$dm_tools__value__replace" \
+    "$dm_tools__value__max_args" \
+    "$@"
+}
 
-  # Execution based on the decision string.
-  case "$dm_tools__decision" in
+#==============================================================================
+# Common call mapping function.
+#------------------------------------------------------------------------------
+# Globals:
+#   None
+# Options:
+#   None
+# Arguments:
+#   [1] decision_string - String that decodes the optional parameter presence.
+#   [2] value_replace - Value for the replace option.
+#   [3] value_max_args - Value for the max args option.
+#   [..] additionals - Additional variables.
+# STDIN:
+#   Input passed to the mapped command.
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   Mapped command's output.
+# STDERR:
+#   Mapped command's error output. Mapping error output.
+# Status:
+#   0  - Call succeeded.
+#   .. - Call failed with it's error status
+#==============================================================================
+_dm_tools__xargs__common() {
+  dm_tools__decision_string="$1"
+  shift
+  dm_tools__value__replace="$1"
+  shift
+  dm_tools__value__max_args="$1"
+  shift
+
+  case "$dm_tools__decision_string" in
+  # ,------ null
+  # |,----- replace
+  # ||,---- max_args
     000)
-      xargs "$@"
+      xargs \
+        \
+        \
+        \
+        "$@" \
+
       ;;
+  # ,------ null
+  # |,----- replace
+  # ||,---- max_args
     001)
-      xargs -n "$dm_tools__max_args__value" "$@"
+      xargs \
+        \
+        \
+        -n "$dm_tools__value__max_args" \
+        "$@" \
+
       ;;
+  # ,------ null
+  # |,----- replace
+  # ||,---- max_args
     010)
-      xargs -I "$dm_tools__pattern__value" "$@"
+      xargs \
+        \
+        -I "$dm_tools__value__replace" \
+        \
+        "$@" \
+
       ;;
+  # ,------ null
+  # |,----- replace
+  # ||,---- max_args
     011)
-      xargs -I "$dm_tools__pattern__value" -n "$dm_tools__max_args__value" "$@"
+      xargs \
+        \
+        -I "$dm_tools__value__replace" \
+        -n "$dm_tools__value__max_args" \
+        "$@" \
+
       ;;
+  # ,------ null
+  # |,----- replace
+  # ||,---- max_args
     100)
-      xargs -0 "$@"
+      xargs \
+        -0 \
+        \
+        \
+        "$@" \
+
       ;;
+  # ,------ null
+  # |,----- replace
+  # ||,---- max_args
     101)
-      xargs -0 -n "$dm_tools__max_args__value" "$@"
+      xargs \
+        -0 \
+        \
+        -n "$dm_tools__value__max_args" \
+        "$@" \
+
       ;;
+  # ,------ null
+  # |,----- replace
+  # ||,---- max_args
     110)
-      xargs -0 -I "$dm_tools__pattern__value" "$@"
+      xargs \
+        -0 \
+        -I "$dm_tools__value__replace" \
+        \
+        "$@" \
+
       ;;
+  # ,------ null
+  # |,----- replace
+  # ||,---- max_args
     111)
-      xargs -0 -I "$dm_tools__pattern__value" -n "$dm_tools__max_args__value" "$@"
+      xargs \
+        -0 \
+        -I "$dm_tools__value__replace" \
+        -n "$dm_tools__value__max_args" \
+        "$@" \
+
       ;;
     *)
-      >&2 echo "dm_tools__xargs - Unexpected combination: '${dm_tools__decision}'"
-      exit 1
+      dm_tools__report_invalid_parameters \
+        'dm_tools__xargs' \
+        'Unexpected parameter combination!' \
+        'You can only have --kernel_name --kernel_release --machine.'
       ;;
   esac
 }
-

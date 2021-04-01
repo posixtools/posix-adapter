@@ -7,93 +7,196 @@
 #==============================================================================
 # TOOL: UNAME
 #==============================================================================
+
+#==============================================================================
+#
+#  dm_tools__uname
+#    [--kernel-name]
+#    [--kernel-release]
+#    [--machine]
+#
+#------------------------------------------------------------------------------
+# Execution mapping function for the 'uname' command line tool with a uniform
+# interface.
+#------------------------------------------------------------------------------
+# Globals:
+#   None
+# Options:
+#   --kernel-name - uname compatible kernel name flag.
+#   --kernel-release - uname compatible kernel release flag.
+#   --machine - uname compatible machine flag.
+# Arguments:
+#   None
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   Mapped command's output.
+# STDERR:
+#   Mapped command's error output. Mapping error output.
+# Status:
+#   0  - Call was successful.
+#   .. - Call failed with it's error status
+#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#==============================================================================
 dm_tools__uname() {
-  case "$DM_TOOLS__RUNTIME__OS" in
-
-    "$DM_TOOLS__CONSTANT__OS__LINUX")
-      uname "$@"
-      ;;
-
-    "$DM_TOOLS__CONSTANT__OS__MACOS")
-      _dm_tools__uname__darwin "$@"
-      ;;
-
-    *)
-      >&2 echo 'dm_tools__uname - No compatible call style was found! Giving up..'
-      exit 1
-
-  esac
-}
-
-_dm_tools__uname__darwin() {
-  # Collecting the optional parameters and its values.
-  dm_tools__kernel_name__present='0'
-  dm_tools__kernel_release__present='0'
-  dm_tools__machine__present='0'
+  dm_tools__flag__kernel_name='0'
+  dm_tools__flag__kernel_release='0'
+  dm_tools__flag__machine='0'
 
   while [ "$#" -gt '0' ]
   do
-    dm_tools__param="$1"
-    case "$dm_tools__param" in
+    case "$1" in
       --kernel-name)
-        dm_tools__kernel_name__present='1'
+        dm_tools__flag__kernel_name='1'
         shift
         ;;
       --kernel-release)
-        dm_tools__kernel_release__present='1'
+        dm_tools__flag__kernel_release='1'
         shift
         ;;
       --machine)
-        dm_tools__machine__present='1'
+        dm_tools__flag__machine='1'
         shift
         ;;
+      --[^-]*)
+        dm_tools__report_invalid_parameters \
+          'dm_tools__uname' \
+          "Unexpected option '${1}'!" \
+          'You can only use --extended --silent --invert-match --count --match-only.'
+        ;;
+      -[^-]*)
+        dm_tools__report_invalid_parameters \
+          'dm_tools__uname' \
+          "Invalid single dashed option '${1}'!" \
+          "dm_tools only uses double dashed options like '--option'."
+        ;;
       *)
-        >&2 echo "dm_tools__uname - Unexpected parameter: '${dm_tools__param}'"
-        exit 1
+        dm_tools__report_invalid_parameters \
+          'dm_tools__uname' \
+          'Unexpected parameter!' \
+          "Parameter '${1}' is unexpected!"
         ;;
     esac
   done
 
   # Assembling the decision string.
+  # ,------ kernel_name
+  # |,----- kernel_release
+  # ||,---- machine
   # 000
-  # ||`-- machine
-  # |`--- kernel-release
-  # `---- kernel_name
+  dm_tools__decision="${dm_tools__flag__kernel_name}"
+  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__kernel_release}"
+  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__machine}"
 
-  dm_tools__decision="${dm_tools__kernel_name__present}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__kernel_release__present}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__machine__present}"
+  _dm_tools__uname__common \
+    "$dm_tools__decision"
+}
 
-  # Execution based on the decision string.
-  case "$dm_tools__decision" in
+#==============================================================================
+# Common call mapping function.
+#------------------------------------------------------------------------------
+# Globals:
+#   None
+# Options:
+#   None
+# Arguments:
+#   [1] decision_string - String that decodes the optional parameter presence.
+# STDIN:
+#   Input passed to the mapped command.
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   Mapped command's output.
+# STDERR:
+#   Mapped command's error output. Mapping error output.
+# Status:
+#   0  - Call succeeded.
+#   .. - Call failed with it's error status
+#==============================================================================
+_dm_tools__uname__common() {
+  dm_tools__decision_string="$1"
+
+  case "$dm_tools__decision_string" in
+  # ,------ kernel_name
+  # |,----- kernel_release
+  # ||,---- machine
     000)
-      uname
+      uname \
+        \
+        \
+        \
+
       ;;
+  # ,------ kernel_name
+  # |,----- kernel_release
+  # ||,---- machine
     001)
-      uname       -m
+      uname \
+        \
+        \
+        -m \
+
       ;;
+  # ,------ kernel_name
+  # |,----- kernel_release
+  # ||,---- machine
     010)
-      uname    -r
+      uname \
+        \
+        -r \
+        \
+
       ;;
+  # ,------ kernel_name
+  # |,----- kernel_release
+  # ||,---- machine
     011)
-      uname    -r -m
+      uname \
+        \
+        -r \
+        -m \
+
       ;;
+  # ,------ kernel_name
+  # |,----- kernel_release
+  # ||,---- machine
     100)
-      uname -s
+      uname \
+        -s \
+        \
+        \
+
       ;;
+  # ,------ kernel_name
+  # |,----- kernel_release
+  # ||,---- machine
     101)
-      uname -s    -m
+      uname \
+        -s \
+        \
+        -m \
+
       ;;
-    110)
-      uname -s -r
-      ;;
+  # ,------ kernel_name
+  # |,----- kernel_release
+  # ||,---- machine
     111)
-      uname -s -r -m
+      uname \
+        -s \
+        -r \
+        -m \
+
       ;;
     *)
-      >&2 echo "dm_tools__uname - Unexpected combination: '${dm_tools__decision}'"
-      exit 1
+      dm_tools__report_invalid_parameters \
+        'dm_tools__uname' \
+        'Unexpected parameter combination!' \
+        'You can only have --kernel_name --kernel_release --machine.'
       ;;
   esac
 }
-

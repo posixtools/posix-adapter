@@ -139,8 +139,6 @@ dm_tools__path_prefix="${DM_TOOLS__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX}"
 . "${dm_tools__path_prefix}/src/tool__sort.sh"
 # shellcheck source=./src/tool__touch.sh
 . "${dm_tools__path_prefix}/src/tool__touch.sh"
-# shellcheck source=./src/tool__tput.sh
-. "${dm_tools__path_prefix}/src/tool__tput.sh"
 # shellcheck source=./src/tool__tr.sh
 . "${dm_tools__path_prefix}/src/tool__tr.sh"
 # shellcheck source=./src/tool__uname.sh
@@ -157,8 +155,117 @@ dm_tools__path_prefix="${DM_TOOLS__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX}"
 # SETTING THE ENVIRONMENT VARIABLES
 #==============================================================================
 
+#==============================================================================
+# Execution mapping function for the 'basename' command line tool with a
+# uniform interface.
+#------------------------------------------------------------------------------
+# Globals:
+#   DM_TOOLS__STATUS__INVALID_PARAMETERS
+# Options:
+#   None
+# Arguments:
+#   [1] reported_from - Tool name where the error happened.
+#   [2] reason - Short summary of the error.
+#   [3] details - Detailed description of the error.
+# STDIN:
+#   Input passed to the mapped command.
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Compiled error message.
+# Status:
+#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#==============================================================================
+dm_tools__report_invalid_parameters() {
+  dm_tools__reported_from="$1"
+  dm_tools__reason="$2"
+  dm_tools__details="$3"
+
+  >&2 printf '%s' "ERROR | ${dm_tools__reported_from} | reason     | "
+  >&2 printf '%s\n' "${dm_tools__reason}"
+  >&2 printf '%s' "ERROR | ${dm_tools__reported_from} | details    | "
+  >&2 printf '%s\n' "${dm_tools__details}"
+
+  _dm_tools__error_suggestion "$dm_tools__reported_from"
+
+  exit "$DM_TOOLS__STATUS__INVALID_PARAMETERS"
+}
+
+#==============================================================================
+# Execution mapping function for the 'basename' command line tool with a
+# uniform interface.
+#------------------------------------------------------------------------------
+# Globals:
+#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL
+# Options:
+#   None
+# Arguments:
+#   [1] reported_from - Tool name where the error happened.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Compiled error message.
+# Status:
+#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - Invalid parameter configuration.
+#==============================================================================
+dm_tools__report_incompatible_call() {
+  dm_tools__reported_from="$1"
+
+  >&2 printf '%s' "ERROR | ${dm_tools__reported_from} | reason     |"
+  >&2 printf '%s\n' 'No compatible call style was found! Giving up..'
+
+  _dm_tools__error_suggestion "$dm_tools__reported_from"
+
+  exit "$DM_TOOLS__STATUS__INCOMPATIBLE_CALL"
+}
+
+#==============================================================================
+# Common error reporting suggestion function that prints out a suggestion to
+# the standard error output.
+#------------------------------------------------------------------------------
+# Globals:
+#   None
+# Options:
+#   None
+# Arguments:
+#   [1] reported_from - Tool name where the error happened.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Suggestion about the error.
+# Status:
+#   0 - Other status is not expected.
+#==============================================================================
+_dm_tools__error_suggestion() {
+  dm_tools__reported_from="$1"
+
+  >&2 printf '%s' "ERROR | ${dm_tools__reported_from} | suggestion | "
+  >&2 printf '%s' 'Probably a new use case needs to be added to the '
+  >&2 printf '%s\n' "'${dm_tools__reported_from}' function."
+}
+
+#==============================================================================
+# GLOBAL VARIABLES
+#==============================================================================
+
 DM_TOOLS__CONSTANT__OS__LINUX="Linux"
 DM_TOOLS__CONSTANT__OS__MACOS="Darwin"
+
+DM_TOOLS__STATUS__INVALID_PARAMETERS='98'
+DM_TOOLS__STATUS__INCOMPATIBLE_CALL='99'
 
 # This variable is used by almost every tool mapping function internally. It
 # was aquired with the non-mapped style to be able to use it in the mapped

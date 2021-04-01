@@ -62,37 +62,79 @@ fi
 # TEST SUITE EXECUTION
 #==============================================================================
 
-dm_tools__log_task 'Running test suite..'
+dm_tools__test__log_task 'Running test suite..'
 
-dm_tools__echo -n '-------------------------------------------------------'
-dm_tools__echo '------------------------'
+printf '%s' "${DIM}"
+printf '%s' '================================================================='
+printf '%s\n' '==================='
+printf '%s\n' ' TEST SYSTEM EVALUATION'
+printf '%s' '================================================================='
+printf '%s' '==================='
+printf '%s\n' "${RESET}"
 
+. './test__0__common.sh'
+
+printf '%s' "${DIM}"
+printf '%s' '================================================================='
+printf '%s\n' '==================='
+printf '%s\n' ' DM TOOLS TEST SUITE'
+printf '%s' '================================================================='
+printf '%s' '==================='
+printf '%s\n' "${RESET}"
+
+printf '%s' "${DIM}"
+printf '%s' \
+  'After this point, red error messages mean an actual error in dm_tools!'
+printf '%s\n' "${RESET}"
+
+dm_tools__test__line
 . './test__basename.sh'
+dm_tools__test__line
 . './test__cat.sh'
+dm_tools__test__line
 . './test__cut.sh'
+dm_tools__test__line
 . './test__date.sh'
+dm_tools__test__line
 . './test__dirname.sh'
+dm_tools__test__line
 . './test__echo.sh'
+dm_tools__test__line
 . './test__find.sh'
+dm_tools__test__line
 . './test__grep.sh'
+dm_tools__test__line
 . './test__mkdir.sh'
+dm_tools__test__line
 . './test__mkfifo.sh'
+dm_tools__test__line
 . './test__mktemp.sh'
+dm_tools__test__line
 . './test__printf.sh'
+dm_tools__test__line
 . './test__readlink.sh'
+dm_tools__test__line
 . './test__realpath.sh'
+dm_tools__test__line
 . './test__rm.sh'
+dm_tools__test__line
 . './test__sed.sh'
+dm_tools__test__line
 . './test__sort.sh'
+dm_tools__test__line
 . './test__touch.sh'
-. './test__tput.sh'
+dm_tools__test__line
 . './test__tr.sh'
+dm_tools__test__line
 . './test__uname.sh'
+dm_tools__test__line
 . './test__wc.sh'
+dm_tools__test__line
 . './test__xargs.sh'
+dm_tools__test__line
 . './test__xxd.sh'
 
-dm_tools__echo -n '-------------------------------------------------------'
-dm_tools__echo '------------------------'
+dm_tools__echo --no-newline '-------------------------------------------------'
+dm_tools__echo '------------------------------'
 
-dm_tools__log_success 'Test suite finished'
+dm_tools__test__log_success 'Test suite finished'

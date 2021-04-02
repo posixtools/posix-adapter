@@ -113,7 +113,7 @@ _dm_tools__tr__common() {
   # ,-- delete
     1)
       tr \
-        --delete "$dm_tools__value__delete" \
+        -d "$dm_tools__value__delete" \
 
       ;;
     *)

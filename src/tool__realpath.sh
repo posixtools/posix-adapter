@@ -196,7 +196,7 @@ _dm_tools__realpath__darwin() {
       then
         # Using python as a last resort..
         python -c \
-          'import os,sys; print(os.path.abspath(os.path.expanduser(sys.argv[1])))' \
+          'import os,sys; print(os.path.realpath(os.path.expanduser(sys.argv[1])))' \
           "$dm_tools__value__path"
       fi
       ;;
@@ -206,7 +206,7 @@ _dm_tools__realpath__darwin() {
       then
         # Using python as a last resort..
         python -c \
-          'import os,sys; print(os.path.realpath(os.path.expanduser(sys.argv[1])))' \
+          'import os,sys; print(os.path.abspath(os.path.expanduser(sys.argv[1])))' \
           "$dm_tools__value__path"
       fi
       ;;

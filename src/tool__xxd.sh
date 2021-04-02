@@ -53,13 +53,13 @@ dm_tools__xxd() {
         dm_tools__flag__revert='1'
         shift
         ;;
-      --[^-]*)
+      --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__xxd' \
           "Unexpected option '${1}'!" \
           'You can only use --plain --revert.'
         ;;
-      -[^-]*)
+      -[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__xxd' \
           "Invalid single dashed option '${1}'!" \
@@ -147,7 +147,7 @@ _dm_tools__xxd__common() {
       dm_tools__report_invalid_parameters \
         'dm_tools__xxd' \
         'Unexpected parameter combination!' \
-        'You can only have --kernel_name --kernel_release --machine.'
+        'You can only use --plain --revert.'
       ;;
   esac
 }

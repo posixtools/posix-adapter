@@ -47,13 +47,13 @@ dm_tools__touch() {
   elif [ "$#" -eq 1 ]
   then
     case "$1" in
-    --[^-]*)
+    --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__touch' \
           "Unexpected option '${1}'!" \
           'This function does not take options.'
         ;;
-    -[^-]*)
+    -[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__touch' \
           "Invalid single dashed option '${1}'!" \

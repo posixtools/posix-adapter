@@ -53,13 +53,13 @@ dm_tools__dirname() {
     fi
 
     case "$1" in
-      --[^-]*)
+      --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__dirname' \
           "Unexpected option '${1}'!" \
           'This function does not take options.'
         ;;
-      -[^-]*)
+      -[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__dirname' \
           "Invalid single dashed option '${1}'!" \

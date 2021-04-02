@@ -50,13 +50,13 @@ dm_tools__realpath() {
         dm_tools__flag__no_symlink='1'
         shift
         ;;
-      --[^-]*)
+      --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__realpath' \
           "Unexpected option '${1}'!" \
           'You can only use --no-symlink.'
         ;;
-      -[^-]*)
+      -[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__realpath' \
           "Invalid single dashed option '${1}'!" \
@@ -212,7 +212,7 @@ _dm_tools__realpath__darwin() {
       ;;
     *)
       dm_tools__report_invalid_parameters \
-        'dm_tools__readlink' \
+        'dm_tools__realpath' \
         'Unexpected parameter combination!' \
         'You can only have --no-symlink.'
       ;;

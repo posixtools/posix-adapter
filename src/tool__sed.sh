@@ -60,13 +60,13 @@ dm_tools__sed() {
         shift
         shift
         ;;
-      --[^-]*)
+      --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__sed' \
           "Unexpected option '${1}'!" \
           'You can only use --extended or --expression.'
         ;;
-      -[^-]*)
+      -[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__sed' \
           "Invalid single dashed option '${1}'!" \

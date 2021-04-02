@@ -56,13 +56,13 @@ dm_tools__sort() {
         dm_tools__flag__dictionary_order='1'
         shift
         ;;
-      --[^-]*)
+      --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__sort' \
           "Unexpected option '${1}'!" \
           'You can only use --zero-terminated or --dictionary-order.'
         ;;
-      -[^-]*)
+      -[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__sort' \
           "Invalid single dashed option '${1}'!" \
@@ -208,9 +208,9 @@ _dm_tools__sort__common() {
       ;;
     *)
       dm_tools__report_invalid_parameters \
-        'dm_tools__sed' \
+        'dm_tools__sort' \
         'Unexpected parameter combination!' \
-        '--expression is mandatory, --extended is optional'
+        'Only --zero-terminated and --dictionary-order is available.'
       ;;
   esac
 }

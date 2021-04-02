@@ -79,13 +79,13 @@ dm_tools__grep() {
         dm_tools__flag__match_only='1'
         shift
         ;;
-      --[^-]*)
+      --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__grep' \
           "Unexpected option '${1}'!" \
           'You can only use --extended --silent --invert-match --count --match-only.'
         ;;
-      -[^-]*)
+      -[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__grep' \
           "Invalid single dashed option '${1}'!" \

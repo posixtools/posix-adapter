@@ -51,13 +51,13 @@ dm_tools__tr() {
         shift
         shift
         ;;
-    --[^-]*)
+    --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__tr' \
           "Unexpected option '${1}'!" \
           'This function does not take options.'
         ;;
-    -[^-]*)
+    -[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__tr' \
           "Invalid single dashed option '${1}'!" \

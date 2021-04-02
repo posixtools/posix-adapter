@@ -15,10 +15,6 @@ then
   then
     GREEN=''
   fi
-  if ! YELLOW="$(tput setaf 3)"
-  then
-    YELLOW=''
-  fi
   if ! BLUE="$(tput setaf 4)"
   then
     BLUE=''
@@ -38,7 +34,6 @@ then
 else
   RED=''
   GREEN=''
-  YELLOW=''
   BLUE=''
   RESET=''
   BOLD=''

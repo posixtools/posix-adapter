@@ -61,13 +61,13 @@ dm_tools__mktemp() {
         shift
         shift
         ;;
-      --[^-]*)
+      --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__mktemp' \
           "Unexpected option '${1}'!" \
           'You can only use --extended --silent --invert-match --count -- match-only.'
         ;;
-      -[^-]*)
+      -[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__mktemp' \
           "Invalid single dashed option '${1}'!" \

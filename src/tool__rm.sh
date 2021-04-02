@@ -56,13 +56,13 @@ dm_tools__rm() {
         dm_tools__flag__force='1'
         shift
         ;;
-      --[^-]*)
+      --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__rm' \
           "Unexpected option '${1}'!" \
           'You can only use --recursive and --force.'
         ;;
-      -[^-]*)
+      -[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__rm' \
           "Invalid single dashed option '${1}'!" \

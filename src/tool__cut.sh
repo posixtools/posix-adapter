@@ -74,13 +74,13 @@ dm_tools__cut() {
         shift
         shift
         ;;
-      --[^-]*)
+      --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__cut' \
           "Unexpected option '${1}'!" \
           'You can only use (--delimiter --fields) or (--characters).'
         ;;
-      -[^-]*)
+      -[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__cut' \
           "Invalid single dashed option '${1}'!" \

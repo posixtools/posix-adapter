@@ -88,13 +88,13 @@ dm_tools__find() {
         dm_tools__flag__print0='1'
         shift
         ;;
-      --[^-]*)
+      --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__find' \
           "Unexpected option '${1}'!" \
           'You can only use (--delimiter --fields) or (--characters).'
         ;;
-      -[^-]*)
+      -[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__find' \
           "Invalid single dashed option '${1}'!" \

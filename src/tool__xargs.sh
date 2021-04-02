@@ -71,13 +71,13 @@ dm_tools__xargs() {
         shift
         shift
         ;;
-      --[^-]*)
+      --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__xargs' \
           "Unexpected option '${1}'!" \
           'You can only use --null --replace --max-args.'
         ;;
-      -[^-]*)
+      -[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__xargs' \
           "Invalid single dashed option '${1}'!" \
@@ -233,7 +233,7 @@ _dm_tools__xargs__common() {
       dm_tools__report_invalid_parameters \
         'dm_tools__xargs' \
         'Unexpected parameter combination!' \
-        'You can only have --kernel_name --kernel_release --machine.'
+        'You can only use --null --replace --max-args.'
       ;;
   esac
 }

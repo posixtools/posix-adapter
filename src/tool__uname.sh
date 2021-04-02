@@ -62,13 +62,13 @@ dm_tools__uname() {
         dm_tools__flag__machine='1'
         shift
         ;;
-      --[^-]*)
+      --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__uname' \
           "Unexpected option '${1}'!" \
-          'You can only use --extended --silent --invert-match --count --match-only.'
+          'You can only use --kernel-name --kernel-release and --machine.'
         ;;
-      -[^-]*)
+      -[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__uname' \
           "Invalid single dashed option '${1}'!" \

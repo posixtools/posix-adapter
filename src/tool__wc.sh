@@ -56,13 +56,13 @@ dm_tools__wc() {
         dm_tools__flag__lines='1'
         shift
         ;;
-      --[^-]*)
+      --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__wc' \
           "Unexpected option '${1}'!" \
           'You can only use --chars and --lines.'
         ;;
-      -[^-]*)
+      -[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__wc' \
           "Invalid single dashed option '${1}'!" \
@@ -93,9 +93,26 @@ dm_tools__wc() {
   dm_tools__decision="${dm_tools__decision}${dm_tools__flag__lines}"
   dm_tools__decision="${dm_tools__decision}${dm_tools__flag__path}"
 
-  _dm_tools__wc__common \
-    "$dm_tools__decision" \
-    "$dm_tools__value__path"
+  case "$DM_TOOLS__RUNTIME__OS" in
+
+    "$DM_TOOLS__CONSTANT__OS__LINUX")
+      _dm_tools__wc__common \
+        "$dm_tools__decision" \
+        "$dm_tools__value__path"
+      ;;
+
+    "$DM_TOOLS__CONSTANT__OS__MACOS")
+      # Some old BSD based wc implementations pads these results with empty
+      # spaces, hence the additional xargs call.
+      _dm_tools__wc__common \
+        "$dm_tools__decision" \
+        "$dm_tools__value__path" | xargs
+      ;;
+
+    *)
+      dm_tools__report_incompatible_call 'dm_tools__wc'
+      ;;
+  esac
 }
 
 #==============================================================================
@@ -188,7 +205,7 @@ _dm_tools__wc__common() {
       ;;
     *)
       dm_tools__report_invalid_parameters \
-        'dm_tools__sed' \
+        'dm_tools__wc' \
         'Unexpected parameter combination!' \
         'You can only have either --chars or --lines'
       ;;

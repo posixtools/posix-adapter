@@ -50,13 +50,13 @@ dm_tools__mkdir() {
         dm_tools__flag__parents='1'
         shift
         ;;
-      --[^-]*)
+      --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__mkdir' \
           "Unexpected option '${1}'!" \
           'You can only use --parents.'
         ;;
-      -[^-]*)
+      -[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__mkdir' \
           "Invalid single dashed option '${1}'!" \

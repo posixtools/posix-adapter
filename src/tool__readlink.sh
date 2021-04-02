@@ -50,13 +50,13 @@ dm_tools__readlink() {
         dm_tools__flag__canonicalize='1'
         shift
         ;;
-      --[^-]*)
+      --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__readlink' \
           "Unexpected option '${1}'!" \
           'You can only use --canonicalize.'
         ;;
-      -[^-]*)
+      -[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__readlink' \
           "Invalid single dashed option '${1}'!" \

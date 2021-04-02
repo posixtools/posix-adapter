@@ -138,3 +138,20 @@ dm_tools__echo --no-newline '-------------------------------------------------'
 dm_tools__echo '------------------------------'
 
 dm_tools__test__log_success 'Test suite finished'
+
+#==============================================================================
+# SHELLCHECK VALIDATION
+#==============================================================================
+
+if command -v shellcheck >/dev/null
+then
+  current_path="$(pwd)"
+  cd ../src
+  # Specifying shell type here to be able to omit the shebangs from the
+  # modules.
+  # More info: https://github.com/koalaman/shellcheck/wiki/SC2148
+  shellcheck --shell=sh -x ./*.sh
+  cd "$current_path"
+else
+  echo "WARNING: shellcheck won't be executed as it cannot be found."
+fi

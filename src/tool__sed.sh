@@ -79,10 +79,15 @@ dm_tools__sed() {
           dm_tools__value__path="$1"
           shift
         else
+          dm_tools__error_details="$( \
+            printf '%s' 'You have already passed a path argument, you '; \
+            printf '%s' 'probably forgot the --expression flag before '; \
+            printf '%s\n' 'your expression which is mandatory in dm_tools.' \
+          )"
           dm_tools__report_invalid_parameters \
             'dm_tools__sed' \
             'Unexpected parameter!' \
-            "Parameter '${1}' is unexpected!"
+            "$dm_tools__error_details"
         fi
         ;;
     esac

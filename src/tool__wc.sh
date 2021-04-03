@@ -110,11 +110,21 @@ dm_tools__wc() {
       ;;
 
     "$DM_TOOLS__CONSTANT__OS__MACOS")
-      # Some old BSD based wc implementations pads these results with empty
-      # spaces, hence the additional xargs call.
-      _dm_tools__wc__common \
-        "$dm_tools__decision" \
-        "$dm_tools__value__path" | xargs
+      # This if else construction is needed because POSIX does not have the
+      # pipefail feature.
+      if dm_tools__result="$( \
+        _dm_tools__wc__common \
+          "$dm_tools__decision" \
+          "$dm_tools__value__path" \
+      )"
+      then
+        # Some old BSD based wc implementations pads these results with empty
+        # spaces, hence the additional xargs call.
+        echo "$dm_tools__result" | xargs
+      else
+        dm_tools__status="$?"
+        exit "$dm_tools__status"
+      fi
       ;;
 
     *)

@@ -41,3 +41,39 @@
 dm_tools__tput() {
   tput "$@"
 }
+
+#==============================================================================
+#
+#  dm_tools__tput__is_available
+#
+#------------------------------------------------------------------------------
+# Function that should evaluate the availibility and usability of the tput
+# utility.
+#------------------------------------------------------------------------------
+# Globals:
+#   None
+# Options:
+#   None
+# Arguments:
+#   None
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   None
+# Status:
+#   0 - tput is available.
+#   1 - tput is not available.
+#==============================================================================
+dm_tools__tput__is_available() {
+  if command -v tput >/dev/null && tput init >/dev/null 2>&1
+  then
+    return 0
+  else
+    return 1
+  fi
+}

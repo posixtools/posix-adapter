@@ -1,29 +1,28 @@
 #==============================================================================
-#
-# __      _____
-# \ \ /\ / / __|
-#  \ V  V / (__
-#   \_/\_/ \___|
+#   _
+#  | |___
+#  | / __|
+#  | \__ \
+#  |_|___/
 #==============================================================================
-# TOOL: WC
+# TOOL: LS
 #==============================================================================
 
 #==============================================================================
 #
-#  dm_tools__wc [--chars] [--lines] [--words] [<path>]
+#  dm_tools__ls [--all] [--almost-all] <path>
 #
 #------------------------------------------------------------------------------
-# Execution mapping function for the 'wc' command line tool with a
+# Execution mapping function for the 'ls' command line tool with a
 # uniform interface.
 #------------------------------------------------------------------------------
 # Globals:
 #   None
 # Options:
-#   --chars - Use the wc compatible -c flag.
-#   --lines - Use the wc compatible -l flag.
-#   --words - Use the wc compatible -w flag.
+#   --all - ls compatible -a flag equivavelent.
+#   --almost-all - ls compatible -A flag equivavelent.
 # Arguments:
-#   [1] [path] - Optional file path.
+#   [1] path - Path that should be listed.
 # STDIN:
 #   Input passed to the mapped command.
 #------------------------------------------------------------------------------
@@ -39,10 +38,9 @@
 #   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
 #   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
 #==============================================================================
-dm_tools__wc() {
-  dm_tools__flag__chars='0'
-  dm_tools__flag__lines='0'
-  dm_tools__flag__words='0'
+dm_tools__ls() {
+  dm_tools__flag__all='0'
+  dm_tools__flag__almost_all='0'
 
   dm_tools__flag__path='0'
   dm_tools__value__path=''
@@ -50,27 +48,23 @@ dm_tools__wc() {
   while [ "$#" -gt '0' ]
   do
     case "$1" in
-      --chars)
-        dm_tools__flag__chars='1'
+      --all)
+        dm_tools__flag__all='1'
         shift
         ;;
-      --lines)
-        dm_tools__flag__lines='1'
-        shift
-        ;;
-      --words)
-        dm_tools__flag__words='1'
+      --almost-all)
+        dm_tools__flag__almost_all='1'
         shift
         ;;
       --[!-]*)
         dm_tools__report_invalid_parameters \
-          'dm_tools__wc' \
+          'dm_tools__ls' \
           "Unexpected option '${1}'!" \
-          'You can only use --chars, --lines or --words.'
+          'You can only use --all or --almost-all.'
         ;;
       -[!-]*)
         dm_tools__report_invalid_parameters \
-          'dm_tools__wc' \
+          'dm_tools__ls' \
           "Invalid single dashed option '${1}'!" \
           "dm_tools only uses double dashed options like '--option'."
         ;;
@@ -82,7 +76,7 @@ dm_tools__wc() {
           shift
         else
           dm_tools__report_invalid_parameters \
-            'dm_tools__wc' \
+            'dm_tools__ls' \
             'Unexpected parameter!' \
             "Parameter '${1}' is unexpected!"
         fi
@@ -90,37 +84,24 @@ dm_tools__wc() {
     esac
   done
 
+  if [ "$dm_tools__flag__path" -eq '0' ]
+  then
+    dm_tools__report_invalid_parameters \
+      'dm_tools__ls' \
+      'Missing <path> argument!' \
+      'To be able to use readlink, you need to specify a path to work with.'
+  fi
+
   # Assembling the decision string.
-  # ,----- chars
-  # |,---- lines
-  # ||,--- words
-  # |||,-- path
-  # 0000
-  dm_tools__decision="${dm_tools__flag__chars}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__lines}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__words}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__path}"
+  # ,-- all
+  # |,- almost_all
+  # 00
+  dm_tools__decision="${dm_tools__flag__all}"
+  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__almost_all}"
 
-  case "$DM_TOOLS__RUNTIME__OS" in
-
-    "$DM_TOOLS__CONSTANT__OS__LINUX")
-      _dm_tools__wc__common \
-        "$dm_tools__decision" \
-        "$dm_tools__value__path"
-      ;;
-
-    "$DM_TOOLS__CONSTANT__OS__MACOS")
-      # Some old BSD based wc implementations pads these results with empty
-      # spaces, hence the additional xargs call.
-      _dm_tools__wc__common \
-        "$dm_tools__decision" \
-        "$dm_tools__value__path" | xargs
-      ;;
-
-    *)
-      dm_tools__report_incompatible_call 'dm_tools__wc'
-      ;;
-  esac
+  _dm_tools__ls__common \
+    "$dm_tools__decision" \
+    "$dm_tools__value__path"
 }
 
 #==============================================================================
@@ -132,7 +113,7 @@ dm_tools__wc() {
 #   None
 # Arguments:
 #   [1] decision_string - String that decodes the optional parameter presence.
-#   [2] value_path - Value for the positional path argument.
+#   [2] value_path - Path value.
 # STDIN:
 #   Input passed to the mapped command.
 #------------------------------------------------------------------------------
@@ -146,112 +127,43 @@ dm_tools__wc() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_dm_tools__wc__common() {
+_dm_tools__ls__common() {
   dm_tools__decision_string="$1"
   dm_tools__value__path="$2"
 
   case "$dm_tools__decision_string" in
-  # ,----- chars
-  # |,---- lines
-  # ||,--- words
-  # |||,-- path
-    0000)
-      wc \
-        \
-        \
-        \
-        \
-
-      ;;
-  # ,----- chars
-  # |,---- lines
-  # ||,--- words
-  # |||,-- path
-    0001)
-      wc \
-        \
+  # ,-- all
+  # |,- almost_all
+    00)
+      ls \
         \
         \
         "$dm_tools__value__path" \
 
       ;;
-  # ,----- chars
-  # |,---- lines
-  # ||,--- words
-  # |||,-- path
-    0010)
-      wc \
+  # ,-- all
+  # |,- almost_all
+    01)
+      ls \
         \
-        \
-        -w \
-        \
-
-      ;;
-  # ,----- chars
-  # |,---- lines
-  # ||,--- words
-  # |||,-- path
-    0011)
-      wc \
-        \
-        \
-        -w \
+        -A \
         "$dm_tools__value__path" \
 
       ;;
-  # ,----- chars
-  # |,---- lines
-  # ||,--- words
-  # |||,-- path
-    0100)
-      wc \
-        \
-        -l \
-        \
-        \
-
-      ;;
-  # ,----- chars
-  # |,---- lines
-  # ||,--- words
-  # |||,-- path
-    0101)
-      wc \
-        \
-        -l \
-        \
-        "$dm_tools__value__path" \
-
-      ;;
-  # ,----- chars
-  # |,---- lines
-  # ||,--- words
-  # |||,-- path
-    1000)
-      wc \
-        -c \
-        \
-        \
-        \
-
-      ;;
-  # ,----- chars
-  # |,---- lines
-  # ||,--- words
-  # |||,-- path
-    1001)
-      wc \
-        -c \
-        \
+  # ,-- all
+  # |,- almost_all
+    10)
+      ls \
+        -a \
         \
         "$dm_tools__value__path" \
 
       ;;
     *)
       dm_tools__report_invalid_parameters \
-        'dm_tools__wc' \
+        'dm_tools__ls' \
         'Unexpected parameter combination!' \
-        'You can only have either --chars, --lines or --words'
+        'You can only have --all or --almost-all.'
       ;;
   esac
 }

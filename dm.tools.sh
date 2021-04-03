@@ -119,6 +119,8 @@ dm_tools__path_prefix="${DM_TOOLS__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX}"
 . "${dm_tools__path_prefix}/src/tool__find.sh"
 # shellcheck source=./src/tool__grep.sh
 . "${dm_tools__path_prefix}/src/tool__grep.sh"
+# shellcheck source=./src/tool__ls.sh
+. "${dm_tools__path_prefix}/src/tool__ls.sh"
 # shellcheck source=./src/tool__mkdir.sh
 . "${dm_tools__path_prefix}/src/tool__mkdir.sh"
 # shellcheck source=./src/tool__mkfifo.sh

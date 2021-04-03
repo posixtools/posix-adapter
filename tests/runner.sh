@@ -124,6 +124,8 @@ dm_tools__test__line
 dm_tools__test__line
 . './test__touch.sh'
 dm_tools__test__line
+. './test__tput.sh'
+dm_tools__test__line
 . './test__tr.sh'
 dm_tools__test__line
 . './test__uname.sh'

@@ -1,28 +1,28 @@
 #==============================================================================
-#              _       _    __
-#   _ __  _ __(_)_ __ | |_ / _|
-#  | '_ \| '__| | '_ \| __| |_
-#  | |_) | |  | | | | | |_|  _|
-#  | .__/|_|  |_|_| |_|\__|_|
-#==|_|=========================================================================
-# TOOL: PRINTF
+#   _               _
+#  | |_ _ __  _   _| |_
+#  | __| '_ \| | | | __|
+#  | |_| |_) | |_| | |_
+#   \__| .__/ \__,_|\__|
+#======|_|=====================================================================
+# TOOL: TPUT
 #==============================================================================
 
 #==============================================================================
 #
-#  dm_tools__printf <printf_specification>..
+#  dm_tools__tput <tput_specification>..
 #
 #------------------------------------------------------------------------------
-# Execution mapping function for the 'printf' command line tool with a uniform
-# interface. This is the only command mapping besides tput that is only a proxy
-# because of the nature of printf.
+# Execution mapping function for the 'tput' command line tool with a uniform
+# interface. This is the only command mapping besides printf that is only a
+# proxy because of the nature of tput.
 #------------------------------------------------------------------------------
 # Globals:
 #   None
 # Options:
 #   None
 # Arguments:
-#   [..] specification - printf compatible specification.
+#   [..] specification - tput compatible specification.
 # STDIN:
 #   Input passed to the mapped command.
 #------------------------------------------------------------------------------
@@ -38,9 +38,6 @@
 #   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
 #   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
 #==============================================================================
-dm_tools__printf() {
-  # We are proxying all the parameters here, hence ignoring the warning.
-  # shellcheck disable=SC2059
-  printf "$@"
+dm_tools__tput() {
+  tput "$@"
 }
-

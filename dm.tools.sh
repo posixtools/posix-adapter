@@ -139,6 +139,8 @@ dm_tools__path_prefix="${DM_TOOLS__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX}"
 . "${dm_tools__path_prefix}/src/tool__sort.sh"
 # shellcheck source=./src/tool__touch.sh
 . "${dm_tools__path_prefix}/src/tool__touch.sh"
+# shellcheck source=./src/tool__tput.sh
+. "${dm_tools__path_prefix}/src/tool__tput.sh"
 # shellcheck source=./src/tool__tr.sh
 . "${dm_tools__path_prefix}/src/tool__tr.sh"
 # shellcheck source=./src/tool__uname.sh

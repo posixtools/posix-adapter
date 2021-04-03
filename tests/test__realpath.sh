@@ -20,12 +20,12 @@ else
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'realpath - no-symlink mode'
+dm_tools__test__valid_case 'realpath - no-symlinks mode'
 
 target_path='fixtures/realpath/direct_link'
 expected='direct_link'
 
-if result="$(dm_tools__realpath --no-symlink "$target_path" | dm_tools__basename)"
+if result="$(dm_tools__realpath --no-symlinks "$target_path" | dm_tools__basename)"
 then
   dm_tools__test__assert_equal "$expected" "$result"
 else

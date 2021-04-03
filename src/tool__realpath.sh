@@ -10,7 +10,7 @@
 
 #==============================================================================
 #
-#  dm_tools__realpath [--no-symlink] <path>
+#  dm_tools__realpath [--no-symlinks] <path>
 #
 #------------------------------------------------------------------------------
 # Execution mapping function for the 'realpath' command line tool with a
@@ -19,7 +19,7 @@
 # Globals:
 #   None
 # Options:
-#   --no-symlink - realpath compatible flag for the -s flag.
+#   --no-symlinks - realpath compatible flag for the -s flag.
 # Arguments:
 #   [1] path - Path that should be resolved.
 # STDIN:
@@ -38,7 +38,7 @@
 #   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
 #==============================================================================
 dm_tools__realpath() {
-  dm_tools__flag__no_symlink='0'
+  dm_tools__flag__no_symlinks='0'
 
   dm_tools__flag__path='0'
   dm_tools__value__path=''
@@ -46,15 +46,15 @@ dm_tools__realpath() {
   while [ "$#" -gt '0' ]
   do
     case "$1" in
-      --no-symlink)
-        dm_tools__flag__no_symlink='1'
+      --no-symlinks)
+        dm_tools__flag__no_symlinks='1'
         shift
         ;;
       --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__realpath' \
           "Unexpected option '${1}'!" \
-          'You can only use --no-symlink.'
+          'You can only use --no-symlinks.'
         ;;
       -[!-]*)
         dm_tools__report_invalid_parameters \
@@ -87,9 +87,9 @@ dm_tools__realpath() {
   fi
 
   # Assembling the decision string.
-  # ,-- no_symlink
+  # ,-- no_symlinks
   # 0
-  dm_tools__decision="${dm_tools__flag__no_symlink}"
+  dm_tools__decision="${dm_tools__flag__no_symlinks}"
 
   case "$DM_TOOLS__RUNTIME__OS" in
 
@@ -139,14 +139,14 @@ _dm_tools__realpath__linux() {
   dm_tools__value__path="$2"
 
   case "$dm_tools__decision_string" in
-  # ,-- no_symlink
+  # ,-- no_symlinks
     0)
       realpath \
         \
         "$dm_tools__value__path" \
 
       ;;
-  # ,-- no_symlink
+  # ,-- no_symlinks
     1)
       realpath \
         -s \
@@ -157,7 +157,7 @@ _dm_tools__realpath__linux() {
       dm_tools__report_invalid_parameters \
         'dm_tools__realpath' \
         'Unexpected parameter combination!' \
-        'You can only have --no-symlink.'
+        'You can only have --no-symlinks.'
       ;;
   esac
 }
@@ -190,7 +190,7 @@ _dm_tools__realpath__darwin() {
   dm_tools__value__path="$2"
 
   case "$dm_tools__decision_string" in
-  # ,-- no-symlink
+  # ,-- no-symlinks
     0)
       if ! realpath "$dm_tools__value__path" 2>/dev/null
       then
@@ -200,7 +200,7 @@ _dm_tools__realpath__darwin() {
           "$dm_tools__value__path"
       fi
       ;;
-  # ,-- no-symlink
+  # ,-- no-symlinks
     1)
       if ! realpath -s "$dm_tools__value__path" 2>/dev/null
       then
@@ -214,7 +214,7 @@ _dm_tools__realpath__darwin() {
       dm_tools__report_invalid_parameters \
         'dm_tools__realpath' \
         'Unexpected parameter combination!' \
-        'You can only have --no-symlink.'
+        'You can only have --no-symlinks.'
       ;;
   esac
 }

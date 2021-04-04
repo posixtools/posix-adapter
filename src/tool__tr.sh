@@ -10,7 +10,7 @@
 
 #==============================================================================
 #
-#  dm_tools__tr [--delete <char>]
+#  dm_tools__tr [--delete <char>] [--replace <target> <value>]
 #
 #------------------------------------------------------------------------------
 # Execution mapping function for the 'tr' command line tool with a uniform
@@ -20,6 +20,8 @@
 #   None
 # Options:
 #   --delete <char> - tr compatible --delete flag.
+#   --replace <target> <value> - Default tr functionality put behind an option
+#                                to make it more explicit.
 # Arguments:
 #   None
 # STDIN:
@@ -41,6 +43,10 @@ dm_tools__tr() {
   dm_tools__flag__delete='0'
   dm_tools__value__delete=''
 
+  dm_tools__flag__replace='0'
+  dm_tools__value__replace__target=''
+  dm_tools__value__replace__value=''
+
   while [ "$#" -gt '0' ]
   do
     dm_tools__param="$1"
@@ -51,11 +57,19 @@ dm_tools__tr() {
         shift
         shift
         ;;
+      --replace)
+        dm_tools__flag__replace='1'
+        dm_tools__value__replace__target="$2"
+        dm_tools__value__replace__value="$3"
+        shift
+        shift
+        shift
+        ;;
     --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__tr' \
           "Unexpected option '${1}'!" \
-          'This function does not take options.'
+          'Only --delete or --replace is available.'
         ;;
     -[!-]*)
         dm_tools__report_invalid_parameters \
@@ -73,13 +87,17 @@ dm_tools__tr() {
   done
 
   # Assembling the decision string.
-  # ,-- delete
-  # 0
+  # ,--- delete
+  # |,-- replace
+  # 00
   dm_tools__decision="${dm_tools__flag__delete}"
+  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__replace}"
 
   _dm_tools__tr__common \
     "$dm_tools__decision" \
-    "$dm_tools__value__delete"
+    "$dm_tools__value__delete" \
+    "$dm_tools__value__replace__target" \
+    "$dm_tools__value__replace__value"
 }
 
 #==============================================================================
@@ -91,7 +109,9 @@ dm_tools__tr() {
 #   None
 # Arguments:
 #   [1] decision_string - String that decodes the optional parameter presence.
-#   [2] value_delete -  Value passed with the delete flag.
+#   [2] value_delete -  Value passed with the delete option.
+#   [3] value_replace_target -  Target value passed with the replace option.
+#   [4] value_replace_value -  Value passed with the replace option.
 # STDIN:
 #   Input passed to the mapped command.
 #------------------------------------------------------------------------------
@@ -108,19 +128,31 @@ dm_tools__tr() {
 _dm_tools__tr__common() {
   dm_tools__decision_string="$1"
   dm_tools__value__delete="$2"
+  dm_tools__value__replace__target="$3"
+  dm_tools__value__replace__value="$4"
 
   case "$dm_tools__decision_string" in
-  # ,-- delete
-    1)
+  # ,--- delete
+  # |,-- replace
+    01)
+      tr \
+        \
+        "$dm_tools__value__replace__target" "$dm_tools__value__replace__value" \
+
+      ;;
+  # ,--- delete
+  # |,-- replace
+    10)
       tr \
         -d "$dm_tools__value__delete" \
+        \
 
       ;;
     *)
       dm_tools__report_invalid_parameters \
         'dm_tools__tr' \
         'Unexpected parameter combination!' \
-        'Only --delete is available.'
+        'Only --delete or --replace is available.'
       ;;
   esac
 }

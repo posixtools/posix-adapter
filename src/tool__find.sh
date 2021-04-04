@@ -117,15 +117,17 @@ dm_tools__find() {
     esac
   done
 
-  # Assembling the decision string.
-  # ,----- type
-  # |,---- name
-  # ||,--- max_depth
+  # Assembling the decision string. Max depth sohuld be the first as find
+  # processes its parameters sequentially. MAx-depth - type - name should be
+  # the priority order.
+  # ,----- max_depth
+  # |,---- type
+  # ||,--- name
   # |||,-- print0
   # 0000
-  dm_tools__decision="${dm_tools__flag__type}"
+  dm_tools__decision="${dm_tools__flag__max_depth}"
+  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__type}"
   dm_tools__decision="${dm_tools__decision}${dm_tools__flag__name}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__max_depth}"
   dm_tools__decision="${dm_tools__decision}${dm_tools__flag__print0}"
 
   _dm_tools__find__common \
@@ -170,9 +172,9 @@ _dm_tools__find__common() {
   dm_tools__value__path="$5"
 
   case "$dm_tools__decision_string" in
-  # ,----- type
-  # |,---- name
-  # ||,--- max_depth
+  # ,----- max_depth
+  # |,---- type
+  # ||,--- name
   # |||,-- print0
     0000)
       find \
@@ -183,9 +185,9 @@ _dm_tools__find__common() {
         \
 
       ;;
-  # ,----- type
-  # |,---- name
-  # ||,--- max_depth
+  # ,----- max_depth
+  # |,---- type
+  # ||,--- name
   # |||,-- print0
     0001)
       find \
@@ -196,185 +198,185 @@ _dm_tools__find__common() {
         -print0 \
 
       ;;
-  # ,----- type
-  # |,---- name
-  # ||,--- max_depth
+  # ,----- max_depth
+  # |,---- type
+  # ||,--- name
   # |||,-- print0
     0010)
       find \
         "$dm_tools__value__path" \
         \
         \
-        -maxdepth "$dm_tools__value__max_depth" \
+        -name "$dm_tools__value__name" \
         \
 
       ;;
-  # ,----- type
-  # |n---- name
-  # ||,--- max_depth
+  # ,----- max_depth
+  # |,---- type
+  # ||,--- name
   # |||,-- print0
     0011)
       find \
         "$dm_tools__value__path" \
         \
         \
-        -maxdepth "$dm_tools__value__max_depth" \
+        -name "$dm_tools__value__name" \
         -print0 \
 
       ;;
-  # ,----- type
-  # |,---- name
-  # ||,--- max_depth
+  # ,----- max_depth
+  # |,---- type
+  # ||,--- name
   # |||,-- print0
     0100)
       find \
         "$dm_tools__value__path" \
         \
-        -name "$dm_tools__value__name" \
+        -type "$dm_tools__value__type" \
         \
         \
 
       ;;
-  # ,----- type
-  # |,---- name
-  # ||,--- max_depth
+  # ,----- max_depth
+  # |,---- type
+  # ||,--- name
   # |||,-- print0
     0101)
       find \
         "$dm_tools__value__path" \
         \
-        -name "$dm_tools__value__name" \
+        -type "$dm_tools__value__type" \
         \
         -print0 \
 
       ;;
-  # ,----- type
-  # |,---- name
-  # ||,--- max_depth
+  # ,----- max_depth
+  # |,---- type
+  # ||,--- name
   # |||,-- print0
     0110)
       find \
         "$dm_tools__value__path" \
         \
+        -type "$dm_tools__value__type" \
         -name "$dm_tools__value__name" \
-        -maxdepth "$dm_tools__value__max_depth" \
         \
 
       ;;
-  # ,----- type
-  # |,---- name
-  # ||,--- max_depth
+  # ,----- max_depth
+  # |,---- type
+  # ||,--- name
   # |||,-- print0
     0111)
       find \
         "$dm_tools__value__path" \
         \
+        -type "$dm_tools__value__type" \
         -name "$dm_tools__value__name" \
-        -maxdepth "$dm_tools__value__max_depth" \
         -print0 \
 
       ;;
-  # ,----- type
-  # |,---- name
-  # ||,--- max_depth
+  # ,----- max_depth
+  # |,---- type
+  # ||,--- name
   # |||,-- print0
     1000)
       find \
         "$dm_tools__value__path" \
-        -type "$dm_tools__value__type" \
+        -maxdepth "$dm_tools__value__max_depth" \
         \
         \
         \
 
       ;;
-  # ,----- type
-  # |,---- name
-  # ||,--- max_depth
+  # ,----- max_depth
+  # |,---- type
+  # ||,--- name
   # |||,-- print0
     1001)
       find \
         "$dm_tools__value__path" \
-        -type "$dm_tools__value__type" \
+        -maxdepth "$dm_tools__value__max_depth" \
         \
         \
         -print0 \
 
       ;;
-  # ,----- type
-  # |,---- name
-  # ||,--- max_depth
+  # ,----- max_depth
+  # |,---- type
+  # ||,--- name
   # |||,-- print0
     1010)
       find \
         "$dm_tools__value__path" \
-        -type "$dm_tools__value__type" \
-        \
         -maxdepth "$dm_tools__value__max_depth" \
+        \
+        -name "$dm_tools__value__name" \
         \
 
       ;;
-  # ,----- type
-  # |,---- name
-  # ||,--- max_depth
+  # ,----- max_depth
+  # |,---- type
+  # ||,--- name
   # |||,-- print0
     1011)
       find \
         "$dm_tools__value__path" \
-        -type "$dm_tools__value__type" \
-        \
         -maxdepth "$dm_tools__value__max_depth" \
+        \
+        -name "$dm_tools__value__name" \
         -print0 \
 
       ;;
-  # ,----- type
-  # |,---- name
-  # ||,--- max_depth
+  # ,----- max_depth
+  # |,---- type
+  # ||,--- name
   # |||,-- print0
     1100)
       find \
         "$dm_tools__value__path" \
+        -maxdepth "$dm_tools__value__max_depth" \
         -type "$dm_tools__value__type" \
-        -name "$dm_tools__value__name" \
         \
         \
 
       ;;
-  # ,----- type
-  # |,---- name
-  # ||,--- max_depth
+  # ,----- max_depth
+  # |,---- type
+  # ||,--- name
   # |||,-- print0
     1101)
       find \
         "$dm_tools__value__path" \
+        -maxdepth "$dm_tools__value__max_depth" \
         -type "$dm_tools__value__type" \
-        -name "$dm_tools__value__name" \
         \
         -print0 \
 
       ;;
-  # ,----- type
-  # |,---- name
-  # ||,--- max_depth
+  # ,----- max_depth
+  # |,---- type
+  # ||,--- name
   # |||,-- print0
     1110)
       find \
         "$dm_tools__value__path" \
+        -maxdepth "$dm_tools__value__max_depth" \
         -type "$dm_tools__value__type" \
         -name "$dm_tools__value__name" \
-        -maxdepth "$dm_tools__value__max_depth" \
         \
 
       ;;
-  # ,----- type
-  # |,---- name
-  # ||,--- max_depth
+  # ,----- max_depth
+  # |,---- type
+  # ||,--- name
   # |||,-- print0
     1111)
       find \
         "$dm_tools__value__path" \
+        -maxdepth "$dm_tools__value__max_depth" \
         -type "$dm_tools__value__type" \
         -name "$dm_tools__value__name" \
-        -maxdepth "$dm_tools__value__max_depth" \
         -print0 \
 
       ;;

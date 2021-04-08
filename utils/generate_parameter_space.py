@@ -110,8 +110,9 @@ import argparse
 import re
 import sys
 from dataclasses import dataclass, field
+from typing import Any
 from typing import Generator as TypeGenerator
-from typing import List
+from typing import List, Optional
 
 
 @dataclass
@@ -121,26 +122,48 @@ class GeneratorConfiguration:
     provide all information about the parameter space generation.
     """
 
+    # Bitwise explanation of the parameter space bits represented in a shell
+    # compatible comment section.
     documentation: List[str] = field(default_factory=list)
 
+    # Parameter space size derived from the bits in the input template.
     parameter_space__size: int = 0
+    # Formatting template that should do the int -> case-esac case conversion.
     parameter_space__template: str = ""
+    # Formatting template that should do the int -> binary string conversion.
     parameter_space__combination_template: str = ""
 
+    # Raw command that is parsed from the input and simply pasted into the
+    # generated items.
     command: str = ""
 
-    fixed_indexes: List[int] = field(default_factory=list)
-
+    # Parsed parameter list that contains all the parameters passd to the
+    # input as a list.
     parameters: List[str] = field(default_factory=list)
+    # Generated emty template based on the parameter section indentation. If an
+    # iterable parameter is not active in the current combination, this
+    # template will be inserted.
     parameters__empty: str = ""
 
+    # Raw footer parsed from the input and simply pasted in to the generated
+    # items.
     footer: str = ""
+
+    # Externally set configuration that will set certain paramters as fixed
+    # parameters excluding them from the parameter combination iteration. It is
+    # expected to be a list of indexes in incrementing order.
+    fixed_indexes: List[int] = field(default_factory=list)
+    # Externally set configuration that will prevent any non matching
+    # combination to be outputted. It should be a compiled regular expression
+    # pattern, that should match binary decision strings. For example "...1."
+    # will make the second bit fixed to one.
+    combination_pattern: Optional[Any] = None
 
     class Matchers:
         documentation = re.compile(r"^\s*#.*$")
         parameter_space = re.compile(r"^(\s*)(\d+)\)$")
         command = re.compile(r"^\s+[A-Za-z0-9_-]+\s*\\$")
-        parameter = re.compile(r"^(\s+)[A-Za-z0-9_\-\$\'\"]+\s*\\$")
+        parameter = re.compile(r"^(\s+)[A-Za-z0-9_\-\$\'\"\s]+\s*\\$")
         empty_line = re.compile(r"^\s*$")
         footer = re.compile(r"^\s+;;$")
 
@@ -346,6 +369,9 @@ class Generator:
         API method. Line-by-line generator for all the configured combinations.
         """
         for combination in range(self._config.parameter_space__size):
+            if self._should_omit_current_combination(combination=combination):
+                continue
+
             lines: List[str] = []
 
             self._fill_documentation_section(lines=lines)
@@ -356,6 +382,23 @@ class Generator:
             self._fill_footer_section(lines=lines)
 
             yield from lines
+
+    def _should_omit_current_combination(self, combination: int) -> bool:
+        """
+        Function to determine if the current combination should be skipped or
+        not. The decision is based on the externally set combination_pattern
+        property. If the property is set only the matching combinations should
+        be return False value i.e. only the matching combinations should be
+        processed further.
+        """
+        if not self._config.combination_pattern:
+            return False
+        combination_template = self._config.parameter_space__combination_template
+        combination_string = combination_template.format(combination=combination)
+        if self._config.combination_pattern.match(combination_string):
+            return False
+        else:
+            return True
 
     def _fill_documentation_section(self, lines: list):
         """
@@ -434,16 +477,31 @@ if __name__ == "__main__":
         type=str,
         default="",
     )
+    parser.add_argument(
+        "-p",
+        "--combination-pattern",
+        help="regular expression pattern to lock certain part of the combinations",
+        type=str,
+        default="",
+    )
     args = parser.parse_args()
 
     lines = [line.rstrip() for line in sys.stdin]
+
     # Converting the 1-based indexes into 0-based ones.
-    fixed_indexes = [int(index) - 1 for index in args.fixed_indexes.split(",")]
+    if args.fixed_indexes:
+        fixed_indexes = [int(index) - 1 for index in args.fixed_indexes.split(",")]
+    else:
+        fixed_indexes = []
+
+    combination_pattern: Optional[Any]
+    if args.combination_pattern:
+        combination_pattern = re.compile(args.combination_pattern)
+    else:
+        combination_pattern = None
 
     try:
         config = GeneratorConfiguration.from_lines(lines=lines)
-        config.fixed_indexes = fixed_indexes
-
     except SyntaxError as e:
         print("SyntaxError during configuration parsing:")
         print(e)
@@ -452,6 +510,9 @@ if __name__ == "__main__":
         print("Unexpected error happened during configuration parsing:")
         print(e)
         sys.exit(1)
+
+    config.fixed_indexes = fixed_indexes
+    config.combination_pattern = combination_pattern
 
     generator = Generator(config=config)
     for line in generator.generate_lines():

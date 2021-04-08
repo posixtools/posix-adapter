@@ -1,3 +1,5 @@
+import re
+
 import pytest
 
 from utils.generate_parameter_space import Generator, GeneratorConfiguration
@@ -234,7 +236,7 @@ class TestGeneratorParsing:
             "    command \\",
             "      fixed_argument_1 \\",
             "      fixed_argument_2 \\",
-            "      --argument_1 \\",
+            "      --argument_1 value \\",
             "      --argument_2 \\",
             "      --argument_3 \\",
             "      --argument_4 \\",
@@ -616,6 +618,49 @@ class TestGeneratorCases:
         # Fixed parameters should be added explicitly to the config. These
         # would be passed to the command az flags.
         config.fixed_indexes = [0, 2, 4, 5]
+
+        generator = Generator(config=config)
+
+        result = [line for line in generator.generate_lines()]
+
+        assert expected == result
+
+    def test__fixed_combinations_can_be_handled(self):
+        lines = [
+            "# ,--- argument_1",
+            "# |,-- argument_2",
+            "  00)",
+            "    command \\",
+            "      --argument_1 \\",
+            "      --argument_2 \\",
+            "",
+            "    ;;",
+        ]
+
+        expected = [
+            "# ,--- argument_1",
+            "# |,-- argument_2",
+            "  01)",
+            "    command \\",
+            "      \\",
+            "      --argument_2 \\",
+            "",
+            "    ;;",
+            "# ,--- argument_1",
+            "# |,-- argument_2",
+            "  11)",
+            "    command \\",
+            "      --argument_1 \\",
+            "      --argument_2 \\",
+            "",
+            "    ;;",
+        ]
+
+        config = GeneratorConfiguration.from_lines(lines=lines)
+
+        # This pattern should lock the first bit to one, reducing the outputted
+        # combinations.
+        config.combination_pattern = re.compile(".1")
 
         generator = Generator(config=config)
 

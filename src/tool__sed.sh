@@ -10,7 +10,11 @@
 
 #==============================================================================
 #
-#  dm_tools__sed [--extended] [--expression <expression>] [<path>]
+#  dm_tools__sed
+#    [--extended]
+#    [--in-place <suffix>]
+#    [--expression <expression>]
+#    [<path>]
 #
 #------------------------------------------------------------------------------
 # Execution mapping function for the 'sed' command line tool with a
@@ -20,6 +24,7 @@
 #   None
 # Options:
 #   --extended - Use the extended regexp engine.
+#   --in-place <suffix> - In place processing with optional backup with suffix.
 #   --expression <expression> - Expression that should be executed.
 # Arguments:
 #   [1] [path] - Optional file path.
@@ -41,6 +46,9 @@
 dm_tools__sed() {
   dm_tools__flag__extended='0'
 
+  dm_tools__flag__in_place='0'
+  dm_tools__value__in_place_suffix=''
+
   dm_tools__flag__expression='0'
   dm_tools__value__expression=''
 
@@ -54,6 +62,12 @@ dm_tools__sed() {
         dm_tools__flag__extended='1'
         shift
         ;;
+      --in-place)
+        dm_tools__flag__in_place='1'
+        dm_tools__value__in_place_suffix="$2"
+        shift
+        shift
+        ;;
       --expression)
         dm_tools__flag__expression='1'
         dm_tools__value__expression="$2"
@@ -64,7 +78,7 @@ dm_tools__sed() {
         dm_tools__report_invalid_parameters \
           'dm_tools__sed' \
           "Unexpected option '${1}'!" \
-          'You can only use --extended or --expression.'
+          'You can only use --extended or --expression or --in-place.'
         ;;
       -[!-]*)
         dm_tools__report_invalid_parameters \
@@ -95,15 +109,18 @@ dm_tools__sed() {
 
   # Assembling the decision string.
   # ,----- extended
-  # |,---- expression
-  # ||,--- path
-  # 000
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+  # 0000
   dm_tools__decision="${dm_tools__flag__extended}"
+  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__in_place}"
   dm_tools__decision="${dm_tools__decision}${dm_tools__flag__expression}"
   dm_tools__decision="${dm_tools__decision}${dm_tools__flag__path}"
 
   _dm_tools__sed__common \
     "$dm_tools__decision" \
+    "$dm_tools__value__in_place_suffix" \
     "$dm_tools__value__expression" \
     "$dm_tools__value__path"
 }
@@ -117,8 +134,9 @@ dm_tools__sed() {
 #   None
 # Arguments:
 #   [1] decision_string - String that decodes the optional parameter presence.
-#   [2] value_expression -  Value passed with the expression flag.
-#   [3] value_path - Value for the positional path argument.
+#   [2] value_in_place_suffix - Value passed with the expression flag.
+#   [3] value_expression - Value passed with the expression flag.
+#   [4] value_path - Value for the positional path argument.
 # STDIN:
 #   Input passed to the mapped command.
 #------------------------------------------------------------------------------
@@ -134,46 +152,103 @@ dm_tools__sed() {
 #==============================================================================
 _dm_tools__sed__common() {
   dm_tools__decision_string="$1"
-  dm_tools__value__expression="$2"
-  dm_tools__value__path="$3"
+  dm_tools__value__in_place_suffix="$2"
+  dm_tools__value__expression="$3"
+  dm_tools__value__path="$4"
 
   case "$dm_tools__decision_string" in
   # ,----- extended
-  # |,---- expression
-  # ||,--- path
-    010)
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+    0010)
       sed \
+        \
         \
         -e "$dm_tools__value__expression" \
         \
 
       ;;
   # ,----- extended
-  # |,---- expression
-  # ||,--- path
-    011)
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+    0011)
       sed \
+        \
         \
         -e "$dm_tools__value__expression" \
         "$dm_tools__value__path" \
 
       ;;
   # ,----- extended
-  # |,---- expression
-  # ||,--- path
-    110)
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+    0110)
       sed \
-        -E \
+        \
+        -i"$dm_tools__value__in_place_suffix" \
         -e "$dm_tools__value__expression" \
         \
 
       ;;
   # ,----- extended
-  # |,---- expression
-  # ||,--- path
-    111)
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+    0111)
+      sed \
+        \
+        -i"$dm_tools__value__in_place_suffix" \
+        -e "$dm_tools__value__expression" \
+        "$dm_tools__value__path" \
+
+      ;;
+  # ,----- extended
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+    1010)
       sed \
         -E \
+        \
+        -e "$dm_tools__value__expression" \
+        \
+
+      ;;
+  # ,----- extended
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+    1011)
+      sed \
+        -E \
+        \
+        -e "$dm_tools__value__expression" \
+        "$dm_tools__value__path" \
+
+      ;;
+  # ,----- extended
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+    1110)
+      sed \
+        -E \
+        -i"$dm_tools__value__in_place_suffix" \
+        -e "$dm_tools__value__expression" \
+        \
+
+      ;;
+  # ,----- extended
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+    1111)
+      sed \
+        -E \
+        -i"$dm_tools__value__in_place_suffix" \
         -e "$dm_tools__value__expression" \
         "$dm_tools__value__path" \
 
@@ -182,7 +257,7 @@ _dm_tools__sed__common() {
       dm_tools__report_invalid_parameters \
         'dm_tools__sed' \
         'Unexpected parameter combination!' \
-        '--expression is mandatory, --extended is optional'
+        '--expression is mandatory, --extended and --in-place is optional'
       ;;
   esac
 }

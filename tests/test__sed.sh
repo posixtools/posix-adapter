@@ -95,6 +95,51 @@ else
 fi
 
 #==============================================================================
+dm_tools__test__valid_case 'sed - [path] inplace edit without backup'
+
+file_name='dummy_file_inplace'
+path="fixtures/sed/${file_name}"
+expected_original='hello'
+expected_edited='world'
+
+# Current content
+dm_tools__echo "$expected_original" > "$path"
+
+if ! dm_tools__sed --in-place '' --expression "s/hello/world/" "$path"
+then
+  status="$?"
+  dm_tools__test__test_case_failed "$status"
+fi
+
+dm_tools__test__assert_equal "$expected_edited" "$(dm_tools__cat "$path")"
+
+dm_tools__rm "$path"
+
+#==============================================================================
+dm_tools__test__valid_case 'sed - [path] inplace edit with backup'
+
+file_name='dummy_file_inplace'
+path="fixtures/sed/${file_name}"
+suffix='.backup'
+expected_original='hello'
+expected_edited='world'
+
+# Current content
+dm_tools__echo "$expected_original" > "$path"
+
+if ! dm_tools__sed --in-place '.backup' --expression "s/hello/world/" "$path"
+then
+  status="$?"
+  dm_tools__test__test_case_failed "$status"
+fi
+
+dm_tools__test__assert_equal "$expected_edited" "$(dm_tools__cat "$path")"
+
+dm_tools__rm "$path"
+# If the backup file can be deleted wihtout any error, it was there.
+dm_tools__rm "${path}${suffix}"
+
+#==============================================================================
 # ERROR CASES
 #==============================================================================
 dm_tools__test__error_case 'sed - expression is mandatory'

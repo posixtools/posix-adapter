@@ -13,9 +13,10 @@
 #  dm_tools__tput <tput_specification>..
 #
 #------------------------------------------------------------------------------
-# Execution mapping function for the 'tput' command line tool with a uniform
-# interface. This is the only command mapping besides printf that is only a
-# proxy because of the nature of tput.
+# Execution mapping function for the 'tput' command line tool. This is the only
+# command mapping besides printf that is only a proxy because of the nature of
+# tput. It also performs a fail-safe step and supresses not supported escape
+# sequences by returnin an empty string in case of error.
 #------------------------------------------------------------------------------
 # Globals:
 #   None
@@ -33,13 +34,13 @@
 # STDERR:
 #   Mapped command's error output. Mapping error output.
 # Status:
-#   0  - Call was successful.
-#   .. - Call failed with it's error status
-#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
-#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#   0 - Other staus is not expected.
 #==============================================================================
 dm_tools__tput() {
-  tput "$@"
+  if ! tput "$@" 2>/dev/null
+  then
+    printf '%s' ''
+  fi
 }
 
 #==============================================================================

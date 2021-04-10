@@ -9,7 +9,7 @@ link_name="${base_path}/dummy_link"
 
 dm_tools__rm --force "$link_name"
 
-if dm_tools__ln --target "$target" --link_name "$link_name"
+if dm_tools__ln --target "$target" --link-name "$link_name"
 then
   # With the hard link there should be two matches.
   expected='2'
@@ -34,7 +34,7 @@ link_name="${base_path}/dummy_link"
 
 dm_tools__rm --force "$link_name"
 
-if dm_tools__ln --symbolic --target "$target" --link_name "$link_name"
+if dm_tools__ln --symbolic --target "$target" --link-name "$link_name"
 then
   # One symbolic link should be created.
   expected='1'

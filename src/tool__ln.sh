@@ -72,7 +72,7 @@ dm_tools__ln() {
         shift
         shift
         ;;
-      --link_name)
+      --link-name)
         dm_tools__flag__link_name='1'
         dm_tools__value__link_name="$2"
         shift
@@ -82,7 +82,7 @@ dm_tools__ln() {
         dm_tools__report_invalid_parameters \
           'dm_tools__ln' \
           "Unexpected option '${1}'!" \
-          'Only --symbolic --verbose --target and --link_name are available.'
+          'Only --symbolic --verbose --target and --link-name are available.'
         ;;
       -[!-]*)
         dm_tools__report_invalid_parameters \

@@ -61,7 +61,7 @@ dm_tools__echo() {
         dm_tools__report_invalid_parameters \
           'dm_tools__echo' \
           "Unexpected option '${1}'!" \
-          'This function does not take options.'
+          'Only --no-newline is available.'
         ;;
       -[!-]*)
         dm_tools__report_invalid_parameters \

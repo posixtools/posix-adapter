@@ -717,6 +717,36 @@ else
 fi
 
 #==============================================================================
+dm_tools__test__valid_case 'find - full parameter space - samefile'
+
+find_base_dir='./fixtures/find'
+
+# tests/fixtures/find/  0
+# ├── dir               0
+# │   └── file_c_1      0
+# ├── file_a_1          1
+# ├── file_a_2          1
+# └── file_b_1          0
+# Because of the same file flag, only one file would be found.
+expected='1'
+
+if result="$( \
+  dm_tools__find "$find_base_dir" 2>&1 \
+    --max-depth '1' \
+    --type 'f' \
+    --name 'file_a*' \
+    --same-file "${find_base_dir}/file_a_1" \
+    --print0 \
+  | dm_tools__tr --replace '\0' ' ' 2>&1 | dm_tools__wc --words 2>&1 \
+)"
+then
+  dm_tools__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  dm_tools__test__test_case_failed "$status"
+fi
+
+#==============================================================================
 # ERROR CASES
 #==============================================================================
 dm_tools__test__error_case 'find - multiple paths should result an error'

@@ -104,6 +104,8 @@ dm_tools__test__line
 dm_tools__test__line
 . './test__grep.sh'
 dm_tools__test__line
+. './test__ln.sh'
+dm_tools__test__line
 . './test__ls.sh'
 dm_tools__test__line
 . './test__mkdir.sh'

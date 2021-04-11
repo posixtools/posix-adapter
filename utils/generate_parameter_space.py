@@ -158,6 +158,9 @@ class GeneratorConfiguration:
     # pattern, that should match binary decision strings. For example "...1."
     # will make the second bit fixed to one.
     combination_pattern: Optional[Any] = None
+    # Externally set configuration that makes the combinations exclusive only.
+    # i.e. for a three sized decision string: 001 010 100.
+    exclusive: bool = False
 
     class Matchers:
         documentation = re.compile(r"^\s*#.*$")
@@ -391,10 +394,17 @@ class Generator:
         be return False value i.e. only the matching combinations should be
         processed further.
         """
-        if not self._config.combination_pattern:
-            return False
         combination_template = self._config.parameter_space__combination_template
         combination_string = combination_template.format(combination=combination)
+
+        if self._config.exclusive:
+            ones = combination_string.replace("0", "")
+            if len(ones) > 1 or len(ones) == 0:
+                return True
+
+        if not self._config.combination_pattern:
+            return False
+
         if self._config.combination_pattern.match(combination_string):
             return False
         else:
@@ -484,6 +494,12 @@ if __name__ == "__main__":
         type=str,
         default="",
     )
+    parser.add_argument(
+        "-e",
+        "--exclusive",
+        help="flag to make the possible combinations exclusive only. i.e. 001 010 100",
+        action="store_true",
+    )
     args = parser.parse_args()
 
     lines = [line.rstrip() for line in sys.stdin]
@@ -513,6 +529,7 @@ if __name__ == "__main__":
 
     config.fixed_indexes = fixed_indexes
     config.combination_pattern = combination_pattern
+    config.exclusive = args.exclusive
 
     generator = Generator(config=config)
     for line in generator.generate_lines():

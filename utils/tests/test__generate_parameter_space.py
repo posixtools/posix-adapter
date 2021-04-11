@@ -667,3 +667,45 @@ class TestGeneratorCases:
         result = [line for line in generator.generate_lines()]
 
         assert expected == result
+
+    def test__exclusive_combinations_can_be_handled(self):
+        lines = [
+            "# ,--- argument_1",
+            "# |,-- argument_2",
+            "  00)",
+            "    command \\",
+            "      --argument_1 \\",
+            "      --argument_2 \\",
+            "",
+            "    ;;",
+        ]
+
+        expected = [
+            "# ,--- argument_1",
+            "# |,-- argument_2",
+            "  01)",
+            "    command \\",
+            "      \\",
+            "      --argument_2 \\",
+            "",
+            "    ;;",
+            "# ,--- argument_1",
+            "# |,-- argument_2",
+            "  10)",
+            "    command \\",
+            "      --argument_1 \\",
+            "      \\",
+            "",
+            "    ;;",
+        ]
+
+        config = GeneratorConfiguration.from_lines(lines=lines)
+
+        # This config should only allow exclusive combinations.
+        config.exclusive = True
+
+        generator = Generator(config=config)
+
+        result = [line for line in generator.generate_lines()]
+
+        assert expected == result

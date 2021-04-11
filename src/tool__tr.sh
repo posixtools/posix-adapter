@@ -10,7 +10,10 @@
 
 #==============================================================================
 #
-#  dm_tools__tr [--delete <char>] [--replace <target> <value>]
+#  dm_tools__tr
+#    [--delete <char>]
+#    [--replace <target> <value>]
+#    [--squeeze-repeats <char>]
 #
 #------------------------------------------------------------------------------
 # Execution mapping function for the 'tr' command line tool with a uniform
@@ -22,6 +25,8 @@
 #   --delete <char> - tr compatible --delete flag.
 #   --replace <target> <value> - Default tr functionality put behind an option
 #                                to make it more explicit.
+#   --squeeze-repeats <char> - Deletes repeated occurences of the given
+#                              character or character class.
 # Arguments:
 #   None
 # STDIN:
@@ -47,6 +52,9 @@ dm_tools__tr() {
   dm_tools__value__replace__target=''
   dm_tools__value__replace__value=''
 
+  dm_tools__flag__squeeze='0'
+  dm_tools__value__squeeze=''
+
   while [ "$#" -gt '0' ]
   do
     dm_tools__param="$1"
@@ -65,11 +73,17 @@ dm_tools__tr() {
         shift
         shift
         ;;
+      --squeeze-repeats)
+        dm_tools__flag__squeeze='1'
+        dm_tools__value__squeeze="$2"
+        shift
+        shift
+        ;;
     --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__tr' \
           "Unexpected option '${1}'!" \
-          'Only --delete or --replace is available.'
+          'Only --delete or --replace or --squeeze-repeats is available.'
         ;;
     -[!-]*)
         dm_tools__report_invalid_parameters \
@@ -87,17 +101,20 @@ dm_tools__tr() {
   done
 
   # Assembling the decision string.
-  # ,--- delete
-  # |,-- replace
-  # 00
+  # ,---- delete
+  # |,--- replace
+  # ||,-- squeeze_repeats
+  # 000
   dm_tools__decision="${dm_tools__flag__delete}"
   dm_tools__decision="${dm_tools__decision}${dm_tools__flag__replace}"
+  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__squeeze}"
 
   _dm_tools__tr__common \
     "$dm_tools__decision" \
     "$dm_tools__value__delete" \
     "$dm_tools__value__replace__target" \
-    "$dm_tools__value__replace__value"
+    "$dm_tools__value__replace__value" \
+    "$dm_tools__value__squeeze"
 }
 
 #==============================================================================
@@ -112,6 +129,7 @@ dm_tools__tr() {
 #   [2] value_delete -  Value passed with the delete option.
 #   [3] value_replace_target -  Target value passed with the replace option.
 #   [4] value_replace_value -  Value passed with the replace option.
+#   [5] value_squeeze -  Value passed with the squeeze repeats option.
 # STDIN:
 #   Input passed to the mapped command.
 #------------------------------------------------------------------------------
@@ -130,21 +148,36 @@ _dm_tools__tr__common() {
   dm_tools__value__delete="$2"
   dm_tools__value__replace__target="$3"
   dm_tools__value__replace__value="$4"
+  dm_tools__value__squeeze="$5"
 
   case "$dm_tools__decision_string" in
-  # ,--- delete
-  # |,-- replace
-    01)
+  # ,---- delete
+  # |,--- replace
+  # ||,-- squeeze_repeats
+    001)
+      tr \
+        \
+        \
+        -s "$dm_tools__value__squeeze" \
+
+      ;;
+  # ,---- delete
+  # |,--- replace
+  # ||,-- squeeze_repeats
+    010)
       tr \
         \
         "$dm_tools__value__replace__target" "$dm_tools__value__replace__value" \
+        \
 
       ;;
-  # ,--- delete
-  # |,-- replace
-    10)
+  # ,---- delete
+  # |,--- replace
+  # ||,-- squeeze_repeats
+    100)
       tr \
         -d "$dm_tools__value__delete" \
+        \
         \
 
       ;;
@@ -152,7 +185,7 @@ _dm_tools__tr__common() {
       dm_tools__report_invalid_parameters \
         'dm_tools__tr' \
         'Unexpected parameter combination!' \
-        'Only --delete or --replace is available.'
+        'Only --delete or --replace  or --squeeze-repeats is available.'
       ;;
   esac
 }

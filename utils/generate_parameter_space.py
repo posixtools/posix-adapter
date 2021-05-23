@@ -166,7 +166,7 @@ class GeneratorConfiguration:
         documentation = re.compile(r"^\s*#.*$")
         parameter_space = re.compile(r"^(\s*)(\d+)\)$")
         command = re.compile(r"^\s+[A-Za-z0-9_-]+\s*\\$")
-        parameter = re.compile(r"^(\s+)[A-Za-z0-9_\-\$\'\"\s]+\s*\\$")
+        parameter = re.compile(r"^(\s+)[A-Za-z0-9_\-\$\'\"\s\{\}]+\s*\\$")
         empty_line = re.compile(r"^\s*$")
         footer = re.compile(r"^\s+;;$")
 
@@ -483,7 +483,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-f",
         "--fixed-indexes",
-        help="1-based list of fixed parameter indexes",
+        help="1-based comma separated list of fixed parameter indexes",
         type=str,
         default="",
     )

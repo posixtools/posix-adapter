@@ -21,6 +21,7 @@
 # Options:
 #   --recursive - rm compatible flag for the -r flag.
 #   --force - rm compatible flag for the -f flag.
+#   --verbose - rm compatible flag for the -v flag.
 # Arguments:
 #   [1] path - Path that should be removed.
 # STDIN:
@@ -41,6 +42,7 @@
 dm_tools__rm() {
   dm_tools__flag__recursive='0'
   dm_tools__flag__force='0'
+  dm_tools__flag__verbose='0'
 
   dm_tools__flag__path='0'
   dm_tools__value__path=''
@@ -54,6 +56,10 @@ dm_tools__rm() {
         ;;
       --force)
         dm_tools__flag__force='1'
+        shift
+        ;;
+      --verbose)
+        dm_tools__flag__verbose='1'
         shift
         ;;
       --[!-]*)
@@ -93,11 +99,13 @@ dm_tools__rm() {
   fi
 
   # Assembling the decision string.
-  # ,--- recursive
-  # |,-- force
-  # 00
+  # ,---- recursive
+  # |,--- force
+  # ||,-- verbose
+  # 000
   dm_tools__decision="${dm_tools__flag__recursive}"
   dm_tools__decision="${dm_tools__decision}${dm_tools__flag__force}"
+  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__verbose}"
 
   _dm_tools__rm__common \
     "$dm_tools__decision" \
@@ -132,47 +140,107 @@ _dm_tools__rm__common() {
   dm_tools__value__path="$2"
 
   case "$dm_tools__decision_string" in
-  # ,--- recursive
-  # |,-- force
-    00)
+  # ,---- recursive
+  # |,--- force
+  # ||,-- verbose
+  # 000
+    000)
       rm \
         \
         \
-        "${dm_tools__value__path}" \
+        \
+        "$dm_tools__value__path" \
 
       ;;
-  # ,--- recursive
-  # |,-- force
-    01)
+  # ,---- recursive
+  # |,--- force
+  # ||,-- verbose
+  # 000
+    001)
+      rm \
+        \
+        \
+        -v \
+        "$dm_tools__value__path" \
+
+      ;;
+  # ,---- recursive
+  # |,--- force
+  # ||,-- verbose
+  # 000
+    010)
       rm \
         \
         -f \
-        "${dm_tools__value__path}" \
+        \
+        "$dm_tools__value__path" \
 
       ;;
-  # ,--- recursive
-  # |,-- force
-    10)
+  # ,---- recursive
+  # |,--- force
+  # ||,-- verbose
+  # 000
+    011)
+      rm \
+        \
+        -f \
+        -v \
+        "$dm_tools__value__path" \
+
+      ;;
+  # ,---- recursive
+  # |,--- force
+  # ||,-- verbose
+  # 000
+    100)
       rm \
         -r \
         \
-        "${dm_tools__value__path}" \
+        \
+        "$dm_tools__value__path" \
 
       ;;
-  # ,--- recursive
-  # |,-- force
-    11)
+  # ,---- recursive
+  # |,--- force
+  # ||,-- verbose
+  # 000
+    101)
+      rm \
+        -r \
+        \
+        -v \
+        "$dm_tools__value__path" \
+
+      ;;
+  # ,---- recursive
+  # |,--- force
+  # ||,-- verbose
+  # 000
+    110)
       rm \
         -r \
         -f \
-        "${dm_tools__value__path}" \
+        \
+        "$dm_tools__value__path" \
+
+      ;;
+  # ,---- recursive
+  # |,--- force
+  # ||,-- verbose
+  # 000
+    111)
+      rm \
+        -r \
+        -f \
+        -v \
+        "$dm_tools__value__path" \
 
       ;;
     *)
       dm_tools__report_invalid_parameters \
         'dm_tools__rm' \
         'Unexpected parameter combination!' \
-        'You can only have --no-symlink.'
+        'You can only have --recursive --force and --verbose.'
       ;;
   esac
 }

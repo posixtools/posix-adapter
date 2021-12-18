@@ -114,40 +114,48 @@ _dm_tools__xxd__common() {
   # ,------ plain
   # |,----- revert
     00)
-      xxd \
-        \
-        \
-
+      dm_tools__report_invalid_parameters \
+        'dm_tools__xxd' \
+        'Unexpected parameter combination!' \
+        'You can only use --plain [--revert].'
       ;;
   # ,------ plain
   # |,----- revert
     01)
-      xxd \
-        \
-        -r \
-
+      dm_tools__report_invalid_parameters \
+        'dm_tools__xxd' \
+        'Unexpected parameter combination!' \
+        'You can only use --plain [--revert].'
       ;;
   # ,------ plain
   # |,----- revert
     10)
-      xxd \
-        -p \
-        \
-
+      if command -v xxd >/dev/null
+      then
+        xxd -p
+      else
+        # Since xxd is not a common tool and for linux it is mostly shipped
+        # with vim, we are replacing its functionality with python as a last
+        # resort.
+        python -c 'import sys;print("".join([line.encode().hex() for line in sys.stdin]))'
+      fi
       ;;
   # ,------ plain
   # |,----- revert
     11)
-      xxd \
-        -p \
-        -r \
-
+      if command -v xxd >/dev/null
+      then
+        xxd -p -r
+      else
+        # See the explanation one case up for the usage of python.
+        python -c 'import sys;print("".join([bytearray.fromhex(line).decode() for line in sys.stdin]).rstrip())'
+      fi
       ;;
     *)
       dm_tools__report_invalid_parameters \
         'dm_tools__xxd' \
         'Unexpected parameter combination!' \
-        'You can only use --plain --revert.'
+        'You can only use --plain [--revert].'
       ;;
   esac
 }

@@ -117,8 +117,8 @@ dm_tools__path_prefix="${DM_TOOLS__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX}"
 . "${dm_tools__path_prefix}/src/tool__echo.sh"
 # shellcheck source=./src/tool__find.sh
 . "${dm_tools__path_prefix}/src/tool__find.sh"
-# shellcheck source=./src/tool__fmt.sh
-. "${dm_tools__path_prefix}/src/tool__fmt.sh"
+# shellcheck source=./src/tool__fold.sh
+. "${dm_tools__path_prefix}/src/tool__fold.sh"
 # shellcheck source=./src/tool__grep.sh
 . "${dm_tools__path_prefix}/src/tool__grep.sh"
 # shellcheck source=./src/tool__ln.sh

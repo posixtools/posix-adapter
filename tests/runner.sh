@@ -102,7 +102,7 @@ dm_tools__test__line
 dm_tools__test__line
 . './test__find.sh'
 dm_tools__test__line
-. './test__fmt.sh'
+. './test__fold.sh'
 dm_tools__test__line
 . './test__grep.sh'
 dm_tools__test__line

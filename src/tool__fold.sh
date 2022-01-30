@@ -1,27 +1,27 @@
 #==============================================================================
 #
-#   __           _
-#  / _|_ __ ___ | |_
-# | |_| '_ ` _ \| __|
-# |  _| | | | | | |_
-# |_| |_| |_| |_|\__|
+#   __       _     _
+#  / _| ___ | | __| |
+# | |_ / _ \| |/ _` |
+# |  _| (_) | | (_| |
+# |_|  \___/|_|\__,_|
 #==============================================================================
-# TOOL: FMT
+# TOOL: FOLD
 #==============================================================================
 
 #==============================================================================
 #
-#  dm_tools__fmt [--split-only] --width <line_width>
+#  dm_tools__fold [--spaces] --width <line_width>
 #
 #------------------------------------------------------------------------------
-# Execution mapping function for the 'fmt' command line tool with a
+# Execution mapping function for the 'fold' command line tool with a
 # uniform interface.
 #------------------------------------------------------------------------------
 # Globals:
 #   None
 # Options:
-#   --split-only - Use the modern fmt compatible -s flag.
-#   --width <line_width> - Use the fmt compatible -w flag.
+#   --spaces - Use the fold compatible -s flag to break at spaces
+#   --width <line_width> - Use the fold compatible -w flag.
 # Arguments:
 #   None
 # STDIN:
@@ -39,8 +39,8 @@
 #   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
 #   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
 #==============================================================================
-dm_tools__fmt() {
-  dm_tools__flag__split_only='0'
+dm_tools__fold() {
+  dm_tools__flag__spaces='0'
 
   dm_tools__flag__width='0'
   dm_tools__value__width=''
@@ -48,8 +48,8 @@ dm_tools__fmt() {
   while [ "$#" -gt '0' ]
   do
     case "$1" in
-      --split-only)
-        dm_tools__flag__split_only='1'
+      --spaces)
+        dm_tools__flag__spaces='1'
         shift
         ;;
       --width)
@@ -60,19 +60,19 @@ dm_tools__fmt() {
         ;;
       --[!-]*)
         dm_tools__report_invalid_parameters \
-          'dm_tools__fmt' \
+          'dm_tools__fold' \
           "Unexpected option '${1}'!" \
-          'You can only use --split-only and --width.'
+          'You can only use --spaces and --width.'
         ;;
       -[!-]*)
         dm_tools__report_invalid_parameters \
-          'dm_tools__fmt' \
+          'dm_tools__fold' \
           "Invalid single dashed option '${1}'!" \
           "dm_tools only uses double dashed options like '--option'."
         ;;
       *)
         dm_tools__report_invalid_parameters \
-          'dm_tools__fmt' \
+          'dm_tools__fold' \
           'Unexpected parameter!' \
           "Parameter '${1}' is unexpected!"
         ;;
@@ -80,34 +80,19 @@ dm_tools__fmt() {
   done
 
   # Assembling the decision string.
-  # ,----- split_only
+  # ,----- spaces
   # |,---- width
   # 00
-  dm_tools__decision="${dm_tools__flag__split_only}"
+  dm_tools__decision="${dm_tools__flag__spaces}"
   dm_tools__decision="${dm_tools__decision}${dm_tools__flag__width}"
 
-  case "$DM_TOOLS__RUNTIME__OS" in
-
-    "$DM_TOOLS__CONSTANT__OS__LINUX")
-      _dm_tools__fmt__linux \
-        "$dm_tools__decision" \
-        "$dm_tools__value__width"
-      ;;
-
-    "$DM_TOOLS__CONSTANT__OS__MACOS")
-      _dm_tools__fmt__macos \
-        "$dm_tools__decision" \
-        "$dm_tools__value__width"
-      ;;
-
-    *)
-      dm_tools__report_incompatible_call 'dm_tools__fmt'
-      ;;
-  esac
+  _dm_tools__fold__common \
+    "$dm_tools__decision" \
+    "$dm_tools__value__width"
 }
 
 #==============================================================================
-# Linux based call mapping function.
+# Common based call mapping function.
 #------------------------------------------------------------------------------
 # Globals:
 #   None
@@ -129,117 +114,49 @@ dm_tools__fmt() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_dm_tools__fmt__linux() {
+_dm_tools__fold__common() {
   dm_tools__decision_string="$1"
   dm_tools__value__width="$2"
 
   case "$dm_tools__decision_string" in
-  # ,----- split_only
+  # ,----- spaces
   # |,---- width
     00)
-      fmt \
+      fold \
         \
         \
 
       ;;
-  # ,----- split_only
+  # ,----- spaces
   # |,---- width
     01)
-      fmt \
-        \
-        --width "$dm_tools__value__width" \
-
-      ;;
-  # ,----- split_only
-  # |,---- width
-    10)
-      fmt \
-        --split-only \
-        \
-
-      ;;
-  # ,----- split_only
-  # |,---- width
-    11)
-      fmt \
-        --split-only \
-        --width "$dm_tools__value__width" \
-
-      ;;
-    *)
-      dm_tools__report_invalid_parameters \
-        'dm_tools__fmt' \
-        'Unexpected parameter combination!' \
-        'You can only use --split-only and --width.'
-      ;;
-  esac
-}
-
-#==============================================================================
-# Macos based call mapping function.
-#------------------------------------------------------------------------------
-# Globals:
-#   None
-# Options:
-#   None
-# Arguments:
-#   [1] decision_string - String that decodes the optional parameter presence.
-#   [2] value_width - Value for optional width parameter.
-# STDIN:
-#   Input passed to the mapped command.
-#------------------------------------------------------------------------------
-# Output variables:
-#   None
-# STDOUT:
-#   Mapped command's output.
-# STDERR:
-#   Mapped command's error output. Mapping error output.
-# Status:
-#   0  - Call succeeded.
-#   .. - Call failed with it's error status
-#==============================================================================
-_dm_tools__fmt__linux() {
-  dm_tools__decision_string="$1"
-  dm_tools__value__width="$2"
-
-  case "$dm_tools__decision_string" in
-  # ,----- split_only
-  # |,---- width
-    00)
-      fmt \
-        \
-        \
-
-      ;;
-  # ,----- split_only
-  # |,---- width
-    01)
-      fmt \
+      fold \
         \
         -w "$dm_tools__value__width" \
 
       ;;
-  # ,----- split_only
+  # ,----- spaces
   # |,---- width
     10)
-      fmt \
+      fold \
         -s \
         \
 
       ;;
-  # ,----- split_only
+  # ,----- spaces
   # |,---- width
     11)
-      fmt \
+      fold \
         -s \
         -w "$dm_tools__value__width" \
 
       ;;
     *)
       dm_tools__report_invalid_parameters \
-        'dm_tools__fmt' \
+        'dm_tools__fold' \
         'Unexpected parameter combination!' \
-        'You can only use --split-only and --width.'
+        'You can only use --spaces and --width.'
       ;;
   esac
 }
+

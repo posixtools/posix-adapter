@@ -1,17 +1,21 @@
 # These tests are working on the provided fixtures:
 # tests/fixtures/realpath/
+# ├── dir_1
+# ├── dir_2
+# │   └── direct_symlink -> ../target_file
 # ├── direct_symlink -> target_file
 # └── target_file
 
 #==============================================================================
 # VALID CASES
 #==============================================================================
-dm_tools__test__valid_case 'realpath - default mode'
+dm_tools__test__valid_case 'realpath - 00 - no symlink'
 
+# Target file absolute path should be returned.
 target_path='fixtures/realpath/target_file'
-expected='target_file'
+expected="$(pwd)/fixtures/realpath/target_file"
 
-if result="$(dm_tools__realpath "$target_path" | dm_tools__basename)"
+if result="$(dm_tools__realpath "$target_path")"
 then
   dm_tools__test__assert_equal "$expected" "$result"
 else
@@ -20,12 +24,137 @@ else
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'realpath - no-symlinks mode'
+dm_tools__test__valid_case 'realpath - 00 - symlink'
 
-target_path='fixtures/realpath/direct_link'
-expected='direct_link'
+# Target file should be accessible through the direct symlink.
+target_path='fixtures/realpath/direct_symlink'
+expected="$(pwd)/fixtures/realpath/target_file"
 
-if result="$(dm_tools__realpath --no-symlinks "$target_path" | dm_tools__basename)"
+if result="$(dm_tools__realpath "$target_path")"
+then
+  dm_tools__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  dm_tools__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+dm_tools__test__valid_case 'realpath - 01 - no symlink'
+
+target_path='fixtures/realpath/target_file'
+relative_to='fixtures/realpath/dir_1'
+expected="../target_file"
+
+if result="$(dm_tools__realpath --relative-to "$relative_to" "$target_path")"
+then
+  dm_tools__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  dm_tools__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+dm_tools__test__valid_case 'realpath - 01 - symlink - same path'
+
+# Relative calculations should be possible through a symlink.
+target_path='fixtures/realpath/direct_symlink'
+relative_to='fixtures/realpath/dir_1'
+expected="../target_file"
+
+if result="$(dm_tools__realpath --relative-to "$relative_to" "$target_path")"
+then
+  dm_tools__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  dm_tools__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+dm_tools__test__valid_case 'realpath - 01 - symlink - different path'
+
+# Relative calculations should be possible through a symlink.
+target_path='fixtures/realpath/dir_2/direct_symlink'
+relative_to='fixtures/realpath/dir_1'
+expected="../target_file"
+
+if result="$(dm_tools__realpath --relative-to "$relative_to" "$target_path")"
+then
+  dm_tools__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  dm_tools__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+dm_tools__test__valid_case 'realpath - 10 - no symlink'
+
+# Target file absolute path should be returned.
+target_path='fixtures/realpath/target_file'
+expected="$(pwd)/fixtures/realpath/target_file"
+
+if result="$(dm_tools__realpath --no-symlinks "$target_path")"
+then
+  dm_tools__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  dm_tools__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+dm_tools__test__valid_case 'realpath - 10 - symlink'
+
+# No symlinks should be followed, the symlink's absolute path should be returned.
+target_path='fixtures/realpath/direct_symlink'
+expected="$(pwd)/fixtures/realpath/direct_symlink"
+
+if result="$(dm_tools__realpath --no-symlinks "$target_path")"
+then
+  dm_tools__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  dm_tools__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+dm_tools__test__valid_case 'realpath - 11 - no symlink'
+
+target_path='fixtures/realpath/target_file'
+relative_to='fixtures/realpath/dir_1'
+expected="../target_file"
+
+if result="$(dm_tools__realpath --no-symlinks --relative-to "$relative_to" "$target_path")"
+then
+  dm_tools__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  dm_tools__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+dm_tools__test__valid_case 'realpath - 11 - symlink - same path'
+
+# Relative calculations should be possible through a symlink.
+target_path='fixtures/realpath/direct_symlink'
+relative_to='fixtures/realpath/dir_1'
+expected="../direct_symlink"
+
+if result="$(dm_tools__realpath --no-symlinks --relative-to "$relative_to" "$target_path")"
+then
+  dm_tools__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  dm_tools__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+dm_tools__test__valid_case 'realpath - 11 - symlink - different path'
+
+# Relative calculations should be possible through a symlink.
+target_path='fixtures/realpath/dir_2/direct_symlink'
+relative_to='fixtures/realpath/dir_1'
+expected="../dir_2/direct_symlink"
+
+if result="$(dm_tools__realpath --no-symlinks --relative-to "$relative_to" "$target_path")"
 then
   dm_tools__test__assert_equal "$expected" "$result"
 else

@@ -10,7 +10,8 @@
 
 #==============================================================================
 #
-#  dm_tools__realpath [--no-symlinks] <path>
+#  dm_tools__realpath [--no-symlinks] <target_path>
+#  dm_tools__realpath [--no-symlinks] --relative-to <path> <target_path>
 #
 #------------------------------------------------------------------------------
 # Execution mapping function for the 'realpath' command line tool with a
@@ -40,6 +41,9 @@
 dm_tools__realpath() {
   dm_tools__flag__no_symlinks='0'
 
+  dm_tools__flag__relative_to='0'
+  dm_tools__value__relative_to=''
+
   dm_tools__flag__path='0'
   dm_tools__value__path=''
 
@@ -50,11 +54,17 @@ dm_tools__realpath() {
         dm_tools__flag__no_symlinks='1'
         shift
         ;;
+      --relative-to)
+        dm_tools__flag__relative_to='1'
+        dm_tools__value__relative_to="$2"
+        shift
+        shift
+        ;;
       --[!-]*)
         dm_tools__report_invalid_parameters \
           'dm_tools__realpath' \
           "Unexpected option '${1}'!" \
-          'You can only use --no-symlinks.'
+          'You can only have --no-symlinks or --relative-to.'
         ;;
       -[!-]*)
         dm_tools__report_invalid_parameters \
@@ -87,21 +97,25 @@ dm_tools__realpath() {
   fi
 
   # Assembling the decision string.
-  # ,-- no_symlinks
-  # 0
+  # ,--- no_symlinks
+  # |,-- relative-to
+  # 00
   dm_tools__decision="${dm_tools__flag__no_symlinks}"
+  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__relative_to}"
 
   case "$DM_TOOLS__RUNTIME__OS" in
 
     "$DM_TOOLS__CONSTANT__OS__LINUX")
       _dm_tools__realpath__linux \
         "$dm_tools__decision" \
+        "$dm_tools__value__relative_to" \
         "$dm_tools__value__path"
       ;;
 
     "$DM_TOOLS__CONSTANT__OS__MACOS")
       _dm_tools__realpath__darwin \
         "$dm_tools__decision" \
+        "$dm_tools__value__relative_to" \
         "$dm_tools__value__path"
       ;;
 
@@ -120,7 +134,8 @@ dm_tools__realpath() {
 #   None
 # Arguments:
 #   [1] decision_string - String that decodes the optional parameter presence.
-#   [2] value_path - Path value.
+#   [2] dm_tools__value__relative_to - Path value.
+#   [3] value_path - Path value.
 # STDIN:
 #   Input passed to the mapped command.
 #------------------------------------------------------------------------------
@@ -136,20 +151,43 @@ dm_tools__realpath() {
 #==============================================================================
 _dm_tools__realpath__linux() {
   dm_tools__decision_string="$1"
-  dm_tools__value__path="$2"
+  dm_tools__value__relative_to="$2"
+  dm_tools__value__path="$3"
 
   case "$dm_tools__decision_string" in
-  # ,-- no_symlinks
-    0)
+  # ,--- no_symlinks
+  # |,-- relative-to
+    00)
       realpath \
+        \
         \
         "$dm_tools__value__path" \
 
       ;;
-  # ,-- no_symlinks
-    1)
+  # ,--- no_symlinks
+  # |,-- relative-to
+    01)
+      realpath \
+        \
+        --relative-to="$dm_tools__value__relative_to" \
+        "$dm_tools__value__path" \
+
+      ;;
+  # ,--- no_symlinks
+  # |,-- relative-to
+    10)
       realpath \
         -s \
+        \
+        "$dm_tools__value__path" \
+
+      ;;
+  # ,--- no_symlinks
+  # |,-- relative-to
+    11)
+      realpath \
+        -s \
+        --relative-to="$dm_tools__value__relative_to" \
         "$dm_tools__value__path" \
 
       ;;
@@ -157,7 +195,7 @@ _dm_tools__realpath__linux() {
       dm_tools__report_invalid_parameters \
         'dm_tools__realpath' \
         'Unexpected parameter combination!' \
-        'You can only have --no-symlinks.'
+        'You can only have --no-symlinks or --relative-to.'
       ;;
   esac
 }
@@ -171,7 +209,8 @@ _dm_tools__realpath__linux() {
 #   None
 # Arguments:
 #   [1] decision_string - String that decodes the optional parameter presence.
-#   [2] value_path - Path value.
+#   [2] dm_tools__value__relative_to - Path value.
+#   [3] value_path - Path value.
 # STDIN:
 #   Input passed to the mapped command.
 #------------------------------------------------------------------------------
@@ -187,34 +226,55 @@ _dm_tools__realpath__linux() {
 #==============================================================================
 _dm_tools__realpath__darwin() {
   dm_tools__decision_string="$1"
-  dm_tools__value__path="$2"
+  dm_tools__value__relative_to="$2"
+  dm_tools__value__path="$3"
 
   case "$dm_tools__decision_string" in
-  # ,-- no-symlinks
-    0)
+  # ,--- no_symlinks
+  # |,-- relative-to
+    00)
       if ! realpath "$dm_tools__value__path" 2>/dev/null
       then
-        # Using python as a last resort..
         python -c \
-          'import os,sys; print(os.path.realpath(os.path.expanduser(sys.argv[1])))' \
+          'from os.path import expanduser,realpath;import sys;print(realpath(expanduser(sys.argv[1])))' \
           "$dm_tools__value__path"
       fi
       ;;
-  # ,-- no-symlinks
-    1)
+  # ,--- no_symlinks
+  # |,-- relative-to
+    01)
+      if ! realpath --relative-to="$dm_tools__value__relative_to" "$dm_tools__value__path" 2>/dev/null
+      then
+        python -c \
+          'from os.path import relpath,expanduser,realpath;import sys;print(relpath(realpath(expanduser(sys.argv[1])),realpath(expanduser(sys.argv[2]))))' \
+          "$dm_tools__value__path" "$dm_tools__value__relative_to"
+      fi
+      ;;
+  # ,--- no_symlinks
+  # |,-- relative-to
+    10)
       if ! realpath -s "$dm_tools__value__path" 2>/dev/null
       then
-        # Using python as a last resort..
         python -c \
-          'import os,sys; print(os.path.abspath(os.path.expanduser(sys.argv[1])))' \
+          'from os.path import expanduser,abspath;import sys;print(abspath(expanduser(sys.argv[1])))' \
           "$dm_tools__value__path"
+      fi
+      ;;
+  # ,--- no_symlinks
+  # |,-- relative-to
+    11)
+      if ! realpath --relative-to="$dm_tools__value__relative_to" "$dm_tools__value__path" 2>/dev/null
+      then
+        python -c \
+          'from os.path import relpath,expanduser,abspath;import sys;print(relpath(abspath(expanduser(sys.argv[1])),abspath(expanduser(sys.argv[2]))))' \
+          "$dm_tools__value__path" "$dm_tools__value__relative_to"
       fi
       ;;
     *)
       dm_tools__report_invalid_parameters \
         'dm_tools__realpath' \
         'Unexpected parameter combination!' \
-        'You can only have --no-symlinks.'
+        'You can only have --no-symlinks or --relative-to.'
       ;;
   esac
 }

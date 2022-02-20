@@ -616,7 +616,7 @@ class TestGeneratorCases:
         config = GeneratorConfiguration.from_lines(lines=lines)
 
         # Fixed parameters should be added explicitly to the config. These
-        # would be passed to the command az flags.
+        # would be passed to the command as flags.
         config.fixed_indexes = [0, 2, 4, 5]
 
         generator = Generator(config=config)

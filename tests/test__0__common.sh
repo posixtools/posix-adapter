@@ -1,3 +1,5 @@
+#!/bin/sh
+
 printf '%s' "${DIM}"
 printf '%s\n' \
   'Here we are testing the actual testing tools for both success and failure '

@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # These tests are working on the provided fixtures:
 # tests/fixtures/find/
 # ├── dir

@@ -1,3 +1,4 @@
+#!/bin/sh
 # These tests are working on the provided fixtures:
 # tests/fixtures/readlink/
 # ├── direct_symlink -> target_file

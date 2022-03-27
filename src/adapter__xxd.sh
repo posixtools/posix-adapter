@@ -11,7 +11,7 @@
 
 #==============================================================================
 #
-#  dm_tools__xxd [--plain] [--revert]
+#  posix_adapter__xxd [--plain] [--revert]
 #
 #------------------------------------------------------------------------------
 # Execution mapping function for the 'xxd' command line tool with a uniform
@@ -36,39 +36,39 @@
 # Status:
 #   0  - Call was successful.
 #   .. - Call failed with it's error status
-#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
-#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
 #==============================================================================
-dm_tools__xxd() {
-  dm_tools__flag__plain='0'
-  dm_tools__flag__revert='0'
+posix_adapter__xxd() {
+  posix_adapter__flag__plain='0'
+  posix_adapter__flag__revert='0'
 
   while [ "$#" -gt '0' ]
   do
     case "$1" in
       --plain)
-        dm_tools__flag__plain='1'
+        posix_adapter__flag__plain='1'
         shift
         ;;
       --revert)
-        dm_tools__flag__revert='1'
+        posix_adapter__flag__revert='1'
         shift
         ;;
       --[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__xxd' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__xxd' \
           "Unexpected option '${1}'!" \
           'You can only use --plain --revert.'
         ;;
       -[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__xxd' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__xxd' \
           "Invalid single dashed option '${1}'!" \
-          "dm_tools only uses double dashed options like '--option'."
+          "posix_adapter only uses double dashed options like '--option'."
         ;;
       *)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__xxd' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__xxd' \
           'Unexpected parameter!' \
           "Parameter '${1}' is unexpected!"
         ;;
@@ -79,11 +79,11 @@ dm_tools__xxd() {
   # ,------ plain
   # |,----- revert
   # 00
-  dm_tools__decision="${dm_tools__flag__plain}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__revert}"
+  posix_adapter__decision="${posix_adapter__flag__plain}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__revert}"
 
-  _dm_tools__xxd__common \
-    "$dm_tools__decision"
+  _posix_adapter__xxd__common \
+    "$posix_adapter__decision"
 }
 
 #==============================================================================
@@ -108,23 +108,23 @@ dm_tools__xxd() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_dm_tools__xxd__common() {
-  dm_tools__decision_string="$1"
+_posix_adapter__xxd__common() {
+  posix_adapter__decision_string="$1"
 
-  case "$dm_tools__decision_string" in
+  case "$posix_adapter__decision_string" in
   # ,------ plain
   # |,----- revert
     00)
-      dm_tools__report_invalid_parameters \
-        'dm_tools__xxd' \
+      posix_adapter__report_invalid_parameters \
+        'posix_adapter__xxd' \
         'Unexpected parameter combination!' \
         'You can only use --plain [--revert].'
       ;;
   # ,------ plain
   # |,----- revert
     01)
-      dm_tools__report_invalid_parameters \
-        'dm_tools__xxd' \
+      posix_adapter__report_invalid_parameters \
+        'posix_adapter__xxd' \
         'Unexpected parameter combination!' \
         'You can only use --plain [--revert].'
       ;;
@@ -153,8 +153,8 @@ _dm_tools__xxd__common() {
       fi
       ;;
     *)
-      dm_tools__report_invalid_parameters \
-        'dm_tools__xxd' \
+      posix_adapter__report_invalid_parameters \
+        'posix_adapter__xxd' \
         'Unexpected parameter combination!' \
         'You can only use --plain [--revert].'
       ;;

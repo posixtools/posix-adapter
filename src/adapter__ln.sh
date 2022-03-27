@@ -12,7 +12,7 @@
 
 #==============================================================================
 #
-#  dm_tools__ln
+#  posix_adapter__ln
 #    [--symbolic]
 #    [--verbose]
 #    --target <target_path>
@@ -43,57 +43,57 @@
 # Status:
 #   0  - Call was successful.
 #   .. - Call failed with it's error status
-#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
-#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
 #==============================================================================
-dm_tools__ln() {
-  dm_tools__flag__symbolic='0'
-  dm_tools__flag__verbose='0'
+posix_adapter__ln() {
+  posix_adapter__flag__symbolic='0'
+  posix_adapter__flag__verbose='0'
 
-  dm_tools__flag__target='0'
-  dm_tools__value__target=''
+  posix_adapter__flag__target='0'
+  posix_adapter__value__target=''
 
-  dm_tools__flag__link_name='0'
-  dm_tools__value__link_name=''
+  posix_adapter__flag__link_name='0'
+  posix_adapter__value__link_name=''
 
   while [ "$#" -gt '0' ]
   do
     case "$1" in
       --symbolic)
-        dm_tools__flag__symbolic='1'
+        posix_adapter__flag__symbolic='1'
         shift
         ;;
       --verbose)
-        dm_tools__flag__verbose='1'
+        posix_adapter__flag__verbose='1'
         shift
         ;;
       --target)
-        dm_tools__flag__target='1'
-        dm_tools__value__target="$2"
+        posix_adapter__flag__target='1'
+        posix_adapter__value__target="$2"
         shift
         shift
         ;;
       --link-name)
-        dm_tools__flag__link_name='1'
-        dm_tools__value__link_name="$2"
+        posix_adapter__flag__link_name='1'
+        posix_adapter__value__link_name="$2"
         shift
         shift
         ;;
       --[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__ln' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__ln' \
           "Unexpected option '${1}'!" \
           'Only --symbolic --verbose --target and --link-name are available.'
         ;;
       -[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__ln' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__ln' \
           "Invalid single dashed option '${1}'!" \
-          "dm_tools only uses double dashed options like '--option'."
+          "posix_adapter only uses double dashed options like '--option'."
         ;;
       *)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__ln' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__ln' \
           'Unexpected parameter!' \
           'This function does not take positional arguments.'
         ;;
@@ -106,15 +106,15 @@ dm_tools__ln() {
   # ||,--- target
   # |||,-- link_name
   # 0000
-  dm_tools__decision="${dm_tools__flag__symbolic}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__verbose}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__target}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__link_name}"
+  posix_adapter__decision="${posix_adapter__flag__symbolic}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__verbose}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__target}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__link_name}"
 
-  _dm_tools__ln__common \
-    "$dm_tools__decision" \
-    "$dm_tools__value__target" \
-    "$dm_tools__value__link_name"
+  _posix_adapter__ln__common \
+    "$posix_adapter__decision" \
+    "$posix_adapter__value__target" \
+    "$posix_adapter__value__link_name"
 }
 
 #==============================================================================
@@ -141,12 +141,12 @@ dm_tools__ln() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_dm_tools__ln__common() {
-  dm_tools__decision_string="$1"
-  dm_tools__value__target_path="$2"
-  dm_tools__value__link_name="$3"
+_posix_adapter__ln__common() {
+  posix_adapter__decision_string="$1"
+  posix_adapter__value__target_path="$2"
+  posix_adapter__value__link_name="$3"
 
-  case "$dm_tools__decision_string" in
+  case "$posix_adapter__decision_string" in
   # ,----- symbolic
   # |,---- verbose
   # ||,--- target
@@ -155,8 +155,8 @@ _dm_tools__ln__common() {
       ln \
         \
         \
-        "$dm_tools__value__target_path" \
-        "$dm_tools__value__link_name" \
+        "$posix_adapter__value__target_path" \
+        "$posix_adapter__value__link_name" \
 
       ;;
   # ,----- symbolic
@@ -167,8 +167,8 @@ _dm_tools__ln__common() {
       ln \
         \
         -v \
-        "$dm_tools__value__target_path" \
-        "$dm_tools__value__link_name" \
+        "$posix_adapter__value__target_path" \
+        "$posix_adapter__value__link_name" \
 
       ;;
   # ,----- symbolic
@@ -179,8 +179,8 @@ _dm_tools__ln__common() {
       ln \
         -s \
         \
-        "$dm_tools__value__target_path" \
-        "$dm_tools__value__link_name" \
+        "$posix_adapter__value__target_path" \
+        "$posix_adapter__value__link_name" \
 
       ;;
   # ,----- symbolic
@@ -191,13 +191,13 @@ _dm_tools__ln__common() {
       ln \
         -s \
         -v \
-        "$dm_tools__value__target_path" \
-        "$dm_tools__value__link_name" \
+        "$posix_adapter__value__target_path" \
+        "$posix_adapter__value__link_name" \
 
       ;;
     *)
-      dm_tools__report_invalid_parameters \
-        'dm_tools__ln' \
+      posix_adapter__report_invalid_parameters \
+        'posix_adapter__ln' \
         'Unexpected parameter combination!' \
         'Only --symbolic --verbose are optional -target and --link_name are mandatory.'
       ;;

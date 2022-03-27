@@ -11,7 +11,7 @@
 
 #==============================================================================
 #
-#  dm_tools__uname
+#  posix_adapter__uname
 #    [--kernel-name]
 #    [--kernel-release]
 #    [--machine]
@@ -40,44 +40,44 @@
 # Status:
 #   0  - Call was successful.
 #   .. - Call failed with it's error status
-#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
-#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
 #==============================================================================
-dm_tools__uname() {
-  dm_tools__flag__kernel_name='0'
-  dm_tools__flag__kernel_release='0'
-  dm_tools__flag__machine='0'
+posix_adapter__uname() {
+  posix_adapter__flag__kernel_name='0'
+  posix_adapter__flag__kernel_release='0'
+  posix_adapter__flag__machine='0'
 
   while [ "$#" -gt '0' ]
   do
     case "$1" in
       --kernel-name)
-        dm_tools__flag__kernel_name='1'
+        posix_adapter__flag__kernel_name='1'
         shift
         ;;
       --kernel-release)
-        dm_tools__flag__kernel_release='1'
+        posix_adapter__flag__kernel_release='1'
         shift
         ;;
       --machine)
-        dm_tools__flag__machine='1'
+        posix_adapter__flag__machine='1'
         shift
         ;;
       --[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__uname' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__uname' \
           "Unexpected option '${1}'!" \
           'You can only use --kernel-name --kernel-release and --machine.'
         ;;
       -[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__uname' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__uname' \
           "Invalid single dashed option '${1}'!" \
-          "dm_tools only uses double dashed options like '--option'."
+          "posix_adapter only uses double dashed options like '--option'."
         ;;
       *)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__uname' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__uname' \
           'Unexpected parameter!' \
           "Parameter '${1}' is unexpected!"
         ;;
@@ -89,12 +89,12 @@ dm_tools__uname() {
   # |,----- kernel_release
   # ||,---- machine
   # 000
-  dm_tools__decision="${dm_tools__flag__kernel_name}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__kernel_release}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__machine}"
+  posix_adapter__decision="${posix_adapter__flag__kernel_name}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__kernel_release}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__machine}"
 
-  _dm_tools__uname__common \
-    "$dm_tools__decision"
+  _posix_adapter__uname__common \
+    "$posix_adapter__decision"
 }
 
 #==============================================================================
@@ -119,10 +119,10 @@ dm_tools__uname() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_dm_tools__uname__common() {
-  dm_tools__decision_string="$1"
+_posix_adapter__uname__common() {
+  posix_adapter__decision_string="$1"
 
-  case "$dm_tools__decision_string" in
+  case "$posix_adapter__decision_string" in
   # ,------ kernel_name
   # |,----- kernel_release
   # ||,---- machine
@@ -194,8 +194,8 @@ _dm_tools__uname__common() {
 
       ;;
     *)
-      dm_tools__report_invalid_parameters \
-        'dm_tools__uname' \
+      posix_adapter__report_invalid_parameters \
+        'posix_adapter__uname' \
         'Unexpected parameter combination!' \
         'You can only have --kernel_name --kernel_release --machine.'
       ;;

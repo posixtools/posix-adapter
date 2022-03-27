@@ -24,7 +24,7 @@ echo '==========================================================================
 echo " Working in:  '$(pwd)'"
 echo " Target_path: '${path}'"
 echo '-------------------------------------------------------------------------------'
-echo ' Looking for potential commands that are not covered with dm_tools..'
+echo ' Looking for potential commands that are not covered with posix_adapter..'
 echo '-------------------------------------------------------------------------------'
 
 get_lines() {
@@ -46,6 +46,6 @@ do
 done
 
 echo '-------------------------------------------------------------------------------'
-echo ' You should look through the source code and validate if a dm_tools mapping is'
-echo ' needed or not.'
+echo ' You should look through the source code and validate if a posix_adapter'
+echo ' mapping is needed or not.'
 echo '==============================================================================='

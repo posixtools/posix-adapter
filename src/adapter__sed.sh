@@ -11,7 +11,7 @@
 
 #==============================================================================
 #
-#  dm_tools__sed
+#  posix_adapter__sed
 #    [--extended]
 #    [--in-place <suffix>]
 #    [--expression <expression>]
@@ -41,68 +41,68 @@
 # Status:
 #   0  - Call was successful.
 #   .. - Call failed with it's error status
-#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
-#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
 #==============================================================================
-dm_tools__sed() {
-  dm_tools__flag__extended='0'
+posix_adapter__sed() {
+  posix_adapter__flag__extended='0'
 
-  dm_tools__flag__in_place='0'
-  dm_tools__value__in_place_suffix=''
+  posix_adapter__flag__in_place='0'
+  posix_adapter__value__in_place_suffix=''
 
-  dm_tools__flag__expression='0'
-  dm_tools__value__expression=''
+  posix_adapter__flag__expression='0'
+  posix_adapter__value__expression=''
 
-  dm_tools__flag__path='0'
-  dm_tools__value__path=''
+  posix_adapter__flag__path='0'
+  posix_adapter__value__path=''
 
   while [ "$#" -gt '0' ]
   do
     case "$1" in
       --extended)
-        dm_tools__flag__extended='1'
+        posix_adapter__flag__extended='1'
         shift
         ;;
       --in-place)
-        dm_tools__flag__in_place='1'
-        dm_tools__value__in_place_suffix="$2"
+        posix_adapter__flag__in_place='1'
+        posix_adapter__value__in_place_suffix="$2"
         shift
         shift
         ;;
       --expression)
-        dm_tools__flag__expression='1'
-        dm_tools__value__expression="$2"
+        posix_adapter__flag__expression='1'
+        posix_adapter__value__expression="$2"
         shift
         shift
         ;;
       --[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__sed' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__sed' \
           "Unexpected option '${1}'!" \
           'You can only use --extended or --expression or --in-place.'
         ;;
       -[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__sed' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__sed' \
           "Invalid single dashed option '${1}'!" \
-          "dm_tools only uses double dashed options like '--option'."
+          "posix_adapter only uses double dashed options like '--option'."
         ;;
       *)
-        if [ "$dm_tools__flag__path" -eq '0' ]
+        if [ "$posix_adapter__flag__path" -eq '0' ]
         then
-          dm_tools__flag__path='1'
-          dm_tools__value__path="$1"
+          posix_adapter__flag__path='1'
+          posix_adapter__value__path="$1"
           shift
         else
-          dm_tools__error_details="$( \
+          posix_adapter__error_details="$( \
             printf '%s' 'You have already passed a path argument, you '; \
             printf '%s' 'probably forgot the --expression flag before '; \
-            printf '%s\n' 'your expression which is mandatory in dm_tools.' \
+            printf '%s\n' 'your expression which is mandatory in posix_adapter.' \
           )"
-          dm_tools__report_invalid_parameters \
-            'dm_tools__sed' \
+          posix_adapter__report_invalid_parameters \
+            'posix_adapter__sed' \
             'Unexpected parameter!' \
-            "$dm_tools__error_details"
+            "$posix_adapter__error_details"
         fi
         ;;
     esac
@@ -114,16 +114,16 @@ dm_tools__sed() {
   # ||,--- expression
   # |||,-- path
   # 0000
-  dm_tools__decision="${dm_tools__flag__extended}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__in_place}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__expression}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__path}"
+  posix_adapter__decision="${posix_adapter__flag__extended}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__in_place}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__expression}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__path}"
 
-  _dm_tools__sed__common \
-    "$dm_tools__decision" \
-    "$dm_tools__value__in_place_suffix" \
-    "$dm_tools__value__expression" \
-    "$dm_tools__value__path"
+  _posix_adapter__sed__common \
+    "$posix_adapter__decision" \
+    "$posix_adapter__value__in_place_suffix" \
+    "$posix_adapter__value__expression" \
+    "$posix_adapter__value__path"
 }
 
 #==============================================================================
@@ -151,13 +151,13 @@ dm_tools__sed() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_dm_tools__sed__common() {
-  dm_tools__decision_string="$1"
-  dm_tools__value__in_place_suffix="$2"
-  dm_tools__value__expression="$3"
-  dm_tools__value__path="$4"
+_posix_adapter__sed__common() {
+  posix_adapter__decision_string="$1"
+  posix_adapter__value__in_place_suffix="$2"
+  posix_adapter__value__expression="$3"
+  posix_adapter__value__path="$4"
 
-  case "$dm_tools__decision_string" in
+  case "$posix_adapter__decision_string" in
   # ,----- extended
   # |,---- in_place
   # ||,--- expression
@@ -166,7 +166,7 @@ _dm_tools__sed__common() {
       sed \
         \
         \
-        -e "$dm_tools__value__expression" \
+        -e "$posix_adapter__value__expression" \
         \
 
       ;;
@@ -178,8 +178,8 @@ _dm_tools__sed__common() {
       sed \
         \
         \
-        -e "$dm_tools__value__expression" \
-        "$dm_tools__value__path" \
+        -e "$posix_adapter__value__expression" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,----- extended
@@ -189,8 +189,8 @@ _dm_tools__sed__common() {
     0110)
       sed \
         \
-        -i"$dm_tools__value__in_place_suffix" \
-        -e "$dm_tools__value__expression" \
+        -i"$posix_adapter__value__in_place_suffix" \
+        -e "$posix_adapter__value__expression" \
         \
 
       ;;
@@ -201,9 +201,9 @@ _dm_tools__sed__common() {
     0111)
       sed \
         \
-        -i"$dm_tools__value__in_place_suffix" \
-        -e "$dm_tools__value__expression" \
-        "$dm_tools__value__path" \
+        -i"$posix_adapter__value__in_place_suffix" \
+        -e "$posix_adapter__value__expression" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,----- extended
@@ -214,7 +214,7 @@ _dm_tools__sed__common() {
       sed \
         -E \
         \
-        -e "$dm_tools__value__expression" \
+        -e "$posix_adapter__value__expression" \
         \
 
       ;;
@@ -226,8 +226,8 @@ _dm_tools__sed__common() {
       sed \
         -E \
         \
-        -e "$dm_tools__value__expression" \
-        "$dm_tools__value__path" \
+        -e "$posix_adapter__value__expression" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,----- extended
@@ -237,8 +237,8 @@ _dm_tools__sed__common() {
     1110)
       sed \
         -E \
-        -i"$dm_tools__value__in_place_suffix" \
-        -e "$dm_tools__value__expression" \
+        -i"$posix_adapter__value__in_place_suffix" \
+        -e "$posix_adapter__value__expression" \
         \
 
       ;;
@@ -249,14 +249,14 @@ _dm_tools__sed__common() {
     1111)
       sed \
         -E \
-        -i"$dm_tools__value__in_place_suffix" \
-        -e "$dm_tools__value__expression" \
-        "$dm_tools__value__path" \
+        -i"$posix_adapter__value__in_place_suffix" \
+        -e "$posix_adapter__value__expression" \
+        "$posix_adapter__value__path" \
 
       ;;
     *)
-      dm_tools__report_invalid_parameters \
-        'dm_tools__sed' \
+      posix_adapter__report_invalid_parameters \
+        'posix_adapter__sed' \
         'Unexpected parameter combination!' \
         '--expression is mandatory, --extended and --in-place is optional'
       ;;

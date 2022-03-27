@@ -11,8 +11,8 @@
 
 #==============================================================================
 #
-#  dm_tools__cut --delimiter <delimiter_char> --fields <index_def> [file]
-#  dm_tools__cut --characters <index_def> [file]
+#  posix_adapter__cut --delimiter <delimiter_char> --fields <index_def> [file]
+#  posix_adapter__cut --characters <index_def> [file]
 #
 #------------------------------------------------------------------------------
 # Execution mapping function for the 'cut' command line tool with a uniform
@@ -38,65 +38,65 @@
 # Status:
 #   0  - Call was successful.
 #   .. - Call failed with it's error status
-#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
-#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
 #==============================================================================
-dm_tools__cut() {
-  dm_tools__flag__delimiter='0'
-  dm_tools__value__delimiter=''
+posix_adapter__cut() {
+  posix_adapter__flag__delimiter='0'
+  posix_adapter__value__delimiter=''
 
-  dm_tools__flag__fields='0'
-  dm_tools__value__fields=''
+  posix_adapter__flag__fields='0'
+  posix_adapter__value__fields=''
 
-  dm_tools__flag__characters='0'
-  dm_tools__value__characters=''
+  posix_adapter__flag__characters='0'
+  posix_adapter__value__characters=''
 
-  dm_tools__flag__file='0'
-  dm_tools__value__file=''
+  posix_adapter__flag__file='0'
+  posix_adapter__value__file=''
 
   while [ "$#" -gt '0' ]
   do
     case "$1" in
       --delimiter)
-        dm_tools__flag__delimiter='1'
-        dm_tools__value__delimiter="$2"
+        posix_adapter__flag__delimiter='1'
+        posix_adapter__value__delimiter="$2"
         shift
         shift
         ;;
       --fields)
-        dm_tools__flag__fields='1'
-        dm_tools__value__fields="$2"
+        posix_adapter__flag__fields='1'
+        posix_adapter__value__fields="$2"
         shift
         shift
         ;;
       --characters)
-        dm_tools__flag__characters='1'
-        dm_tools__value__characters="$2"
+        posix_adapter__flag__characters='1'
+        posix_adapter__value__characters="$2"
         shift
         shift
         ;;
       --[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__cut' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__cut' \
           "Unexpected option '${1}'!" \
           'You can only use (--delimiter --fields) or (--characters).'
         ;;
       -[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__cut' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__cut' \
           "Invalid single dashed option '${1}'!" \
-          "dm_tools only uses double dashed options like '--option'."
+          "posix_adapter only uses double dashed options like '--option'."
         ;;
       *)
         # Only one file is needed for now.
-        if [ "$dm_tools__flag__file" -eq '0' ]
+        if [ "$posix_adapter__flag__file" -eq '0' ]
         then
-          dm_tools__flag__file='1'
-          dm_tools__value__file="$1"
+          posix_adapter__flag__file='1'
+          posix_adapter__value__file="$1"
           shift
         else
-          dm_tools__report_invalid_parameters \
-            'dm_tools__cut' \
+          posix_adapter__report_invalid_parameters \
+            'posix_adapter__cut' \
             'Unexpected parameter!' \
             "Parameter '${1}' is unexpected!"
         fi
@@ -110,17 +110,17 @@ dm_tools__cut() {
   # ||,--- characters
   # |||,-- file
   # 0000
-  dm_tools__decision="${dm_tools__flag__delimiter}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__fields}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__characters}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__file}"
+  posix_adapter__decision="${posix_adapter__flag__delimiter}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__fields}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__characters}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__file}"
 
-  _dm_tools__cut__common \
-    "$dm_tools__decision" \
-    "$dm_tools__value__delimiter" \
-    "$dm_tools__value__fields" \
-    "$dm_tools__value__characters" \
-    "$dm_tools__value__file"
+  _posix_adapter__cut__common \
+    "$posix_adapter__decision" \
+    "$posix_adapter__value__delimiter" \
+    "$posix_adapter__value__fields" \
+    "$posix_adapter__value__characters" \
+    "$posix_adapter__value__file"
 }
 
 #==============================================================================
@@ -150,22 +150,22 @@ dm_tools__cut() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_dm_tools__cut__common() {
-  dm_tools__decision_string="$1"
-  dm_tools__value__delimiter="$2"
-  dm_tools__value__fields="$3"
-  dm_tools__value__characters="$4"
-  dm_tools__value__file="$5"
+_posix_adapter__cut__common() {
+  posix_adapter__decision_string="$1"
+  posix_adapter__value__delimiter="$2"
+  posix_adapter__value__fields="$3"
+  posix_adapter__value__characters="$4"
+  posix_adapter__value__file="$5"
 
-  case "$dm_tools__decision_string" in
+  case "$posix_adapter__decision_string" in
   # ,----- delimiter
   # |,---- fields
   # ||,--- characters
   # |||,-- file
     1100)
       cut \
-        -d "$dm_tools__value__delimiter" \
-        -f "$dm_tools__value__fields" \
+        -d "$posix_adapter__value__delimiter" \
+        -f "$posix_adapter__value__fields" \
         \
         \
 
@@ -178,7 +178,7 @@ _dm_tools__cut__common() {
       cut \
         \
         \
-        -c "$dm_tools__value__characters" \
+        -c "$posix_adapter__value__characters" \
         \
 
       ;;
@@ -188,10 +188,10 @@ _dm_tools__cut__common() {
   # |||,-- file
     1101)
       cut \
-        -d "$dm_tools__value__delimiter" \
-        -f "$dm_tools__value__fields" \
+        -d "$posix_adapter__value__delimiter" \
+        -f "$posix_adapter__value__fields" \
         \
-        "$dm_tools__value__file" \
+        "$posix_adapter__value__file" \
 
       ;;
   # ,----- delimiter
@@ -202,13 +202,13 @@ _dm_tools__cut__common() {
       cut \
         \
         \
-        -c "$dm_tools__value__characters" \
-        "$dm_tools__value__file" \
+        -c "$posix_adapter__value__characters" \
+        "$posix_adapter__value__file" \
 
       ;;
     *)
-      dm_tools__report_invalid_parameters \
-        'dm_tools__cut' \
+      posix_adapter__report_invalid_parameters \
+        'posix_adapter__cut' \
         'Unexpected parameter combination!' \
         'You can only have (--delimiter --fields) or (--characters).'
       ;;

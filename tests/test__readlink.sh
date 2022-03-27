@@ -8,111 +8,111 @@
 #==============================================================================
 # VALID CASES
 #==============================================================================
-dm_tools__test__valid_case 'readlink - direct link can be resolved'
+posix_adapter__test__valid_case 'readlink - direct link can be resolved'
 
 symlink_path='fixtures/readlink/direct_symlink'
 expected='target_file'
 
-if result="$(dm_tools__readlink "$symlink_path" | dm_tools__basename)"
+if result="$(posix_adapter__readlink "$symlink_path" | posix_adapter__basename)"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case \
+posix_adapter__test__valid_case \
   'readlink - indirect link will only resolve into the pointed symlink'
 
 symlink_path='fixtures/readlink/indirect_symlink'
 expected='direct_symlink'
 
-if result="$(dm_tools__readlink "$symlink_path" | dm_tools__basename)"
+if result="$(posix_adapter__readlink "$symlink_path" | posix_adapter__basename)"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case \
+posix_adapter__test__valid_case \
   'readlink - indirect link with canonicalize mode can be resolved'
 
 symlink_path='fixtures/readlink/indirect_symlink'
 expected='target_file'
 
 if result="$( \
-  dm_tools__readlink --canonicalize "$symlink_path" | dm_tools__basename \
+  posix_adapter__readlink --canonicalize "$symlink_path" | posix_adapter__basename \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
 # ERROR CASES
 #==============================================================================
-dm_tools__test__error_case 'readlink - only symlinks can be resolved'
+posix_adapter__test__error_case 'readlink - only symlinks can be resolved'
 
 symlink_path='fixtures/readlink/target_file'
 
-if dm_tools__readlink "$symlink_path"
+if posix_adapter__readlink "$symlink_path"
 then
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 else
-  dm_tools__test__test_case_passed
+  posix_adapter__test__test_case_passed
 fi
 
 #==============================================================================
-dm_tools__test__error_case 'readlink - missing path should result in an error'
+posix_adapter__test__error_case 'readlink - missing path should result in an error'
 
-if error_message="$(dm_tools__readlink 2>&1)"
+if error_message="$(posix_adapter__readlink 2>&1)"
 then
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
 fi
 
 #==============================================================================
-dm_tools__test__error_case \
+posix_adapter__test__error_case \
   'readlink - multiple paths should result in an error'
 
-if error_message="$(dm_tools__readlink 'link_1' 'link_2' 2>&1)"
+if error_message="$(posix_adapter__readlink 'link_1' 'link_2' 2>&1)"
 then
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
 fi
 
 #==============================================================================
-dm_tools__test__error_case 'readlink - invalid option'
+posix_adapter__test__error_case 'readlink - invalid option'
 
-if error_message="$(dm_tools__readlink --option 2>&1)"
+if error_message="$(posix_adapter__readlink --option 2>&1)"
 then
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
 fi
 
 #==============================================================================
-dm_tools__test__error_case 'readlink - invalid option style'
+posix_adapter__test__error_case 'readlink - invalid option style'
 
-if error_message="$(dm_tools__readlink -option 2>&1)"
+if error_message="$(posix_adapter__readlink -option 2>&1)"
 then
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
 fi

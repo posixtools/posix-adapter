@@ -11,7 +11,7 @@
 
 #==============================================================================
 #
-#  dm_tools__xargs
+#  posix_adapter__xargs
 #    [--null]
 #    [--replace <replace_string>]
 #    [--max-args <arg_count>]
@@ -41,48 +41,48 @@
 # Status:
 #   0  - Call was successful.
 #   .. - Call failed with it's error status
-#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
-#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
 #==============================================================================
-dm_tools__xargs() {
-  dm_tools__flag__null='0'
+posix_adapter__xargs() {
+  posix_adapter__flag__null='0'
 
-  dm_tools__flag__replace='0'
-  dm_tools__value__replace='0'
+  posix_adapter__flag__replace='0'
+  posix_adapter__value__replace='0'
 
-  dm_tools__flag__max_args='0'
-  dm_tools__value__max_args='0'
+  posix_adapter__flag__max_args='0'
+  posix_adapter__value__max_args='0'
 
   while [ "$#" -gt '0' ]
   do
     case "$1" in
       --null)
-        dm_tools__flag__null='1'
+        posix_adapter__flag__null='1'
         shift
         ;;
       --replace)
-        dm_tools__flag__replace='1'
-        dm_tools__value__replace="$2"
+        posix_adapter__flag__replace='1'
+        posix_adapter__value__replace="$2"
         shift
         shift
         ;;
       --max-args)
-        dm_tools__flag__max_args='1'
-        dm_tools__value__max_args="$2"
+        posix_adapter__flag__max_args='1'
+        posix_adapter__value__max_args="$2"
         shift
         shift
         ;;
       --[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__xargs' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__xargs' \
           "Unexpected option '${1}'!" \
           'You can only use --null --replace --max-args.'
         ;;
       -[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__xargs' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__xargs' \
           "Invalid single dashed option '${1}'!" \
-          "dm_tools only uses double dashed options like '--option'."
+          "posix_adapter only uses double dashed options like '--option'."
         ;;
       *)
         # We are breaking here to have all the additional parameters available
@@ -97,14 +97,14 @@ dm_tools__xargs() {
   # |,----- replace
   # ||,---- max_args
   # 000
-  dm_tools__decision="${dm_tools__flag__null}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__replace}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__max_args}"
+  posix_adapter__decision="${posix_adapter__flag__null}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__replace}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__max_args}"
 
-  _dm_tools__xargs__common \
-    "$dm_tools__decision" \
-    "$dm_tools__value__replace" \
-    "$dm_tools__value__max_args" \
+  _posix_adapter__xargs__common \
+    "$posix_adapter__decision" \
+    "$posix_adapter__value__replace" \
+    "$posix_adapter__value__max_args" \
     "$@"
 }
 
@@ -133,15 +133,15 @@ dm_tools__xargs() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_dm_tools__xargs__common() {
-  dm_tools__decision_string="$1"
+_posix_adapter__xargs__common() {
+  posix_adapter__decision_string="$1"
   shift
-  dm_tools__value__replace="$1"
+  posix_adapter__value__replace="$1"
   shift
-  dm_tools__value__max_args="$1"
+  posix_adapter__value__max_args="$1"
   shift
 
-  case "$dm_tools__decision_string" in
+  case "$posix_adapter__decision_string" in
   # ,------ null
   # |,----- replace
   # ||,---- max_args
@@ -160,7 +160,7 @@ _dm_tools__xargs__common() {
       xargs \
         \
         \
-        -n "$dm_tools__value__max_args" \
+        -n "$posix_adapter__value__max_args" \
         "$@" \
 
       ;;
@@ -170,7 +170,7 @@ _dm_tools__xargs__common() {
     010)
       xargs \
         \
-        -I "$dm_tools__value__replace" \
+        -I "$posix_adapter__value__replace" \
         \
         "$@" \
 
@@ -181,8 +181,8 @@ _dm_tools__xargs__common() {
     011)
       xargs \
         \
-        -I "$dm_tools__value__replace" \
-        -n "$dm_tools__value__max_args" \
+        -I "$posix_adapter__value__replace" \
+        -n "$posix_adapter__value__max_args" \
         "$@" \
 
       ;;
@@ -204,7 +204,7 @@ _dm_tools__xargs__common() {
       xargs \
         -0 \
         \
-        -n "$dm_tools__value__max_args" \
+        -n "$posix_adapter__value__max_args" \
         "$@" \
 
       ;;
@@ -214,7 +214,7 @@ _dm_tools__xargs__common() {
     110)
       xargs \
         -0 \
-        -I "$dm_tools__value__replace" \
+        -I "$posix_adapter__value__replace" \
         \
         "$@" \
 
@@ -225,14 +225,14 @@ _dm_tools__xargs__common() {
     111)
       xargs \
         -0 \
-        -I "$dm_tools__value__replace" \
-        -n "$dm_tools__value__max_args" \
+        -I "$posix_adapter__value__replace" \
+        -n "$posix_adapter__value__max_args" \
         "$@" \
 
       ;;
     *)
-      dm_tools__report_invalid_parameters \
-        'dm_tools__xargs' \
+      posix_adapter__report_invalid_parameters \
+        'posix_adapter__xargs' \
         'Unexpected parameter combination!' \
         'You can only use --null --replace --max-args.'
       ;;

@@ -11,7 +11,7 @@
 
 #==============================================================================
 #
-#  dm_tools__sort [--zero-terminated] [--dictionary-order] [<path>]
+#  posix_adapter__sort [--zero-terminated] [--dictionary-order] [<path>]
 #
 #------------------------------------------------------------------------------
 # Execution mapping function for the 'sed' command line tool with a
@@ -36,48 +36,48 @@
 # Status:
 #   0  - Call was successful.
 #   .. - Call failed with it's error status
-#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
-#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
 #==============================================================================
-dm_tools__sort() {
-  dm_tools__flag__zero_terminated='0'
-  dm_tools__flag__dictionary_order='0'
+posix_adapter__sort() {
+  posix_adapter__flag__zero_terminated='0'
+  posix_adapter__flag__dictionary_order='0'
 
-  dm_tools__flag__path='0'
-  dm_tools__value__path=''
+  posix_adapter__flag__path='0'
+  posix_adapter__value__path=''
 
   while [ "$#" -gt '0' ]
   do
     case "$1" in
       --zero-terminated)
-        dm_tools__flag__zero_terminated='1'
+        posix_adapter__flag__zero_terminated='1'
         shift
         ;;
       --dictionary-order)
-        dm_tools__flag__dictionary_order='1'
+        posix_adapter__flag__dictionary_order='1'
         shift
         ;;
       --[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__sort' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__sort' \
           "Unexpected option '${1}'!" \
           'You can only use --zero-terminated or --dictionary-order.'
         ;;
       -[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__sort' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__sort' \
           "Invalid single dashed option '${1}'!" \
-          "dm_tools only uses double dashed options like '--option'."
+          "posix_adapter only uses double dashed options like '--option'."
         ;;
       *)
-        if [ "$dm_tools__flag__path" -eq '0' ]
+        if [ "$posix_adapter__flag__path" -eq '0' ]
         then
-          dm_tools__flag__path='1'
-          dm_tools__value__path="$1"
+          posix_adapter__flag__path='1'
+          posix_adapter__value__path="$1"
           shift
         else
-          dm_tools__report_invalid_parameters \
-            'dm_tools__sort' \
+          posix_adapter__report_invalid_parameters \
+            'posix_adapter__sort' \
             'Unexpected parameter!' \
             "Parameter '${1}' is unexpected!"
         fi
@@ -90,13 +90,13 @@ dm_tools__sort() {
   # |,---- dictionary_order
   # ||,--- path
   # 000
-  dm_tools__decision="${dm_tools__flag__zero_terminated}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__dictionary_order}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__path}"
+  posix_adapter__decision="${posix_adapter__flag__zero_terminated}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__dictionary_order}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__path}"
 
-  _dm_tools__sort__common \
-    "$dm_tools__decision" \
-    "$dm_tools__value__path"
+  _posix_adapter__sort__common \
+    "$posix_adapter__decision" \
+    "$posix_adapter__value__path"
 }
 
 #==============================================================================
@@ -122,11 +122,11 @@ dm_tools__sort() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_dm_tools__sort__common() {
-  dm_tools__decision_string="$1"
-  dm_tools__value__path="$2"
+_posix_adapter__sort__common() {
+  posix_adapter__decision_string="$1"
+  posix_adapter__value__path="$2"
 
-  case "$dm_tools__decision_string" in
+  case "$posix_adapter__decision_string" in
   # ,----- zero_terminated
   # |,---- dictionary_order
   # ||,--- path
@@ -144,7 +144,7 @@ _dm_tools__sort__common() {
       sort \
         \
         \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,----- zero_terminated
@@ -164,7 +164,7 @@ _dm_tools__sort__common() {
       sort \
         \
         --dictionary-order \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,----- zero_terminated
@@ -184,7 +184,7 @@ _dm_tools__sort__common() {
       sort \
         --zero-terminated \
         \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,----- zero_terminated
@@ -204,12 +204,12 @@ _dm_tools__sort__common() {
       sort \
         --zero-terminated \
         --dictionary-order \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__path" \
 
       ;;
     *)
-      dm_tools__report_invalid_parameters \
-        'dm_tools__sort' \
+      posix_adapter__report_invalid_parameters \
+        'posix_adapter__sort' \
         'Unexpected parameter combination!' \
         'Only --zero-terminated and --dictionary-order is available.'
       ;;

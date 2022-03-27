@@ -11,7 +11,7 @@
 
 #==============================================================================
 #
-#  dm_tools__printf <printf_specification>..
+#  posix_adapter__printf <printf_specification>..
 #
 #------------------------------------------------------------------------------
 # Execution mapping function for the 'printf' command line tool with a uniform
@@ -36,10 +36,10 @@
 # Status:
 #   0  - Call was successful.
 #   .. - Call failed with it's error status
-#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
-#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
 #==============================================================================
-dm_tools__printf() {
+posix_adapter__printf() {
   # We are proxying all the parameters here, hence ignoring the warning.
   # shellcheck disable=SC2059
   printf "$@"

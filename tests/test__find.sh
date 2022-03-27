@@ -11,18 +11,18 @@
 #==============================================================================
 # VALID CASES
 #==============================================================================
-dm_tools__test__valid_case 'find - default path parameter'
+posix_adapter__test__valid_case 'find - default path parameter'
 
-if dm_tools__find >/dev/null
+if posix_adapter__find >/dev/null
 then
-  dm_tools__test__test_case_passed
+  posix_adapter__test__test_case_passed
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - basic file search'
+posix_adapter__test__valid_case 'find - basic file search'
 
 find_base_dir='./fixtures/find'
 
@@ -35,18 +35,18 @@ find_base_dir='./fixtures/find'
 expected='6'
 
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 | \
-  dm_tools__wc --lines \
+  posix_adapter__find "$find_base_dir" 2>&1 | \
+  posix_adapter__wc --lines \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - basic file search by type'
+posix_adapter__test__valid_case 'find - basic file search by type'
 
 find_base_dir='./fixtures/find'
 
@@ -59,18 +59,18 @@ find_base_dir='./fixtures/find'
 expected='4'
 
 if result="$( \
-  dm_tools__find "$find_base_dir" --type 'f' 2>&1 | \
-  dm_tools__wc --lines \
+  posix_adapter__find "$find_base_dir" --type 'f' 2>&1 | \
+  posix_adapter__wc --lines \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - basic file search by type and maxdepth'
+posix_adapter__test__valid_case 'find - basic file search by type and maxdepth'
 
 find_base_dir='./fixtures/find'
 
@@ -83,18 +83,18 @@ find_base_dir='./fixtures/find'
 expected='3'
 
 if result="$( \
-  dm_tools__find "$find_base_dir" --type 'f' --max-depth '1' 2>&1 | \
-  dm_tools__wc --lines \
+  posix_adapter__find "$find_base_dir" --type 'f' --max-depth '1' 2>&1 | \
+  posix_adapter__wc --lines \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - basic file search by name and type'
+posix_adapter__test__valid_case 'find - basic file search by name and type'
 
 find_base_dir='./fixtures/find'
 
@@ -107,18 +107,18 @@ find_base_dir='./fixtures/find'
 expected='2'
 
 if result="$( \
-  dm_tools__find "$find_base_dir" --type 'f' --name 'file_a*' 2>&1 | \
-  dm_tools__wc --lines \
+  posix_adapter__find "$find_base_dir" --type 'f' --name 'file_a*' 2>&1 | \
+  posix_adapter__wc --lines \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - basic file search by name zero terminated'
+posix_adapter__test__valid_case 'find - basic file search by name zero terminated'
 
 find_base_dir='./fixtures/find'
 
@@ -132,18 +132,18 @@ expected='2'
 
 # Same result as before but zero terminated -> only one line should be found.
 if result="$( \
-  dm_tools__find "$find_base_dir" --type 'f' --name 'file_a*' --print0 2>&1 | \
-  dm_tools__tr --replace '\0' ' ' | dm_tools__wc --words \
+  posix_adapter__find "$find_base_dir" --type 'f' --name 'file_a*' --print0 2>&1 | \
+  posix_adapter__tr --replace '\0' ' ' | posix_adapter__wc --words \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - basic directory search by type'
+posix_adapter__test__valid_case 'find - basic directory search by type'
 
 find_base_dir='./fixtures/find'
 
@@ -156,18 +156,18 @@ find_base_dir='./fixtures/find'
 expected='2'
 
 if result="$( \
-  dm_tools__find "$find_base_dir" --type 'd' 2>&1 | \
-  dm_tools__wc --lines \
+  posix_adapter__find "$find_base_dir" --type 'd' 2>&1 | \
+  posix_adapter__wc --lines \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - basic directory search by name zero terminated'
+posix_adapter__test__valid_case 'find - basic directory search by name zero terminated'
 
 find_base_dir='./fixtures/find'
 
@@ -180,18 +180,18 @@ find_base_dir='./fixtures/find'
 expected='1'
 
 if result="$( \
-  dm_tools__find "$find_base_dir" --type 'd' --name 'find' 2>&1 | \
-  dm_tools__wc --lines \
+  posix_adapter__find "$find_base_dir" --type 'd' --name 'find' 2>&1 | \
+  posix_adapter__wc --lines \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - full parameter space - case 0000'
+posix_adapter__test__valid_case 'find - full parameter space - case 0000'
 
 find_base_dir='./fixtures/find'
 
@@ -209,22 +209,22 @@ expected='6'
 # |||,-- print0
 # 0000
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 \
+  posix_adapter__find "$find_base_dir" 2>&1 \
     \
     \
     \
     \
-  | dm_tools__wc --lines 2>&1 \
+  | posix_adapter__wc --lines 2>&1 \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - full parameter space - case 0001'
+posix_adapter__test__valid_case 'find - full parameter space - case 0001'
 
 find_base_dir='./fixtures/find'
 
@@ -242,22 +242,22 @@ expected='6'
 # |||,-- print0
 # 0001
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 \
+  posix_adapter__find "$find_base_dir" 2>&1 \
     \
     \
     \
     --print0 \
-  | dm_tools__tr --replace '\0' ' ' 2>&1 | dm_tools__wc --words 2>&1 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - full parameter space - case 0010'
+posix_adapter__test__valid_case 'find - full parameter space - case 0010'
 
 find_base_dir='./fixtures/find'
 
@@ -275,22 +275,22 @@ expected='2'
 # |||,-- print0
 # 0010
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 \
+  posix_adapter__find "$find_base_dir" 2>&1 \
     \
     \
     --name 'file_a*' \
     \
-  | dm_tools__wc --lines 2>&1 \
+  | posix_adapter__wc --lines 2>&1 \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - full parameter space - case 0011'
+posix_adapter__test__valid_case 'find - full parameter space - case 0011'
 
 find_base_dir='./fixtures/find'
 
@@ -308,22 +308,22 @@ expected='2'
 # |||,-- print0
 # 0011
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 \
+  posix_adapter__find "$find_base_dir" 2>&1 \
     \
     \
     --name 'file_a*' \
     --print0 \
-  | dm_tools__tr --replace '\0' ' ' 2>&1 | dm_tools__wc --words 2>&1 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - full parameter space - case 0100'
+posix_adapter__test__valid_case 'find - full parameter space - case 0100'
 
 find_base_dir='./fixtures/find'
 
@@ -341,22 +341,22 @@ expected='4'
 # |||,-- print0
 # 0100
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 \
+  posix_adapter__find "$find_base_dir" 2>&1 \
     \
     --type 'f' \
     \
     \
-  | dm_tools__wc --lines 2>&1 \
+  | posix_adapter__wc --lines 2>&1 \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - full parameter space - case 0101'
+posix_adapter__test__valid_case 'find - full parameter space - case 0101'
 
 find_base_dir='./fixtures/find'
 
@@ -374,22 +374,22 @@ expected='4'
 # |||,-- print0
 # 0101
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 \
+  posix_adapter__find "$find_base_dir" 2>&1 \
     \
     --type 'f' \
     \
     --print0 \
-  | dm_tools__tr --replace '\0' ' ' 2>&1 | dm_tools__wc --words 2>&1 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - full parameter space - case 0110'
+posix_adapter__test__valid_case 'find - full parameter space - case 0110'
 
 find_base_dir='./fixtures/find'
 
@@ -407,22 +407,22 @@ expected='2'
 # |||,-- print0
 # 0110
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 \
+  posix_adapter__find "$find_base_dir" 2>&1 \
     \
     --type 'f' \
     --name 'file_a*' \
     \
-  | dm_tools__wc --lines 2>&1 \
+  | posix_adapter__wc --lines 2>&1 \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - full parameter space - case 0111'
+posix_adapter__test__valid_case 'find - full parameter space - case 0111'
 
 find_base_dir='./fixtures/find'
 
@@ -440,22 +440,22 @@ expected='2'
 # |||,-- print0
 # 0111
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 \
+  posix_adapter__find "$find_base_dir" 2>&1 \
     \
     --type 'f' \
     --name 'file_a*' \
     --print0 \
-  | dm_tools__tr --replace '\0' ' ' 2>&1 | dm_tools__wc --words 2>&1 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - full parameter space - case 1000'
+posix_adapter__test__valid_case 'find - full parameter space - case 1000'
 
 find_base_dir='./fixtures/find'
 
@@ -473,22 +473,22 @@ expected='5'
 # |||,-- print0
 # 1000
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 \
+  posix_adapter__find "$find_base_dir" 2>&1 \
     --max-depth '1' \
     \
     \
     \
-  | dm_tools__wc --lines 2>&1 \
+  | posix_adapter__wc --lines 2>&1 \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - full parameter space - case 1001'
+posix_adapter__test__valid_case 'find - full parameter space - case 1001'
 
 find_base_dir='./fixtures/find'
 
@@ -506,22 +506,22 @@ expected='5'
 # |||,-- print0
 # 1001
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 \
+  posix_adapter__find "$find_base_dir" 2>&1 \
     --max-depth '1' \
     \
     \
     --print0 \
-  | dm_tools__tr --replace '\0' ' ' 2>&1 | dm_tools__wc --words 2>&1 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - full parameter space - case 1010'
+posix_adapter__test__valid_case 'find - full parameter space - case 1010'
 
 find_base_dir='./fixtures/find'
 
@@ -539,22 +539,22 @@ expected='2'
 # |||,-- print0
 # 1010
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 \
+  posix_adapter__find "$find_base_dir" 2>&1 \
     --max-depth '1' \
     \
     --name 'file_a*' \
     \
-  | dm_tools__wc --lines 2>&1 \
+  | posix_adapter__wc --lines 2>&1 \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - full parameter space - case 1011'
+posix_adapter__test__valid_case 'find - full parameter space - case 1011'
 
 find_base_dir='./fixtures/find'
 
@@ -572,22 +572,22 @@ expected='2'
 # |||,-- print0
 # 1011
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 \
+  posix_adapter__find "$find_base_dir" 2>&1 \
     --max-depth '1' \
     \
     --name 'file_a*' \
     --print0 \
-  | dm_tools__tr --replace '\0' ' ' 2>&1 | dm_tools__wc --words 2>&1 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - full parameter space - case 1100'
+posix_adapter__test__valid_case 'find - full parameter space - case 1100'
 
 find_base_dir='./fixtures/find'
 
@@ -605,22 +605,22 @@ expected='3'
 # |||,-- print0
 # 1100
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 \
+  posix_adapter__find "$find_base_dir" 2>&1 \
     --max-depth '1' \
     --type 'f' \
     \
     \
-  | dm_tools__wc --lines 2>&1 \
+  | posix_adapter__wc --lines 2>&1 \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - full parameter space - case 1101'
+posix_adapter__test__valid_case 'find - full parameter space - case 1101'
 
 find_base_dir='./fixtures/find'
 
@@ -638,22 +638,22 @@ expected='3'
 # |||,-- print0
 # 1101
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 \
+  posix_adapter__find "$find_base_dir" 2>&1 \
     --max-depth '1' \
     --type 'f' \
     \
     --print0 \
-  | dm_tools__tr --replace '\0' ' ' 2>&1 | dm_tools__wc --words 2>&1 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - full parameter space - case 1110'
+posix_adapter__test__valid_case 'find - full parameter space - case 1110'
 
 find_base_dir='./fixtures/find'
 
@@ -671,22 +671,22 @@ expected='2'
 # |||,-- print0
 # 1110
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 \
+  posix_adapter__find "$find_base_dir" 2>&1 \
     --max-depth '1' \
     --type 'f' \
     --name 'file_a*' \
     \
-  | dm_tools__wc --lines 2>&1 \
+  | posix_adapter__wc --lines 2>&1 \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - full parameter space - case 1111'
+posix_adapter__test__valid_case 'find - full parameter space - case 1111'
 
 find_base_dir='./fixtures/find'
 
@@ -704,22 +704,22 @@ expected='2'
 # |||,-- print0
 # 1111
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 \
+  posix_adapter__find "$find_base_dir" 2>&1 \
     --max-depth '1' \
     --type 'f' \
     --name 'file_a*' \
     --print0 \
-  | dm_tools__tr --replace '\0' ' ' 2>&1 | dm_tools__wc --words 2>&1 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'find - full parameter space - samefile'
+posix_adapter__test__valid_case 'find - full parameter space - samefile'
 
 find_base_dir='./fixtures/find'
 
@@ -733,54 +733,54 @@ find_base_dir='./fixtures/find'
 expected='1'
 
 if result="$( \
-  dm_tools__find "$find_base_dir" 2>&1 \
+  posix_adapter__find "$find_base_dir" 2>&1 \
     --max-depth '1' \
     --type 'f' \
     --name 'file_a*' \
     --same-file "${find_base_dir}/file_a_1" \
     --print0 \
-  | dm_tools__tr --replace '\0' ' ' 2>&1 | dm_tools__wc --words 2>&1 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
 # ERROR CASES
 #==============================================================================
-dm_tools__test__error_case 'find - multiple paths should result an error'
+posix_adapter__test__error_case 'find - multiple paths should result an error'
 
-if error_message="$(dm_tools__find 'one' 'two' 2>&1)"
+if error_message="$(posix_adapter__find 'one' 'two' 2>&1)"
 then
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
 fi
 
 #==============================================================================
-dm_tools__test__error_case 'find - invalid option'
+posix_adapter__test__error_case 'find - invalid option'
 
-if error_message="$(dm_tools__find --option 2>&1)"
+if error_message="$(posix_adapter__find --option 2>&1)"
 then
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
 fi
 
 #==============================================================================
-dm_tools__test__error_case 'find - invalid option style'
+posix_adapter__test__error_case 'find - invalid option style'
 
-if error_message="$(dm_tools__find -option 2>&1)"
+if error_message="$(posix_adapter__find -option 2>&1)"
 then
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
 fi

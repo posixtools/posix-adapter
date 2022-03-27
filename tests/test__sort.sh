@@ -2,94 +2,94 @@
 #==============================================================================
 # VALID CASES
 #==============================================================================
-dm_tools__test__valid_case 'sort - parameter checking 1'
+posix_adapter__test__valid_case 'sort - parameter checking 1'
 
 if ( \
-  dm_tools__echo 'hello' | \
-  dm_tools__sort >/dev/null \
+  posix_adapter__echo 'hello' | \
+  posix_adapter__sort >/dev/null \
 )
 then
-  dm_tools__test__test_case_passed
+  posix_adapter__test__test_case_passed
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'sort - parameter checking 2'
+posix_adapter__test__valid_case 'sort - parameter checking 2'
 
 if ( \
-  dm_tools__echo 'hello' | dm_tools__sort --dictionary-order >/dev/null \
+  posix_adapter__echo 'hello' | posix_adapter__sort --dictionary-order >/dev/null \
 )
 then
-  dm_tools__test__test_case_passed
+  posix_adapter__test__test_case_passed
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'sort - parameter checking 3'
+posix_adapter__test__valid_case 'sort - parameter checking 3'
 
 if ( \
-  dm_tools__printf 'hello' | dm_tools__sort --zero-terminated >/dev/null \
+  posix_adapter__printf 'hello' | posix_adapter__sort --zero-terminated >/dev/null \
 )
 then
-  dm_tools__test__test_case_passed
+  posix_adapter__test__test_case_passed
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'sort - parameter checking 4'
+posix_adapter__test__valid_case 'sort - parameter checking 4'
 
 if ( \
-  dm_tools__echo 'hello' | \
-  dm_tools__sort --zero-terminated --dictionary-order >/dev/null \
+  posix_adapter__echo 'hello' | \
+  posix_adapter__sort --zero-terminated --dictionary-order >/dev/null \
 )
 then
-  dm_tools__test__test_case_passed
+  posix_adapter__test__test_case_passed
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
 # ERROR CASES
 #==============================================================================
-dm_tools__test__error_case \
+posix_adapter__test__error_case \
   'sort - multiple paths should result in an error'
 
-if error_message="$(dm_tools__sort 'path_1' 'path_2' 2>&1)"
+if error_message="$(posix_adapter__sort 'path_1' 'path_2' 2>&1)"
 then
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
 fi
 
 #==============================================================================
-dm_tools__test__error_case 'sort - invalid option'
+posix_adapter__test__error_case 'sort - invalid option'
 
-if error_message="$(dm_tools__sort --option 2>&1)"
+if error_message="$(posix_adapter__sort --option 2>&1)"
 then
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
 fi
 
 #==============================================================================
-dm_tools__test__error_case 'sort - invalid option style'
+posix_adapter__test__error_case 'sort - invalid option style'
 
-if error_message="$(dm_tools__sort -option 2>&1)"
+if error_message="$(posix_adapter__sort -option 2>&1)"
 then
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
 fi

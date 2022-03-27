@@ -9,7 +9,7 @@
 #==============================================================================
 # VALID CASES
 #==============================================================================
-dm_tools__test__valid_case 'ls - directory can be listed in the default mode'
+posix_adapter__test__valid_case 'ls - directory can be listed in the default mode'
 
 test_path='fixtures/ls'
 # ..           0
@@ -19,16 +19,16 @@ test_path='fixtures/ls'
 # .hidden_file 0
 expected='2'
 
-if result="$(dm_tools__ls "$test_path" | dm_tools__wc --words)"
+if result="$(posix_adapter__ls "$test_path" | posix_adapter__wc --words)"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case 'ls - directory can be listed in the all mode'
+posix_adapter__test__valid_case 'ls - directory can be listed in the all mode'
 
 test_path='fixtures/ls'
 # ..           1
@@ -38,16 +38,16 @@ test_path='fixtures/ls'
 # .hidden_file 1
 expected='5'
 
-if result="$(dm_tools__ls --all "$test_path" | dm_tools__wc --words)"
+if result="$(posix_adapter__ls --all "$test_path" | posix_adapter__wc --words)"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
-dm_tools__test__valid_case \
+posix_adapter__test__valid_case \
   'ls - directory can be listed in the almost all mode'
 
 test_path='fixtures/ls'
@@ -58,75 +58,75 @@ test_path='fixtures/ls'
 # .hidden_file 1
 expected='3'
 
-if result="$(dm_tools__ls --almost-all "$test_path" | dm_tools__wc --words)"
+if result="$(posix_adapter__ls --almost-all "$test_path" | posix_adapter__wc --words)"
 then
-  dm_tools__test__assert_equal "$expected" "$result"
+  posix_adapter__test__assert_equal "$expected" "$result"
 else
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 fi
 
 #==============================================================================
 # ERROR CASES
 #==============================================================================
-dm_tools__test__error_case 'ls - both all and almost all cannot be specified'
+posix_adapter__test__error_case 'ls - both all and almost all cannot be specified'
 
 test_path='fixtures/ls'
 
-if error_message="$(dm_tools__ls --all --almost-all "$test_path" 2>&1)"
+if error_message="$(posix_adapter__ls --all --almost-all "$test_path" 2>&1)"
 then
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
 fi
 
 #==============================================================================
-dm_tools__test__error_case 'ls - missing path should result in an error'
+posix_adapter__test__error_case 'ls - missing path should result in an error'
 
-if error_message="$(dm_tools__ls 2>&1)"
+if error_message="$(posix_adapter__ls 2>&1)"
 then
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
 fi
 
 #==============================================================================
-dm_tools__test__error_case \
+posix_adapter__test__error_case \
   'ls - multiple paths should result in an error'
 
-if error_message="$(dm_tools__ls 'path_1' 'path_2' 2>&1)"
+if error_message="$(posix_adapter__ls 'path_1' 'path_2' 2>&1)"
 then
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
 fi
 
 #==============================================================================
-dm_tools__test__error_case 'ls - invalid option'
+posix_adapter__test__error_case 'ls - invalid option'
 
-if error_message="$(dm_tools__ls --option 2>&1)"
+if error_message="$(posix_adapter__ls --option 2>&1)"
 then
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
 fi
 
 #==============================================================================
-dm_tools__test__error_case 'ls - invalid option style'
+posix_adapter__test__error_case 'ls - invalid option style'
 
-if error_message="$(dm_tools__ls -option 2>&1)"
+if error_message="$(posix_adapter__ls -option 2>&1)"
 then
   status="$?"
-  dm_tools__test__test_case_failed "$status"
+  posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  dm_tools__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
 fi

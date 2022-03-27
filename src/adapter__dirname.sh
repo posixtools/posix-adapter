@@ -11,7 +11,7 @@
 
 #==============================================================================
 #
-#  dm_tools__dirname <path>
+#  posix_adapter__dirname <path>
 #
 #------------------------------------------------------------------------------
 # Execution mapping function for the 'dirname' command line tool with a uniform
@@ -35,10 +35,10 @@
 # Status:
 #   0  - Call was successful.
 #   .. - Call failed with it's error status
-#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
-#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
 #==============================================================================
-dm_tools__dirname() {
+posix_adapter__dirname() {
   if [ "$#" -eq 0 ]
   then
     # dirname does not support the standard input by it's own, so helping it
@@ -47,24 +47,24 @@ dm_tools__dirname() {
   else
     if [ "$#" -gt 1 ]
     then
-      dm_tools__report_invalid_parameters \
-        'dm_tools__dirname' \
+      posix_adapter__report_invalid_parameters \
+        'posix_adapter__dirname' \
         'Unexpected parameter count!' \
         "Only 1 parameter is expected, got ${#}!"
     fi
 
     case "$1" in
       --[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__dirname' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__dirname' \
           "Unexpected option '${1}'!" \
           'This function does not take options.'
         ;;
       -[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__dirname' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__dirname' \
           "Invalid single dashed option '${1}'!" \
-          "dm_tools only uses double dashed options like '--option'."
+          "posix_adapter only uses double dashed options like '--option'."
         ;;
     esac
 

@@ -1,20 +1,20 @@
 #!/bin/sh
 #==============================================================================
-#            _
-#   ___ __ _| |_
-#  / __/ _` | __|
-# | (_| (_| | |_
-#  \___\__,_|\__|
+#   _                   _
+#  | |_ ___  _   _  ___| |__
+#  | __/ _ \| | | |/ __| '_ \
+#  | || (_) | |_| | (__| | | |
+#   \__\___/ \__,_|\___|_| |_|
 #==============================================================================
-# TOOL: CAT
+# TOOL: TOUCH
 #==============================================================================
 
 #==============================================================================
 #
-#  dm_tools__cat [path]
+#  posix_adapter__touch <path>
 #
 #------------------------------------------------------------------------------
-# Execution mapping function for the 'cat' command line tool with a uniform
+# Execution mapping function for the 'touch' command line tool with a uniform
 # interface.
 #------------------------------------------------------------------------------
 # Globals:
@@ -22,7 +22,7 @@
 # Options:
 #   None
 # Arguments:
-#   [1] [path] - Path that's content should be printed out.
+#   [1] path - Path that needs to be touched.
 # STDIN:
 #   Input passed to the mapped command.
 #------------------------------------------------------------------------------
@@ -35,34 +35,38 @@
 # Status:
 #   0  - Call was successful.
 #   .. - Call failed with it's error status
-#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
-#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
 #==============================================================================
-dm_tools__cat() {
+posix_adapter__touch() {
   if [ "$#" -eq 0 ]
   then
-    cat
+    posix_adapter__report_invalid_parameters \
+      'posix_adapter__touch' \
+      "Missing <path> parameter" \
+      'This function does not take options.'
   elif [ "$#" -eq 1 ]
   then
     case "$1" in
     --[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__cat' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__touch' \
           "Unexpected option '${1}'!" \
           'This function does not take options.'
         ;;
     -[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__cat' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__touch' \
           "Invalid single dashed option '${1}'!" \
-          "dm_tools only uses double dashed options like '--option'."
+          "posix_adapter only uses double dashed options like '--option'."
         ;;
     esac
 
-    cat "$1"
+    touch "$1"
+
   else
-    dm_tools__report_invalid_parameters \
-      'dm_tools__cat' \
+    posix_adapter__report_invalid_parameters \
+      'posix_adapter__touch' \
       'Unexpected parameter count!' \
       "Only 1 parameter is expected, got ${#}!"
   fi

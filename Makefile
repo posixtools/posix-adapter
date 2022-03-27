@@ -2,7 +2,7 @@
 # MAKE SETTINGS
 
 .DEFAULT_GOAL := help
-NAME := dm.tools
+NAME := posix-adapter
 
 #=======================================================================================
 # HELP TARGET

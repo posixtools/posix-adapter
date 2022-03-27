@@ -11,7 +11,7 @@
 
 #==============================================================================
 #
-#  dm_tools__ls [--all] [--almost-all] <path>
+#  posix_adapter__ls [--all] [--almost-all] <path>
 #
 #------------------------------------------------------------------------------
 # Execution mapping function for the 'ls' command line tool with a
@@ -36,48 +36,48 @@
 # Status:
 #   0  - Call was successful.
 #   .. - Call failed with it's error status
-#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
-#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
 #==============================================================================
-dm_tools__ls() {
-  dm_tools__flag__all='0'
-  dm_tools__flag__almost_all='0'
+posix_adapter__ls() {
+  posix_adapter__flag__all='0'
+  posix_adapter__flag__almost_all='0'
 
-  dm_tools__flag__path='0'
-  dm_tools__value__path=''
+  posix_adapter__flag__path='0'
+  posix_adapter__value__path=''
 
   while [ "$#" -gt '0' ]
   do
     case "$1" in
       --all)
-        dm_tools__flag__all='1'
+        posix_adapter__flag__all='1'
         shift
         ;;
       --almost-all)
-        dm_tools__flag__almost_all='1'
+        posix_adapter__flag__almost_all='1'
         shift
         ;;
       --[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__ls' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__ls' \
           "Unexpected option '${1}'!" \
           'You can only use --all or --almost-all.'
         ;;
       -[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__ls' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__ls' \
           "Invalid single dashed option '${1}'!" \
-          "dm_tools only uses double dashed options like '--option'."
+          "posix_adapter only uses double dashed options like '--option'."
         ;;
       *)
-        if [ "$dm_tools__flag__path" -eq '0' ]
+        if [ "$posix_adapter__flag__path" -eq '0' ]
         then
-          dm_tools__flag__path='1'
-          dm_tools__value__path="$1"
+          posix_adapter__flag__path='1'
+          posix_adapter__value__path="$1"
           shift
         else
-          dm_tools__report_invalid_parameters \
-            'dm_tools__ls' \
+          posix_adapter__report_invalid_parameters \
+            'posix_adapter__ls' \
             'Unexpected parameter!' \
             "Parameter '${1}' is unexpected!"
         fi
@@ -85,10 +85,10 @@ dm_tools__ls() {
     esac
   done
 
-  if [ "$dm_tools__flag__path" -eq '0' ]
+  if [ "$posix_adapter__flag__path" -eq '0' ]
   then
-    dm_tools__report_invalid_parameters \
-      'dm_tools__ls' \
+    posix_adapter__report_invalid_parameters \
+      'posix_adapter__ls' \
       'Missing <path> argument!' \
       'To be able to use readlink, you need to specify a path to work with.'
   fi
@@ -97,12 +97,12 @@ dm_tools__ls() {
   # ,-- all
   # |,- almost_all
   # 00
-  dm_tools__decision="${dm_tools__flag__all}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__almost_all}"
+  posix_adapter__decision="${posix_adapter__flag__all}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__almost_all}"
 
-  _dm_tools__ls__common \
-    "$dm_tools__decision" \
-    "$dm_tools__value__path"
+  _posix_adapter__ls__common \
+    "$posix_adapter__decision" \
+    "$posix_adapter__value__path"
 }
 
 #==============================================================================
@@ -128,18 +128,18 @@ dm_tools__ls() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_dm_tools__ls__common() {
-  dm_tools__decision_string="$1"
-  dm_tools__value__path="$2"
+_posix_adapter__ls__common() {
+  posix_adapter__decision_string="$1"
+  posix_adapter__value__path="$2"
 
-  case "$dm_tools__decision_string" in
+  case "$posix_adapter__decision_string" in
   # ,-- all
   # |,- almost_all
     00)
       ls \
         \
         \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,-- all
@@ -148,7 +148,7 @@ _dm_tools__ls__common() {
       ls \
         \
         -A \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,-- all
@@ -157,12 +157,12 @@ _dm_tools__ls__common() {
       ls \
         -a \
         \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__path" \
 
       ;;
     *)
-      dm_tools__report_invalid_parameters \
-        'dm_tools__ls' \
+      posix_adapter__report_invalid_parameters \
+        'posix_adapter__ls' \
         'Unexpected parameter combination!' \
         'You can only have --all or --almost-all.'
       ;;

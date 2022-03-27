@@ -11,7 +11,7 @@
 
 #==============================================================================
 #
-#  dm_tools__tput <tput_specification>..
+#  posix_adapter__tput <tput_specification>..
 #
 #------------------------------------------------------------------------------
 # Execution mapping function for the 'tput' command line tool. This is the only
@@ -37,7 +37,7 @@
 # Status:
 #   0 - Other staus is not expected.
 #==============================================================================
-dm_tools__tput() {
+posix_adapter__tput() {
   if ! tput "$@" 2>/dev/null
   then
     printf '%s' ''
@@ -46,7 +46,7 @@ dm_tools__tput() {
 
 #==============================================================================
 #
-#  dm_tools__tput__is_available
+#  posix_adapter__tput__is_available
 #
 #------------------------------------------------------------------------------
 # Function that should evaluate the availibility and usability of the tput
@@ -71,7 +71,7 @@ dm_tools__tput() {
 #   0 - tput is available.
 #   1 - tput is not available.
 #==============================================================================
-dm_tools__tput__is_available() {
+posix_adapter__tput__is_available() {
   if command -v tput >/dev/null && tput init >/dev/null 2>&1
   then
     return 0

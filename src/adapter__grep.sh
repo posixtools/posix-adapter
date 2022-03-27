@@ -10,7 +10,7 @@
 
 #==============================================================================
 #
-#  dm_tools__grep
+#  posix_adapter__grep
 #    [--extended]
 #    [--silent]
 #    [--invert-match]
@@ -46,72 +46,72 @@
 # Status:
 #   0  - Call was successful.
 #   .. - Call failed with it's error status
-#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
-#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
 #==============================================================================
-dm_tools__grep() {
-  dm_tools__flag__extended='0'
-  dm_tools__flag__silent='0'
-  dm_tools__flag__invert_match='0'
-  dm_tools__flag__count='0'
-  dm_tools__flag__match_only='0'
+posix_adapter__grep() {
+  posix_adapter__flag__extended='0'
+  posix_adapter__flag__silent='0'
+  posix_adapter__flag__invert_match='0'
+  posix_adapter__flag__count='0'
+  posix_adapter__flag__match_only='0'
 
-  dm_tools__flag__pattern='0'
-  dm_tools__value__pattern=''
+  posix_adapter__flag__pattern='0'
+  posix_adapter__value__pattern=''
 
-  dm_tools__flag__path='0'
-  dm_tools__value__path=''
+  posix_adapter__flag__path='0'
+  posix_adapter__value__path=''
 
   while [ "$#" -gt '0' ]
   do
     case "$1" in
       --extended)
-        dm_tools__flag__extended='1'
+        posix_adapter__flag__extended='1'
         shift
         ;;
       --silent)
-        dm_tools__flag__silent='1'
+        posix_adapter__flag__silent='1'
         shift
         ;;
       --invert-match)
-        dm_tools__flag__invert_match='1'
+        posix_adapter__flag__invert_match='1'
         shift
         ;;
       --count)
-        dm_tools__flag__count='1'
+        posix_adapter__flag__count='1'
         shift
         ;;
       --match-only)
-        dm_tools__flag__match_only='1'
+        posix_adapter__flag__match_only='1'
         shift
         ;;
       --[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__grep' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__grep' \
           "Unexpected option '${1}'!" \
           'You can only use --extended --silent --invert-match --count --match-only.'
         ;;
       -[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__grep' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__grep' \
           "Invalid single dashed option '${1}'!" \
-          "dm_tools only uses double dashed options like '--option'."
+          "posix_adapter only uses double dashed options like '--option'."
         ;;
       *)
-        if [ "$dm_tools__flag__pattern" -eq '0' ]
+        if [ "$posix_adapter__flag__pattern" -eq '0' ]
         then
-          dm_tools__flag__pattern='1'
-          dm_tools__value__pattern="$1"
+          posix_adapter__flag__pattern='1'
+          posix_adapter__value__pattern="$1"
           shift
         else
-          if [ "$dm_tools__flag__path" -eq '0' ]
+          if [ "$posix_adapter__flag__path" -eq '0' ]
           then
-            dm_tools__flag__path='1'
-            dm_tools__value__path="$1"
+            posix_adapter__flag__path='1'
+            posix_adapter__value__path="$1"
             shift
           else
-            dm_tools__report_invalid_parameters \
-              'dm_tools__grep' \
+            posix_adapter__report_invalid_parameters \
+              'posix_adapter__grep' \
               'Unexpected parameter!' \
               "Parameter '${1}' is unexpected!"
           fi
@@ -120,10 +120,10 @@ dm_tools__grep() {
     esac
   done
 
-  if [ "$dm_tools__flag__pattern" -eq '0' ]
+  if [ "$posix_adapter__flag__pattern" -eq '0' ]
   then
-    dm_tools__report_invalid_parameters \
-      'dm_tools__grep' \
+    posix_adapter__report_invalid_parameters \
+      'posix_adapter__grep' \
       'Missing <pattern> argument!' \
       'To be able to use grep, you need to specify at least a pattern.'
   fi
@@ -136,17 +136,17 @@ dm_tools__grep() {
   # ||||,--- match_only
   # |||||,-- path
   # 000000
-  dm_tools__decision="${dm_tools__flag__extended}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__silent}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__invert_match}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__count}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__match_only}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__path}"
+  posix_adapter__decision="${posix_adapter__flag__extended}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__silent}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__invert_match}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__count}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__match_only}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__path}"
 
-  _dm_tools__grep__common \
-    "$dm_tools__decision" \
-    "$dm_tools__value__pattern" \
-    "$dm_tools__value__path"
+  _posix_adapter__grep__common \
+    "$posix_adapter__decision" \
+    "$posix_adapter__value__pattern" \
+    "$posix_adapter__value__path"
 }
 
 #==============================================================================
@@ -173,12 +173,12 @@ dm_tools__grep() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_dm_tools__grep__common() {
-  dm_tools__decision_string="$1"
-  dm_tools__value__pattern="$2"
-  dm_tools__value__path="$3"
+_posix_adapter__grep__common() {
+  posix_adapter__decision_string="$1"
+  posix_adapter__value__pattern="$2"
+  posix_adapter__value__path="$3"
 
-  case "$dm_tools__decision_string" in
+  case "$posix_adapter__decision_string" in
   # ,------- extended
   # |,------ silent
   # ||,----- invert_match
@@ -192,7 +192,7 @@ _dm_tools__grep__common() {
         \
         \
         \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -209,8 +209,8 @@ _dm_tools__grep__common() {
         \
         \
         \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -226,7 +226,7 @@ _dm_tools__grep__common() {
         \
         \
         --only-matching \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -243,8 +243,8 @@ _dm_tools__grep__common() {
         \
         \
         --only-matching \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -260,7 +260,7 @@ _dm_tools__grep__common() {
         \
         --count \
         \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -277,8 +277,8 @@ _dm_tools__grep__common() {
         \
         --count \
         \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -294,7 +294,7 @@ _dm_tools__grep__common() {
         \
         --count \
         --only-matching \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -311,8 +311,8 @@ _dm_tools__grep__common() {
         \
         --count \
         --only-matching \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -328,7 +328,7 @@ _dm_tools__grep__common() {
         --invert-match \
         \
         \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -345,8 +345,8 @@ _dm_tools__grep__common() {
         --invert-match \
         \
         \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -362,7 +362,7 @@ _dm_tools__grep__common() {
         --invert-match \
         \
         --only-matching \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -379,8 +379,8 @@ _dm_tools__grep__common() {
         --invert-match \
         \
         --only-matching \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -396,7 +396,7 @@ _dm_tools__grep__common() {
         --invert-match \
         --count \
         \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -413,8 +413,8 @@ _dm_tools__grep__common() {
         --invert-match \
         --count \
         \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -430,7 +430,7 @@ _dm_tools__grep__common() {
         --invert-match \
         --count \
         --only-matching \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -447,8 +447,8 @@ _dm_tools__grep__common() {
         --invert-match \
         --count \
         --only-matching \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -464,7 +464,7 @@ _dm_tools__grep__common() {
         \
         \
         \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -481,8 +481,8 @@ _dm_tools__grep__common() {
         \
         \
         \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -498,7 +498,7 @@ _dm_tools__grep__common() {
         \
         \
         --only-matching \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -515,8 +515,8 @@ _dm_tools__grep__common() {
         \
         \
         --only-matching \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -532,7 +532,7 @@ _dm_tools__grep__common() {
         \
         --count \
         \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -549,8 +549,8 @@ _dm_tools__grep__common() {
         \
         --count \
         \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -566,7 +566,7 @@ _dm_tools__grep__common() {
         \
         --count \
         --only-matching \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -583,8 +583,8 @@ _dm_tools__grep__common() {
         \
         --count \
         --only-matching \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -600,7 +600,7 @@ _dm_tools__grep__common() {
         --invert-match \
         \
         \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -617,8 +617,8 @@ _dm_tools__grep__common() {
         --invert-match \
         \
         \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -634,7 +634,7 @@ _dm_tools__grep__common() {
         --invert-match \
         \
         --only-matching \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -651,8 +651,8 @@ _dm_tools__grep__common() {
         --invert-match \
         \
         --only-matching \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -668,7 +668,7 @@ _dm_tools__grep__common() {
         --invert-match \
         --count \
         \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -685,8 +685,8 @@ _dm_tools__grep__common() {
         --invert-match \
         --count \
         \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -702,7 +702,7 @@ _dm_tools__grep__common() {
         --invert-match \
         --count \
         --only-matching \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -719,8 +719,8 @@ _dm_tools__grep__common() {
         --invert-match \
         --count \
         --only-matching \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -736,7 +736,7 @@ _dm_tools__grep__common() {
         \
         \
         \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -753,8 +753,8 @@ _dm_tools__grep__common() {
         \
         \
         \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -770,7 +770,7 @@ _dm_tools__grep__common() {
         \
         \
         --only-matching \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -787,8 +787,8 @@ _dm_tools__grep__common() {
         \
         \
         --only-matching \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -804,7 +804,7 @@ _dm_tools__grep__common() {
         \
         --count \
         \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -821,8 +821,8 @@ _dm_tools__grep__common() {
         \
         --count \
         \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -838,7 +838,7 @@ _dm_tools__grep__common() {
         \
         --count \
         --only-matching \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -855,8 +855,8 @@ _dm_tools__grep__common() {
         \
         --count \
         --only-matching \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -872,7 +872,7 @@ _dm_tools__grep__common() {
         --invert-match \
         \
         \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -889,8 +889,8 @@ _dm_tools__grep__common() {
         --invert-match \
         \
         \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -906,7 +906,7 @@ _dm_tools__grep__common() {
         --invert-match \
         \
         --only-matching \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -923,8 +923,8 @@ _dm_tools__grep__common() {
         --invert-match \
         \
         --only-matching \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -940,7 +940,7 @@ _dm_tools__grep__common() {
         --invert-match \
         --count \
         \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -957,8 +957,8 @@ _dm_tools__grep__common() {
         --invert-match \
         --count \
         \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -974,7 +974,7 @@ _dm_tools__grep__common() {
         --invert-match \
         --count \
         --only-matching \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -991,8 +991,8 @@ _dm_tools__grep__common() {
         --invert-match \
         --count \
         --only-matching \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -1008,7 +1008,7 @@ _dm_tools__grep__common() {
         \
         \
         \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -1025,8 +1025,8 @@ _dm_tools__grep__common() {
         \
         \
         \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -1042,7 +1042,7 @@ _dm_tools__grep__common() {
         \
         \
         --only-matching \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -1059,8 +1059,8 @@ _dm_tools__grep__common() {
         \
         \
         --only-matching \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -1076,7 +1076,7 @@ _dm_tools__grep__common() {
         \
         --count \
         \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -1093,8 +1093,8 @@ _dm_tools__grep__common() {
         \
         --count \
         \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -1110,7 +1110,7 @@ _dm_tools__grep__common() {
         \
         --count \
         --only-matching \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -1127,8 +1127,8 @@ _dm_tools__grep__common() {
         \
         --count \
         --only-matching \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -1144,7 +1144,7 @@ _dm_tools__grep__common() {
         --invert-match \
         \
         \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -1161,8 +1161,8 @@ _dm_tools__grep__common() {
         --invert-match \
         \
         \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -1178,7 +1178,7 @@ _dm_tools__grep__common() {
         --invert-match \
         \
         --only-matching \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -1195,8 +1195,8 @@ _dm_tools__grep__common() {
         --invert-match \
         \
         --only-matching \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -1212,7 +1212,7 @@ _dm_tools__grep__common() {
         --invert-match \
         --count \
         \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -1229,8 +1229,8 @@ _dm_tools__grep__common() {
         --invert-match \
         --count \
         \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
   # ,------- extended
@@ -1246,7 +1246,7 @@ _dm_tools__grep__common() {
         --invert-match \
         --count \
         --only-matching \
-        "$dm_tools__value__pattern" \
+        "$posix_adapter__value__pattern" \
         \
 
       ;;
@@ -1263,13 +1263,13 @@ _dm_tools__grep__common() {
         --invert-match \
         --count \
         --only-matching \
-        "$dm_tools__value__pattern" \
-        "$dm_tools__value__path" \
+        "$posix_adapter__value__pattern" \
+        "$posix_adapter__value__path" \
 
       ;;
     *)
-      dm_tools__report_invalid_parameters \
-        'dm_tools__grep' \
+      posix_adapter__report_invalid_parameters \
+        'posix_adapter__grep' \
         'Unexpected parameter combination!' \
         'You can only have (--delimiter --fields) or (--characters).'
       ;;

@@ -3,7 +3,7 @@
 #==============================================================================
 # This testing file is intended to test the dependent program and shell
 # built-ins to have the required behavior on each supported platforms. We are
-# using full manual test suite with no automations. dm_test cannot be used here
+# using full manual test suite with no automations. posix_test cannot be used here
 # because it is relying on this library.
 #==============================================================================
 
@@ -42,14 +42,14 @@ else
 fi
 
 #==============================================================================
-# DM TOOLS INTEGRATION
+# POSIX ADAPTER INTEGRATION
 #==============================================================================
 
-if [ -z ${DM_TOOLS__READY+x} ]
+if [ -z ${POSIX_ADAPTER__READY+x} ]
 then
-  DM_TOOLS__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX='..'
-  # shellcheck source=../dm.tools.sh
-  . "${DM_TOOLS__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX}/dm.tools.sh"
+  POSIX_ADAPTER__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX='..'
+  # shellcheck source=../posix_adapter.sh
+  . "${POSIX_ADAPTER__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX}/posix_adapter.sh"
 fi
 
 #==============================================================================
@@ -62,7 +62,7 @@ fi
 # TEST SUITE EXECUTION
 #==============================================================================
 
-dm_tools__test__log_task 'Running test suite..'
+posix_adapter__test__log_task 'Running test suite..'
 
 printf '%s' "${DIM}"
 printf '%s' '================================================================='
@@ -77,75 +77,75 @@ printf '%s\n' "${RESET}"
 printf '%s' "${DIM}"
 printf '%s' '================================================================='
 printf '%s\n' '==================='
-printf '%s\n' ' DM TOOLS TEST SUITE'
+printf '%s\n' ' POSIX ADAPTER TEST SUITE'
 printf '%s' '================================================================='
 printf '%s' '==================='
 printf '%s\n' "${RESET}"
 
 printf '%s' "${DIM}"
 printf '%s' \
-  'After this point, red error messages mean an actual error in dm_tools!'
+  'After this point, red error messages mean an actual error in posix_adapter!'
 printf '%s\n' "${RESET}"
 
-dm_tools__test__line
+posix_adapter__test__line
 . './test__basename.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__cat.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__cut.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__date.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__dirname.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__echo.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__find.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__fold.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__grep.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__ln.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__ls.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__mkdir.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__mkfifo.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__mktemp.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__printf.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__readlink.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__realpath.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__rm.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__sed.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__sort.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__touch.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__tput.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__tr.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__uname.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__wc.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__xargs.sh'
-dm_tools__test__line
+posix_adapter__test__line
 . './test__xxd.sh'
 
-dm_tools__echo --no-newline '-------------------------------------------------'
-dm_tools__echo '------------------------------'
+posix_adapter__echo --no-newline '-------------------------------------------------'
+posix_adapter__echo '------------------------------'
 
-dm_tools__test__log_success 'Test suite finished'
+posix_adapter__test__log_success 'Test suite finished'
 
 #==============================================================================
 # SHELLCHECK VALIDATION

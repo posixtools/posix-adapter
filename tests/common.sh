@@ -45,40 +45,40 @@ fi
 # PRETTY PRINTING
 #==============================================================================
 
-dm_tools__test__log_task() {
+posix_adapter__test__log_task() {
   ___log_message="$1"
   echo "${BOLD}[ ${BLUE}>>${RESET}${BOLD} ]${RESET} ${___log_message}"
 }
 
-dm_tools__test__log_success() {
+posix_adapter__test__log_success() {
   ___log_message="$1"
   echo "${BOLD}[ ${GREEN}OK${RESET}${BOLD} ]${RESET} ${___log_message}"
 }
 
-dm_tools__test__log_failure() {
+posix_adapter__test__log_failure() {
   ___log_message="$1"
   echo "${BOLD}[ ${RED}!!${RESET}${BOLD} ]${RESET} ${___log_message}"
 }
 
-dm_tools__test__valid_case() {
+posix_adapter__test__valid_case() {
   ___title="$1"
   printf '%s' "[ ${BLUE}${DIM}VALID${RESET} ] ${BOLD}${___title}${RESET}"
 }
 
-dm_tools__test__error_case() {
+posix_adapter__test__error_case() {
   ___title="$1"
   printf '%s' "[ ${BLUE}${DIM}ERROR${RESET} ] ${BOLD}${___title}${RESET}"
 }
 
-_dm_tools__test__test_case_succeeded() {
+_posix_adapter__test__test_case_succeeded() {
   printf '%s\n' " - ${BOLD}${GREEN}ok${RESET}"
 }
 
-_dm_tools__test__test_case_failed() {
+_posix_adapter__test__test_case_failed() {
   printf '%s\n' " - ${BOLD}${RED}not ok${RESET}"
 }
 
-dm_tools__test__line() {
+posix_adapter__test__line() {
   printf '%s' "${DIM}"
   printf '%s' '-----------------------------------------------------------------'
   printf '%s' '-------------------'
@@ -89,13 +89,13 @@ dm_tools__test__line() {
 # ASSERTIONS
 #==============================================================================
 
-DM_TOOLS__TEST__SUPPRESS_RESULT_PRINTOUT='0'
+POSIX_ADAPTER__TEST__SUPPRESS_RESULT_PRINTOUT='0'
 
 #==============================================================================
 # Assertion function that compares two values.
 #------------------------------------------------------------------------------
 # Globals:
-#   DM_TOOLS__TEST__SUPPRESS_RESULT_PRINTOUT
+#   POSIX_ADAPTER__TEST__SUPPRESS_RESULT_PRINTOUT
 #   BOLD
 #   RED
 # Options:
@@ -115,29 +115,26 @@ DM_TOOLS__TEST__SUPPRESS_RESULT_PRINTOUT='0'
 # Status:
 #   0 - Assertion succeeded.
 #   1 - Assertion failed.
-#------------------------------------------------------------------------------
-# Tools:
-#   printf exit
 #==============================================================================
-dm_tools__test__assert_equal() {
+posix_adapter__test__assert_equal() {
   ___expected="$1"
   ___result="$2"
 
   if [ "$___result" = "$___expected" ]
   then
-    if [ "$DM_TOOLS__TEST__SUPPRESS_RESULT_PRINTOUT" -eq '0' ]
+    if [ "$POSIX_ADAPTER__TEST__SUPPRESS_RESULT_PRINTOUT" -eq '0' ]
     then
-      _dm_tools__test__test_case_succeeded
+      _posix_adapter__test__test_case_succeeded
     fi
 
   else
-    if [ "$DM_TOOLS__TEST__SUPPRESS_RESULT_PRINTOUT" -eq '0' ]
+    if [ "$POSIX_ADAPTER__TEST__SUPPRESS_RESULT_PRINTOUT" -eq '0' ]
     then
-      _dm_tools__test__test_case_failed
+      _posix_adapter__test__test_case_failed
     fi
 
     printf '%s' "${BOLD}${RED}[ FAILURE ]${RESET}${RED} - "
-    printf '%s' "dm_tools__test__assert_equal - "
+    printf '%s' "posix_adapter__test__assert_equal - "
     printf '%s\n' "${BOLD}Assertion failed!${RESET}"
 
     printf '  %s' "${RED}expected: "
@@ -152,7 +149,7 @@ dm_tools__test__assert_equal() {
 
 #==============================================================================
 #
-#  dm_tools__test__assert_invalid_parameters <status> <error_message>
+#  posix_adapter__test__assert_invalid_parameters <status> <error_message>
 #
 #------------------------------------------------------------------------------
 # Assertion function that checks if the status is the expected invalid
@@ -161,8 +158,8 @@ dm_tools__test__assert_equal() {
 # error message, then terminates the testing process.
 #------------------------------------------------------------------------------
 # Globals:
-#   DM_TOOLS__STATUS__INVALID_PARAMETERS
-#   DM_TOOLS__TEST__SUPPRESS_RESULT_PRINTOUT
+#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS
+#   POSIX_ADAPTER__TEST__SUPPRESS_RESULT_PRINTOUT
 #   DIM
 #   BOLD
 #   RED
@@ -185,32 +182,29 @@ dm_tools__test__assert_equal() {
 # Status:
 #   0 - Assertion succeeded.
 #   1 - Assertion failed.
-#------------------------------------------------------------------------------
-# Tools:
-#   printf exit
 #==============================================================================
-dm_tools__test__assert_invalid_parameters() {
+posix_adapter__test__assert_invalid_parameters() {
   ___status="$1"
   ___error_message="$2"
 
-  ___expected="$DM_TOOLS__STATUS__INVALID_PARAMETERS"
+  ___expected="$POSIX_ADAPTER__STATUS__INVALID_PARAMETERS"
 
   if [ "$___status" -eq "$___expected" ]
   then
-    if [ "$DM_TOOLS__TEST__SUPPRESS_RESULT_PRINTOUT" -eq '0' ]
+    if [ "$POSIX_ADAPTER__TEST__SUPPRESS_RESULT_PRINTOUT" -eq '0' ]
     then
-      _dm_tools__test__test_case_succeeded
+      _posix_adapter__test__test_case_succeeded
     fi
     printf '%s\n' "${DIM}${___error_message}${RESET}"
 
   else
-    if [ "$DM_TOOLS__TEST__SUPPRESS_RESULT_PRINTOUT" -eq '0' ]
+    if [ "$POSIX_ADAPTER__TEST__SUPPRESS_RESULT_PRINTOUT" -eq '0' ]
     then
-      _dm_tools__test__test_case_failed
+      _posix_adapter__test__test_case_failed
     fi
 
     printf '%s' "${BOLD}${RED}[ FAILURE ]${RESET}${RED} - "
-    printf '%s' "dm_tools__test__assert_invalid_parameters - "
+    printf '%s' "posix_adapter__test__assert_invalid_parameters - "
     printf '%s' "${RED}${BOLD}The tested tool should have reported an invalid "
     printf '%s\n' "parameters error.${RESET}"
 
@@ -226,7 +220,7 @@ dm_tools__test__assert_invalid_parameters() {
 
 #==============================================================================
 #
-# dm_tools__test__test_case_failed <status>
+# posix_adapter__test__test_case_failed <status>
 #
 #------------------------------------------------------------------------------
 # Assertion function that should be called when a tested command returns an
@@ -234,7 +228,7 @@ dm_tools__test__assert_invalid_parameters() {
 # terminates the execution.
 #------------------------------------------------------------------------------
 # Globals:
-#   DM_TOOLS__TEST__SUPPRESS_RESULT_PRINTOUT
+#   POSIX_ADAPTER__TEST__SUPPRESS_RESULT_PRINTOUT
 #   BOLD
 #   RED
 #   RESET
@@ -253,20 +247,17 @@ dm_tools__test__assert_invalid_parameters() {
 #   None
 # Status:
 #   1 - Test case failed.
-#------------------------------------------------------------------------------
-# Tools:
-#   printf exit
 #==============================================================================
-dm_tools__test__test_case_failed() {
+posix_adapter__test__test_case_failed() {
   ___status="$1"
 
-  if [ "$DM_TOOLS__TEST__SUPPRESS_RESULT_PRINTOUT" -eq '0' ]
+  if [ "$POSIX_ADAPTER__TEST__SUPPRESS_RESULT_PRINTOUT" -eq '0' ]
   then
-    _dm_tools__test__test_case_failed
+    _posix_adapter__test__test_case_failed
   fi
 
   printf '%s' "${BOLD}${RED}[ FAILURE ]${RESET}${RED} - "
-  printf '%s' 'dm_tools__test__test_case_failed - '
+  printf '%s' 'posix_adapter__test__test_case_failed - '
   printf '%s\n' "${BOLD}Unexpected status!${RESET}"
 
   printf '%s' "  ${RED}Failed with unexpected non zero status ${BOLD}"
@@ -278,13 +269,13 @@ dm_tools__test__test_case_failed() {
 
 #==============================================================================
 #
-# dm_tools__test__test_case_passed
+# posix_adapter__test__test_case_passed
 #
 #------------------------------------------------------------------------------
 # Marks the test case as passed.
 #------------------------------------------------------------------------------
 # Globals:
-#   DM_TOOLS__TEST__SUPPRESS_RESULT_PRINTOUT
+#   POSIX_ADAPTER__TEST__SUPPRESS_RESULT_PRINTOUT
 # Options:
 #   None
 # Arguments:
@@ -300,13 +291,10 @@ dm_tools__test__test_case_failed() {
 #   None
 # Status:
 #   1 - Test case failed.
-#------------------------------------------------------------------------------
-# Tools:
-#   printf exit
 #==============================================================================
-dm_tools__test__test_case_passed() {
-  if [ "$DM_TOOLS__TEST__SUPPRESS_RESULT_PRINTOUT" -eq '0' ]
+posix_adapter__test__test_case_passed() {
+  if [ "$POSIX_ADAPTER__TEST__SUPPRESS_RESULT_PRINTOUT" -eq '0' ]
   then
-    _dm_tools__test__test_case_succeeded
+    _posix_adapter__test__test_case_succeeded
   fi
 }

@@ -1,12 +1,11 @@
 #!/bin/sh
 #==============================================================================
-#       _            _              _           _
-#      | |          | |            | |         | |
-#    __| |_ __ ___  | |_ ___   ___ | |___   ___| |__
-#   / _` | '_ ` _ \ | __/ _ \ / _ \| / __| / __| '_ \
-#  | (_| | | | | | || || (_) | (_) | \__ \_\__ \ | | |
-#   \__,_|_| |_| |_(_)__\___/ \___/|_|___(_)___/_| |_|
-#
+#                  _                   _             _                _
+#  _ __   ___  ___(_)_  __    __ _  __| | __ _ _ __ | |_ ___ _ __ ___| |__
+# | '_ \ / _ \/ __| \ \/ /   / _` |/ _` |/ _` | '_ \| __/ _ \ '__/ __| '_ \
+# | |_) | (_) \__ \ |>  <   | (_| | (_| | (_| | |_) | ||  __/ | _\__ \ | | |
+# | .__/ \___/|___/_/_/\_\___\__,_|\__,_|\__,_| .__/ \__\___|_|(_)___/_| |_|
+# |_|                   |_____|               |_|
 #==============================================================================
 
 #==============================================================================
@@ -44,11 +43,8 @@ set -u  # prevent unset variable expansion
 #   None
 # Status:
 #   1 - System will exit at the end of this function.
-#------------------------------------------------------------------------------
-# Tools:
-#   echo sed
 #==============================================================================
-dm_tools__report_error_and_exit() {
+posix_adapter__report_error_and_exit() {
   ___message="$1"
   ___details="$2"
   ___reason="$3"
@@ -85,78 +81,78 @@ dm_tools__report_error_and_exit() {
 #==============================================================================
 
 #==============================================================================
-# For better readability dm.test.sh is composed of smaller scripts that are
-# sourced into it dynamically. As dm.test.sh is imported to the user codebase
-# by sourcing, the conventional path determination cannot be used. The '$0'
-# variable contains the the host script's path dm.test.sh is sourced from. The
-# relative path to the root of the dm-test-runner subrepo has to be defined
-# explicitly to the internal sourcing could be executed.
+# For better readability, posix_adapter.sh is composed  out of smaller scripts
+# that are sourced into it dynamically. As posix_adapter.sh is imported to the
+# user codebase by sourcing, the conventional path determination cannot be
+# used. The '$0' variable contains the the host script's path posix_adapter.sh
+# is sourced from. Hence, a global variable needs to be set by the calling code
+# that contains the path prefix posix_adapter.sh is called from.
 #==============================================================================
 
-if [ -z ${DM_TOOLS__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX+x} ]
+if [ -z ${POSIX_ADAPTER__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX+x} ]
 then
-  dm_tools__report_error_and_exit \
+  posix_adapter__report_error_and_exit \
     'Initialization failed!' \
     'Mandatory path prefix variable is missing!' \
-    'DM_TOOLS__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX'
+    'POSIX_ADAPTER__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX'
 fi
 
-dm_tools__path_prefix="${DM_TOOLS__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX}"
+posix_adapter__path_prefix="${POSIX_ADAPTER__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX}"
 
-# shellcheck source=./src/tool__basename.sh
-. "${dm_tools__path_prefix}/src/tool__basename.sh"
-# shellcheck source=./src/tool__cat.sh
-. "${dm_tools__path_prefix}/src/tool__cat.sh"
-# shellcheck source=./src/tool__cut.sh
-. "${dm_tools__path_prefix}/src/tool__cut.sh"
-# shellcheck source=./src/tool__date.sh
-. "${dm_tools__path_prefix}/src/tool__date.sh"
-# shellcheck source=./src/tool__dirname.sh
-. "${dm_tools__path_prefix}/src/tool__dirname.sh"
-# shellcheck source=./src/tool__echo.sh
-. "${dm_tools__path_prefix}/src/tool__echo.sh"
-# shellcheck source=./src/tool__find.sh
-. "${dm_tools__path_prefix}/src/tool__find.sh"
-# shellcheck source=./src/tool__fold.sh
-. "${dm_tools__path_prefix}/src/tool__fold.sh"
-# shellcheck source=./src/tool__grep.sh
-. "${dm_tools__path_prefix}/src/tool__grep.sh"
-# shellcheck source=./src/tool__ln.sh
-. "${dm_tools__path_prefix}/src/tool__ln.sh"
-# shellcheck source=./src/tool__ls.sh
-. "${dm_tools__path_prefix}/src/tool__ls.sh"
-# shellcheck source=./src/tool__mkdir.sh
-. "${dm_tools__path_prefix}/src/tool__mkdir.sh"
-# shellcheck source=./src/tool__mkfifo.sh
-. "${dm_tools__path_prefix}/src/tool__mkfifo.sh"
-# shellcheck source=./src/tool__mktemp.sh
-. "${dm_tools__path_prefix}/src/tool__mktemp.sh"
-# shellcheck source=./src/tool__printf.sh
-. "${dm_tools__path_prefix}/src/tool__printf.sh"
-# shellcheck source=./src/tool__readlink.sh
-. "${dm_tools__path_prefix}/src/tool__readlink.sh"
-# shellcheck source=./src/tool__realpath.sh
-. "${dm_tools__path_prefix}/src/tool__realpath.sh"
-# shellcheck source=./src/tool__rm.sh
-. "${dm_tools__path_prefix}/src/tool__rm.sh"
-# shellcheck source=./src/tool__sed.sh
-. "${dm_tools__path_prefix}/src/tool__sed.sh"
-# shellcheck source=./src/tool__sort.sh
-. "${dm_tools__path_prefix}/src/tool__sort.sh"
-# shellcheck source=./src/tool__touch.sh
-. "${dm_tools__path_prefix}/src/tool__touch.sh"
-# shellcheck source=./src/tool__tput.sh
-. "${dm_tools__path_prefix}/src/tool__tput.sh"
-# shellcheck source=./src/tool__tr.sh
-. "${dm_tools__path_prefix}/src/tool__tr.sh"
-# shellcheck source=./src/tool__uname.sh
-. "${dm_tools__path_prefix}/src/tool__uname.sh"
-# shellcheck source=./src/tool__wc.sh
-. "${dm_tools__path_prefix}/src/tool__wc.sh"
-# shellcheck source=./src/tool__xargs.sh
-. "${dm_tools__path_prefix}/src/tool__xargs.sh"
-# shellcheck source=./src/tool__xxd.sh
-. "${dm_tools__path_prefix}/src/tool__xxd.sh"
+# shellcheck source=./src/adapter__basename.sh
+. "${posix_adapter__path_prefix}/src/adapter__basename.sh"
+# shellcheck source=./src/adapter__cat.sh
+. "${posix_adapter__path_prefix}/src/adapter__cat.sh"
+# shellcheck source=./src/adapter__cut.sh
+. "${posix_adapter__path_prefix}/src/adapter__cut.sh"
+# shellcheck source=./src/adapter__date.sh
+. "${posix_adapter__path_prefix}/src/adapter__date.sh"
+# shellcheck source=./src/adapter__dirname.sh
+. "${posix_adapter__path_prefix}/src/adapter__dirname.sh"
+# shellcheck source=./src/adapter__echo.sh
+. "${posix_adapter__path_prefix}/src/adapter__echo.sh"
+# shellcheck source=./src/adapter__find.sh
+. "${posix_adapter__path_prefix}/src/adapter__find.sh"
+# shellcheck source=./src/adapter__fold.sh
+. "${posix_adapter__path_prefix}/src/adapter__fold.sh"
+# shellcheck source=./src/adapter__grep.sh
+. "${posix_adapter__path_prefix}/src/adapter__grep.sh"
+# shellcheck source=./src/adapter__ln.sh
+. "${posix_adapter__path_prefix}/src/adapter__ln.sh"
+# shellcheck source=./src/adapter__ls.sh
+. "${posix_adapter__path_prefix}/src/adapter__ls.sh"
+# shellcheck source=./src/adapter__mkdir.sh
+. "${posix_adapter__path_prefix}/src/adapter__mkdir.sh"
+# shellcheck source=./src/adapter__mkfifo.sh
+. "${posix_adapter__path_prefix}/src/adapter__mkfifo.sh"
+# shellcheck source=./src/adapter__mktemp.sh
+. "${posix_adapter__path_prefix}/src/adapter__mktemp.sh"
+# shellcheck source=./src/adapter__printf.sh
+. "${posix_adapter__path_prefix}/src/adapter__printf.sh"
+# shellcheck source=./src/adapter__readlink.sh
+. "${posix_adapter__path_prefix}/src/adapter__readlink.sh"
+# shellcheck source=./src/adapter__realpath.sh
+. "${posix_adapter__path_prefix}/src/adapter__realpath.sh"
+# shellcheck source=./src/adapter__rm.sh
+. "${posix_adapter__path_prefix}/src/adapter__rm.sh"
+# shellcheck source=./src/adapter__sed.sh
+. "${posix_adapter__path_prefix}/src/adapter__sed.sh"
+# shellcheck source=./src/adapter__sort.sh
+. "${posix_adapter__path_prefix}/src/adapter__sort.sh"
+# shellcheck source=./src/adapter__touch.sh
+. "${posix_adapter__path_prefix}/src/adapter__touch.sh"
+# shellcheck source=./src/adapter__tput.sh
+. "${posix_adapter__path_prefix}/src/adapter__tput.sh"
+# shellcheck source=./src/adapter__tr.sh
+. "${posix_adapter__path_prefix}/src/adapter__tr.sh"
+# shellcheck source=./src/adapter__uname.sh
+. "${posix_adapter__path_prefix}/src/adapter__uname.sh"
+# shellcheck source=./src/adapter__wc.sh
+. "${posix_adapter__path_prefix}/src/adapter__wc.sh"
+# shellcheck source=./src/adapter__xargs.sh
+. "${posix_adapter__path_prefix}/src/adapter__xargs.sh"
+# shellcheck source=./src/adapter__xxd.sh
+. "${posix_adapter__path_prefix}/src/adapter__xxd.sh"
 
 
 #==============================================================================
@@ -168,7 +164,7 @@ dm_tools__path_prefix="${DM_TOOLS__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX}"
 # uniform interface.
 #------------------------------------------------------------------------------
 # Globals:
-#   DM_TOOLS__STATUS__INVALID_PARAMETERS
+#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS
 # Options:
 #   None
 # Arguments:
@@ -185,21 +181,21 @@ dm_tools__path_prefix="${DM_TOOLS__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX}"
 # STDERR:
 #   Compiled error message.
 # Status:
-#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
 #==============================================================================
-dm_tools__report_invalid_parameters() {
-  dm_tools__reported_from="$1"
-  dm_tools__reason="$2"
-  dm_tools__details="$3"
+posix_adapter__report_invalid_parameters() {
+  posix_adapter__reported_from="$1"
+  posix_adapter__reason="$2"
+  posix_adapter__details="$3"
 
-  >&2 printf '%s' "ERROR | ${dm_tools__reported_from} | reason     | "
-  >&2 printf '%s\n' "${dm_tools__reason}"
-  >&2 printf '%s' "ERROR | ${dm_tools__reported_from} | details    | "
-  >&2 printf '%s\n' "${dm_tools__details}"
+  >&2 printf '%s' "ERROR | ${posix_adapter__reported_from} | reason     | "
+  >&2 printf '%s\n' "${posix_adapter__reason}"
+  >&2 printf '%s' "ERROR | ${posix_adapter__reported_from} | details    | "
+  >&2 printf '%s\n' "${posix_adapter__details}"
 
-  _dm_tools__error_suggestion "$dm_tools__reported_from"
+  _posix_adapter__error_suggestion "$posix_adapter__reported_from"
 
-  exit "$DM_TOOLS__STATUS__INVALID_PARAMETERS"
+  exit "$POSIX_ADAPTER__STATUS__INVALID_PARAMETERS"
 }
 
 #==============================================================================
@@ -207,7 +203,7 @@ dm_tools__report_invalid_parameters() {
 # uniform interface.
 #------------------------------------------------------------------------------
 # Globals:
-#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL
+#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL
 # Options:
 #   None
 # Arguments:
@@ -222,17 +218,17 @@ dm_tools__report_invalid_parameters() {
 # STDERR:
 #   Compiled error message.
 # Status:
-#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - Invalid parameter configuration.
+#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL - Invalid parameter configuration.
 #==============================================================================
-dm_tools__report_incompatible_call() {
-  dm_tools__reported_from="$1"
+posix_adapter__report_incompatible_call() {
+  posix_adapter__reported_from="$1"
 
-  >&2 printf '%s' "ERROR | ${dm_tools__reported_from} | reason     |"
+  >&2 printf '%s' "ERROR | ${posix_adapter__reported_from} | reason     |"
   >&2 printf '%s\n' 'No compatible call style was found! Giving up..'
 
-  _dm_tools__error_suggestion "$dm_tools__reported_from"
+  _posix_adapter__error_suggestion "$posix_adapter__reported_from"
 
-  exit "$DM_TOOLS__STATUS__INCOMPATIBLE_CALL"
+  exit "$POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL"
 }
 
 #==============================================================================
@@ -257,31 +253,31 @@ dm_tools__report_incompatible_call() {
 # Status:
 #   0 - Other status is not expected.
 #==============================================================================
-_dm_tools__error_suggestion() {
-  dm_tools__reported_from="$1"
+_posix_adapter__error_suggestion() {
+  posix_adapter__reported_from="$1"
 
-  >&2 printf '%s' "ERROR | ${dm_tools__reported_from} | suggestion | "
+  >&2 printf '%s' "ERROR | ${posix_adapter__reported_from} | suggestion | "
   >&2 printf '%s' 'Probably a new use case needs to be added to the '
-  >&2 printf '%s\n' "'${dm_tools__reported_from}' function."
+  >&2 printf '%s\n' "'${posix_adapter__reported_from}' function."
 }
 
 #==============================================================================
 # GLOBAL VARIABLES
 #==============================================================================
 
-DM_TOOLS__CONSTANT__OS__LINUX="Linux"
-DM_TOOLS__CONSTANT__OS__MACOS="Darwin"
+POSIX_ADAPTER__CONSTANT__OS__LINUX="Linux"
+POSIX_ADAPTER__CONSTANT__OS__MACOS="Darwin"
 
-DM_TOOLS__STATUS__INVALID_PARAMETERS='98'
-DM_TOOLS__STATUS__INCOMPATIBLE_CALL='99'
+POSIX_ADAPTER__STATUS__INVALID_PARAMETERS='98'
+POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL='99'
 
 # This variable is used by almost every tool mapping function internally. It
 # was aquired with the non-mapped style to be able to use it in the mapped
 # version of uname too. The -s flag should be supported in every release.
 # shellcheck disable=SC2034
-DM_TOOLS__RUNTIME__OS="$(uname -s)"
+POSIX_ADAPTER__RUNTIME__OS="$(uname -s)"
 
 # This file will be sourced to the user code-base so exporting the variable is
 # not necessary here.
 # shellcheck disable=SC2034
-DM_TOOLS__READY='1'
+POSIX_ADAPTER__READY='1'

@@ -11,7 +11,7 @@
 
 #==============================================================================
 #
-#  dm_tools__mktemp [--directory] [--tmpdir <path>] <template>
+#  posix_adapter__mktemp [--directory] [--tmpdir <path>] <template>
 #
 #------------------------------------------------------------------------------
 # Execution mapping function for the 'mktemp' command line tool with a
@@ -37,52 +37,52 @@
 # Status:
 #   0  - Call was successful.
 #   .. - Call failed with it's error status
-#   DM_TOOLS__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
-#   DM_TOOLS__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
+#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
+#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
 #==============================================================================
-dm_tools__mktemp() {
-  dm_tools__flag__directory='0'
+posix_adapter__mktemp() {
+  posix_adapter__flag__directory='0'
 
-  dm_tools__flag__tmpdir='0'
-  dm_tools__value__tmpdir=''
+  posix_adapter__flag__tmpdir='0'
+  posix_adapter__value__tmpdir=''
 
-  dm_tools__flag__template='0'
-  dm_tools__value__template=''
+  posix_adapter__flag__template='0'
+  posix_adapter__value__template=''
 
   while [ "$#" -gt '0' ]
   do
     case "$1" in
       --directory)
-        dm_tools__flag__directory='1'
+        posix_adapter__flag__directory='1'
         shift
         ;;
       --tmpdir)
-        dm_tools__flag__tmpdir='1'
-        dm_tools__value__tmpdir="$2"
+        posix_adapter__flag__tmpdir='1'
+        posix_adapter__value__tmpdir="$2"
         shift
         shift
         ;;
       --[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__mktemp' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__mktemp' \
           "Unexpected option '${1}'!" \
           'You can only use --extended --silent --invert-match --count -- match-only.'
         ;;
       -[!-]*)
-        dm_tools__report_invalid_parameters \
-          'dm_tools__mktemp' \
+        posix_adapter__report_invalid_parameters \
+          'posix_adapter__mktemp' \
           "Invalid single dashed option '${1}'!" \
-          "dm_tools only uses double dashed options like '--option'."
+          "posix_adapter only uses double dashed options like '--option'."
         ;;
       *)
-        if [ "$dm_tools__flag__template" -eq '0' ]
+        if [ "$posix_adapter__flag__template" -eq '0' ]
         then
-          dm_tools__flag__template='1'
-          dm_tools__value__template="$1"
+          posix_adapter__flag__template='1'
+          posix_adapter__value__template="$1"
           shift
         else
-          dm_tools__report_invalid_parameters \
-            'dm_tools__mktemp' \
+          posix_adapter__report_invalid_parameters \
+            'posix_adapter__mktemp' \
             'Unexpected parameter!' \
             "Parameter '${1}' is unexpected!"
         fi
@@ -90,10 +90,10 @@ dm_tools__mktemp() {
     esac
   done
 
-  if [ "$dm_tools__flag__template" -eq '0' ]
+  if [ "$posix_adapter__flag__template" -eq '0' ]
   then
-    dm_tools__report_invalid_parameters \
-      'dm_tools__mktemp' \
+    posix_adapter__report_invalid_parameters \
+      'posix_adapter__mktemp' \
       'Missing <template> argument!' \
       'To be able to use grep, you need to specify at least a pattern.'
   fi
@@ -102,27 +102,27 @@ dm_tools__mktemp() {
   # ,--- directory
   # |,-- tempdir
   # 00
-  dm_tools__decision="${dm_tools__flag__directory}"
-  dm_tools__decision="${dm_tools__decision}${dm_tools__flag__tmpdir}"
+  posix_adapter__decision="${posix_adapter__flag__directory}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__tmpdir}"
 
-  case "$DM_TOOLS__RUNTIME__OS" in
+  case "$POSIX_ADAPTER__RUNTIME__OS" in
 
-    "$DM_TOOLS__CONSTANT__OS__LINUX")
-      _dm_tools__mktemp__linux \
-        "$dm_tools__decision" \
-        "$dm_tools__value__tmpdir" \
-        "$dm_tools__value__template"
+    "$POSIX_ADAPTER__CONSTANT__OS__LINUX")
+      _posix_adapter__mktemp__linux \
+        "$posix_adapter__decision" \
+        "$posix_adapter__value__tmpdir" \
+        "$posix_adapter__value__template"
       ;;
 
-    "$DM_TOOLS__CONSTANT__OS__MACOS")
-      _dm_tools__mktemp__darwin \
-        "$dm_tools__decision" \
-        "$dm_tools__value__tmpdir" \
-        "$dm_tools__value__template"
+    "$POSIX_ADAPTER__CONSTANT__OS__MACOS")
+      _posix_adapter__mktemp__darwin \
+        "$posix_adapter__decision" \
+        "$posix_adapter__value__tmpdir" \
+        "$posix_adapter__value__template"
       ;;
 
     *)
-      dm_tools__report_incompatible_call 'dm_tools__mktemp'
+      posix_adapter__report_incompatible_call 'posix_adapter__mktemp'
       ;;
   esac
 }
@@ -151,19 +151,19 @@ dm_tools__mktemp() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_dm_tools__mktemp__linux() {
-  dm_tools__decision_string="$1"
-  dm_tools__value__tmpdir="$2"
-  dm_tools__value__template="$3"
+_posix_adapter__mktemp__linux() {
+  posix_adapter__decision_string="$1"
+  posix_adapter__value__tmpdir="$2"
+  posix_adapter__value__template="$3"
 
-  case "$dm_tools__decision_string" in
+  case "$posix_adapter__decision_string" in
   # ,--- directory
   # |,-- tempdir
     00)
       mktemp \
         \
         \
-        "$dm_tools__value__template" \
+        "$posix_adapter__value__template" \
 
       ;;
   # ,--- directory
@@ -171,8 +171,8 @@ _dm_tools__mktemp__linux() {
     01)
       mktemp \
         \
-        --tmpdir="$dm_tools__value__tmpdir" \
-        "$dm_tools__value__template" \
+        --tmpdir="$posix_adapter__value__tmpdir" \
+        "$posix_adapter__value__template" \
 
       ;;
   # ,--- directory
@@ -181,7 +181,7 @@ _dm_tools__mktemp__linux() {
       mktemp \
         --directory \
         \
-        "$dm_tools__value__template" \
+        "$posix_adapter__value__template" \
 
       ;;
   # ,--- directory
@@ -189,13 +189,13 @@ _dm_tools__mktemp__linux() {
     11)
       mktemp \
         --directory \
-        --tmpdir="$dm_tools__value__tmpdir" \
-        "$dm_tools__value__template" \
+        --tmpdir="$posix_adapter__value__tmpdir" \
+        "$posix_adapter__value__template" \
 
       ;;
     *)
-      dm_tools__report_invalid_parameters \
-        'dm_tools__mktemp' \
+      posix_adapter__report_invalid_parameters \
+        'posix_adapter__mktemp' \
         'Unexpected parameter combination!' \
         'You can only have --directory --tmpdir.'
       ;;
@@ -226,18 +226,18 @@ _dm_tools__mktemp__linux() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_dm_tools__mktemp__darwin() {
-  dm_tools__decision_string="$1"
-  dm_tools__value__tmpdir="$2"
-  dm_tools__value__template="$3"
+_posix_adapter__mktemp__darwin() {
+  posix_adapter__decision_string="$1"
+  posix_adapter__value__tmpdir="$2"
+  posix_adapter__value__template="$3"
 
-  case "$dm_tools__decision_string" in
+  case "$posix_adapter__decision_string" in
   # ,--- directory
   # |,-- tempdir
     00)
       mktemp \
         \
-        "$dm_tools__value__template" \
+        "$posix_adapter__value__template" \
 
       ;;
   # ,--- directory
@@ -245,7 +245,7 @@ _dm_tools__mktemp__darwin() {
     01)
       mktemp \
         \
-        "${dm_tools__value__tmpdir}/${dm_tools__value__template}" \
+        "${posix_adapter__value__tmpdir}/${posix_adapter__value__template}" \
 
       ;;
   # ,--- directory
@@ -253,7 +253,7 @@ _dm_tools__mktemp__darwin() {
     10)
       mktemp \
         -d \
-        "$dm_tools__value__template" \
+        "$posix_adapter__value__template" \
 
       ;;
   # ,--- directory
@@ -261,12 +261,12 @@ _dm_tools__mktemp__darwin() {
     11)
       mktemp \
         -d \
-        "${dm_tools__value__tmpdir}/${dm_tools__value__template}" \
+        "${posix_adapter__value__tmpdir}/${posix_adapter__value__template}" \
 
       ;;
     *)
-      dm_tools__report_invalid_parameters \
-        'dm_tools__mktemp' \
+      posix_adapter__report_invalid_parameters \
+        'posix_adapter__mktemp' \
         'Unexpected parameter combination!' \
         'You can only have (--delimiter --fields) or (--characters).'
       ;;

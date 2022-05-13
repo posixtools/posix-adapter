@@ -239,9 +239,23 @@ _posix_adapter__realpath__darwin() {
     00)
       if ! realpath "$posix_adapter__value__path" 2>/dev/null
       then
-        python -c \
-          'from os.path import expanduser,realpath;import sys;print(realpath(expanduser(sys.argv[1])))' \
-          "$posix_adapter__value__path"
+        if command -v python >/dev/null
+        then
+          python -c \
+            'from os.path import expanduser,realpath;import sys;print(realpath(expanduser(sys.argv[1])))' \
+            "$posix_adapter__value__path"
+
+        elif command -v python3 >/dev/null
+        then
+          python3 -c \
+            'from os.path import expanduser,realpath;import sys;print(realpath(expanduser(sys.argv[1])))' \
+            "$posix_adapter__value__path"
+
+        else
+          _report_invalid_parameter_combination \
+            'No python nor python3 executable was found.' \
+            'Posix adapter is out of options to provide the desired functionality..'
+        fi
       fi
       ;;
   # ,--- no_symlinks
@@ -249,9 +263,23 @@ _posix_adapter__realpath__darwin() {
     01)
       if ! realpath --relative-to="$posix_adapter__value__relative_to" "$posix_adapter__value__path" 2>/dev/null
       then
-        python -c \
-          'from os.path import relpath,expanduser,realpath;import sys;print(relpath(realpath(expanduser(sys.argv[1])),realpath(expanduser(sys.argv[2]))))' \
-          "$posix_adapter__value__path" "$posix_adapter__value__relative_to"
+        if command -v python >/dev/null
+        then
+          python -c \
+            'from os.path import relpath,expanduser,realpath;import sys;print(relpath(realpath(expanduser(sys.argv[1])),realpath(expanduser(sys.argv[2]))))' \
+            "$posix_adapter__value__path" "$posix_adapter__value__relative_to"
+
+        elif command -v python3 >/dev/null
+        then
+          python3 -c \
+            'from os.path import relpath,expanduser,realpath;import sys;print(relpath(realpath(expanduser(sys.argv[1])),realpath(expanduser(sys.argv[2]))))' \
+            "$posix_adapter__value__path" "$posix_adapter__value__relative_to"
+
+        else
+          _report_invalid_parameter_combination \
+            'No python nor python3 executable was found.' \
+            'Posix adapter is out of options to provide the desired functionality..'
+        fi
       fi
       ;;
   # ,--- no_symlinks
@@ -259,9 +287,23 @@ _posix_adapter__realpath__darwin() {
     10)
       if ! realpath -s "$posix_adapter__value__path" 2>/dev/null
       then
-        python -c \
-          'from os.path import expanduser,abspath;import sys;print(abspath(expanduser(sys.argv[1])))' \
-          "$posix_adapter__value__path"
+        if command -v python >/dev/null
+        then
+          python -c \
+            'from os.path import expanduser,abspath;import sys;print(abspath(expanduser(sys.argv[1])))' \
+            "$posix_adapter__value__path"
+
+        elif command -v python3 >/dev/null
+        then
+          python3 -c \
+            'from os.path import expanduser,abspath;import sys;print(abspath(expanduser(sys.argv[1])))' \
+            "$posix_adapter__value__path"
+
+        else
+          _report_invalid_parameter_combination \
+            'No python nor python3 executable was found.' \
+            'Posix adapter is out of options to provide the desired functionality..'
+        fi
       fi
       ;;
   # ,--- no_symlinks
@@ -269,9 +311,23 @@ _posix_adapter__realpath__darwin() {
     11)
       if ! realpath --relative-to="$posix_adapter__value__relative_to" "$posix_adapter__value__path" 2>/dev/null
       then
-        python -c \
-          'from os.path import relpath,expanduser,abspath;import sys;print(relpath(abspath(expanduser(sys.argv[1])),abspath(expanduser(sys.argv[2]))))' \
-          "$posix_adapter__value__path" "$posix_adapter__value__relative_to"
+        if command -v python >/dev/null
+        then
+          python -c \
+            'from os.path import relpath,expanduser,abspath;import sys;print(relpath(abspath(expanduser(sys.argv[1])),abspath(expanduser(sys.argv[2]))))' \
+            "$posix_adapter__value__path" "$posix_adapter__value__relative_to"
+
+        elif command -v python3 >/dev/null
+        then
+          python3 -c \
+            'from os.path import relpath,expanduser,abspath;import sys;print(relpath(abspath(expanduser(sys.argv[1])),abspath(expanduser(sys.argv[2]))))' \
+            "$posix_adapter__value__path" "$posix_adapter__value__relative_to"
+
+        else
+          _report_invalid_parameter_combination \
+            'No python nor python3 executable was found.' \
+            'Posix adapter is out of options to provide the desired functionality..'
+        fi
       fi
       ;;
     *)

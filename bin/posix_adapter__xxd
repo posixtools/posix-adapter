@@ -126,7 +126,19 @@ _posix_adapter__xxd__common() {
         # Since xxd is not a common tool and for linux it is mostly shipped
         # with vim, we are replacing its functionality with python as a last
         # resort.
-        python -c 'import sys;print("".join([line.encode().hex() for line in sys.stdin]))'
+        if command -v python >/dev/null
+        then
+          python -c 'import sys;print("".join([line.encode().hex() for line in sys.stdin]))'
+
+        elif command -v python3 >/dev/null
+        then
+          python3 -c 'import sys;print("".join([line.encode().hex() for line in sys.stdin]))'
+
+        else
+          _report_invalid_parameter_combination \
+            'No python nor python3 executable was found.' \
+            'Posix adapter is out of options to provide the desired functionality..'
+        fi
       fi
       ;;
   # ,------ plain
@@ -137,7 +149,19 @@ _posix_adapter__xxd__common() {
         xxd -p -r
       else
         # See the explanation one case up for the usage of python.
-        python -c 'import sys;print("".join([bytearray.fromhex(line).decode() for line in sys.stdin]).rstrip())'
+        if command -v python >/dev/null
+        then
+          python -c 'import sys;print("".join([bytearray.fromhex(line).decode() for line in sys.stdin]).rstrip())'
+
+        elif command -v python3 >/dev/null
+        then
+          python3 -c 'import sys;print("".join([bytearray.fromhex(line).decode() for line in sys.stdin]).rstrip())'
+
+        else
+          _report_invalid_parameter_combination \
+            'No python nor python3 executable was found.' \
+            'Posix adapter is out of options to provide the desired functionality..'
+        fi
       fi
       ;;
     *)

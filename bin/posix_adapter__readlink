@@ -206,9 +206,23 @@ _posix_adapter__readlink__darwin() {
       if ! readlink -f "$posix_adapter__value__path" 2>/dev/null
       then
         # Yep we are using python as a last resort..
-        python -c \
-          'import os,sys; print(os.path.realpath(os.path.expanduser(sys.argv[1])))' \
-          "$posix_adapter__value__path"
+        if command -v python >/dev/null
+        then
+          python -c \
+            'import os,sys; print(os.path.realpath(os.path.expanduser(sys.argv[1])))' \
+            "$posix_adapter__value__path"
+
+        elif command -v python3 >/dev/null
+        then
+          python3 -c \
+            'import os,sys; print(os.path.realpath(os.path.expanduser(sys.argv[1])))' \
+            "$posix_adapter__value__path"
+
+        else
+          _report_invalid_parameter_combination \
+            'No python nor python3 executable was found.' \
+            'Posix adapter is out of options to provide the desired functionality..'
+        fi
       fi
       ;;
     *)

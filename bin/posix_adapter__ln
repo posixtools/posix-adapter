@@ -1,0 +1,273 @@
+#!/bin/sh
+#==============================================================================
+#   _
+#  | |_ __
+#  | | '_ \
+#  | | | | |
+#  |_|_| |_|
+#
+#==============================================================================
+# TOOL: LN
+#==============================================================================
+
+TOOL_NAME='posix_adapter__ln'
+
+_print_help() {
+  >&2 echo '=============================================================================='
+  >&2 echo ''
+  >&2 echo '  posix_adapter__ln --help'
+  >&2 echo '  posix_adapter__ln [--symbolic] [--verbose] --target <target_path>'
+  >&2 echo '      --link-name <link_name>'
+  >&2 echo ''
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Execution mapping function for the "ln" command line tool with a uniform'
+  >&2 echo ' interface.'
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Globals:'
+  >&2 echo '   None'
+  >&2 echo ' Options:'
+  >&2 echo '   --help - Prints out the help message and exits.'
+  >&2 echo '   --symbolic - Optional flag that should make the created link symbolic.'
+  >&2 echo '   --symbolic - Optional flag that makes the execution verbose.'
+  >&2 echo '   --target <target_path> - Mandatory target path option.'
+  >&2 echo '   --link-name <link_name> - Mandatory link name option.'
+  >&2 echo ' Arguments:'
+  >&2 echo '   None'
+  >&2 echo ' STDIN:'
+  >&2 echo '   None'
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Output variables:'
+  >&2 echo '   None'
+  >&2 echo ' STDOUT:'
+  >&2 echo '   Output of the mapped command.'
+  >&2 echo ' STDERR:'
+  >&2 echo '   Error output of the mapped command.'
+  >&2 echo ' Status:'
+  >&2 echo '   0  - Call was successful.'
+  >&2 echo '   .. - Call failed with its error status.'
+  >&2 echo '   98 - Invalid parameter configuration.'
+  >&2 echo '   99 - No compatible call style was found.'
+  >&2 echo '=============================================================================='
+}
+
+_posix_adapter__ln() {
+  posix_adapter__flag__symbolic='0'
+  posix_adapter__flag__verbose='0'
+
+  posix_adapter__flag__target='0'
+  posix_adapter__value__target=''
+
+  posix_adapter__flag__link_name='0'
+  posix_adapter__value__link_name=''
+
+  while [ "$#" -gt '0' ]
+  do
+    case "$1" in
+      --symbolic)
+        posix_adapter__flag__symbolic='1'
+        shift
+        ;;
+      --verbose)
+        posix_adapter__flag__verbose='1'
+        shift
+        ;;
+      --target)
+        posix_adapter__flag__target='1'
+        posix_adapter__value__target="$2"
+        shift
+        shift
+        ;;
+      --link-name)
+        posix_adapter__flag__link_name='1'
+        posix_adapter__value__link_name="$2"
+        shift
+        shift
+        ;;
+      --[!-]*)
+        _report_invalid_parameter \
+          "Unexpected option '${1}'!" \
+          'You can only use the available options.'
+        ;;
+      -[!-]*)
+        _report_invalid_parameter \
+          "Invalid single dashed option '${1}'!" \
+          "posix_adapter only uses double dashed options like '--option'."
+        ;;
+      *)
+        _report_invalid_parameter \
+          'Unexpected parameter!' \
+          'This function does not take positional arguments.'
+        ;;
+    esac
+  done
+
+  # Assembling the decision string.
+  # ,----- symbolic
+  # |,---- verbose
+  # ||,--- target
+  # |||,-- link_name
+  # 0000
+  posix_adapter__decision="${posix_adapter__flag__symbolic}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__verbose}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__target}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__link_name}"
+
+  _posix_adapter__ln__common \
+    "$posix_adapter__decision" \
+    "$posix_adapter__value__target" \
+    "$posix_adapter__value__link_name"
+}
+
+#==============================================================================
+# Common call mapping function.
+#------------------------------------------------------------------------------
+# Globals:
+#   None
+# Options:
+#   None
+# Arguments:
+#   [1] decision_string - String that decodes the optional parameter presence.
+#   [2] value__target_path -  Target path passed to the command.
+#   [3] value__link_name -  Link name passed to the command.
+# STDIN:
+#   Input passed to the mapped command.
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   Mapped command's output.
+# STDERR:
+#   Mapped command's error output. Mapping error output.
+# Status:
+#   0  - Call succeeded.
+#   .. - Call failed with it's error status
+#==============================================================================
+_posix_adapter__ln__common() {
+  posix_adapter__decision_string="$1"
+  posix_adapter__value__target_path="$2"
+  posix_adapter__value__link_name="$3"
+
+  case "$posix_adapter__decision_string" in
+  # ,----- symbolic
+  # |,---- verbose
+  # ||,--- target
+  # |||,-- link_name
+    0011)
+      ln \
+        \
+        \
+        "$posix_adapter__value__target_path" \
+        "$posix_adapter__value__link_name" \
+
+      ;;
+  # ,----- symbolic
+  # |,---- verbose
+  # ||,--- target
+  # |||,-- link_name
+    0111)
+      ln \
+        \
+        -v \
+        "$posix_adapter__value__target_path" \
+        "$posix_adapter__value__link_name" \
+
+      ;;
+  # ,----- symbolic
+  # |,---- verbose
+  # ||,--- target
+  # |||,-- link_name
+    1011)
+      ln \
+        -s \
+        \
+        "$posix_adapter__value__target_path" \
+        "$posix_adapter__value__link_name" \
+
+      ;;
+  # ,----- symbolic
+  # |,---- verbose
+  # ||,--- target
+  # |||,-- link_name
+    1111)
+      ln \
+        -s \
+        -v \
+        "$posix_adapter__value__target_path" \
+        "$posix_adapter__value__link_name" \
+
+      ;;
+    *)
+      _report_invalid_parameter_combination \
+        'Unexpected parameter combination!' \
+        'You can only use the available options.'
+      ;;
+  esac
+}
+
+#==============================================================================
+# Invalid parameter error reporting helper function.
+#------------------------------------------------------------------------------
+# Globals:
+#   TOOL_NAME
+# Options:
+#   None
+# Arguments:
+#   [1] reason - Reason of the error.
+#   [2] details - More details about the error.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Reported error.
+# Status:
+#   98  - The function will terminate the execution.
+#==============================================================================
+_report_invalid_parameter() {
+  reason="$1"
+  details="$2"
+  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
+  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
+  _print_help
+  exit 98
+}
+
+#==============================================================================
+# Invalid parameter combination error reporting helper function.
+#------------------------------------------------------------------------------
+# Globals:
+#   TOOL_NAME
+# Options:
+#   None
+# Arguments:
+#   [1] reason - Reason of the error.
+#   [2] details - More details about the error.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Reported error.
+# Status:
+#   99  - The function will terminate the execution.
+#==============================================================================
+_report_invalid_parameter_combination() {
+  reason="$1"
+  details="$2"
+  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
+  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
+  _print_help
+  exit 99
+}
+
+#==============================================================================
+# ENTRY POINT
+#==============================================================================
+
+_posix_adapter__ln "$@"

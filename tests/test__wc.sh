@@ -100,7 +100,7 @@ then
   posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_incompatible_call "$status" "$error_message"
 fi
 
 #==============================================================================
@@ -113,7 +113,7 @@ then
   posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_incompatible_call "$status" "$error_message"
 fi
 
 #==============================================================================
@@ -126,7 +126,7 @@ then
   posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_incompatible_call "$status" "$error_message"
 fi
 
 #==============================================================================
@@ -139,7 +139,7 @@ then
   posix_adapter__test__test_case_failed "$status"
 else
   status="$?"
-  posix_adapter__test__assert_invalid_parameters "$status" "$error_message"
+  posix_adapter__test__assert_incompatible_call "$status" "$error_message"
 fi
 
 #==============================================================================

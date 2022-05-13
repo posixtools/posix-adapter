@@ -1,0 +1,144 @@
+#!/bin/sh
+#==============================================================================
+#      _ _
+#   __| (_)_ __ _ __   __ _ _ __ ___   ___
+#  / _` | | '__| '_ \ / _` | '_ ` _ \ / _ \
+# | (_| | | |  | | | | (_| | | | | | |  __/
+#  \__,_|_|_|  |_| |_|\__,_|_| |_| |_|\___|
+#==============================================================================
+# TOOL: DIRNAME
+#==============================================================================
+
+TOOL_NAME='posix_adapter__dirname'
+
+_print_help() {
+  >&2 echo '=============================================================================='
+  >&2 echo ''
+  >&2 echo '  posix_adapter__dirname --help'
+  >&2 echo '  posix_adapter__dirname <path>'
+  >&2 echo ''
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Execution mapping function for the "dirname" command line tool with a uniform'
+  >&2 echo ' interface.'
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Globals:'
+  >&2 echo '   None'
+  >&2 echo ' Options:'
+  >&2 echo '   --help - Prints out the help message and exits.'
+  >&2 echo ' Arguments:'
+  >&2 echo '   [1] path - Path from which the directory name should be separated.'
+  >&2 echo ' STDIN:'
+  >&2 echo '   Standard input can be used to pass a path.'
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Output variables:'
+  >&2 echo '   None'
+  >&2 echo ' STDOUT:'
+  >&2 echo '   Output of the mapped command.'
+  >&2 echo ' STDERR:'
+  >&2 echo '   Error output of the mapped command.'
+  >&2 echo ' Status:'
+  >&2 echo '   0  - Call was successful.'
+  >&2 echo '   .. - Call failed with its error status.'
+  >&2 echo '   98 - Invalid parameter configuration.'
+  >&2 echo '   99 - No compatible call style was found.'
+  >&2 echo '=============================================================================='
+}
+
+_posix_adapter__dirname() {
+  if [ "$#" -eq 0 ]
+  then
+    # dirname does not support the standard input by it's own, so helping it
+    # out with xargs..
+    xargs dirname
+  else
+    if [ "$#" -gt 1 ]
+    then
+      _report_invalid_parameter \
+        'Unexpected parameter count!' \
+        "Only 1 parameter is expected, got ${#}!"
+    fi
+
+    case "$1" in
+      --[!-]*)
+        _report_invalid_parameter \
+          "Unexpected option '${1}'!" \
+          'This function does not take options.'
+        ;;
+      -[!-]*)
+        _report_invalid_parameter \
+          "Invalid single dashed option '${1}'!" \
+          "posix_adapter only uses double dashed options like '--option'."
+        ;;
+    esac
+
+    dirname "$1"
+  fi
+}
+
+#==============================================================================
+# Invalid parameter error reporting helper function.
+#------------------------------------------------------------------------------
+# Globals:
+#   TOOL_NAME
+# Options:
+#   None
+# Arguments:
+#   [1] reason - Reason of the error.
+#   [2] details - More details about the error.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Reported error.
+# Status:
+#   98  - The function will terminate the execution.
+#==============================================================================
+_report_invalid_parameter() {
+  reason="$1"
+  details="$2"
+  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
+  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
+  _print_help
+  exit 98
+}
+
+#==============================================================================
+# Invalid parameter combination error reporting helper function.
+#------------------------------------------------------------------------------
+# Globals:
+#   TOOL_NAME
+# Options:
+#   None
+# Arguments:
+#   [1] reason - Reason of the error.
+#   [2] details - More details about the error.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Reported error.
+# Status:
+#   99  - The function will terminate the execution.
+#==============================================================================
+_report_invalid_parameter_combination() {
+  reason="$1"
+  details="$2"
+  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
+  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
+  _print_help
+  exit 99
+}
+
+#==============================================================================
+# ENTRY POINT
+#==============================================================================
+
+_posix_adapter__dirname "$@"

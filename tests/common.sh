@@ -220,6 +220,77 @@ posix_adapter__test__assert_invalid_parameters() {
 
 #==============================================================================
 #
+#  posix_adapter__test__assert_incompatible_call <status> <error_message>
+#
+#------------------------------------------------------------------------------
+# Assertion function that checks if the status is the expected incompatible
+# call status code. If it is, it prints out the captured error message provided
+# by the tool. If the status code doesn't match, it prints out an error
+# message, then terminates the testing process.
+#------------------------------------------------------------------------------
+# Globals:
+#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL
+#   POSIX_ADAPTER__TEST__SUPPRESS_RESULT_PRINTOUT
+#   DIM
+#   BOLD
+#   RED
+#   RESET
+# Options:
+#   None
+# Arguments:
+#   [1] status - Resulted status that should be tested.
+#   [2] error_message - Captured error message the tool outputted.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   Captured error printout from the command in case of success, or error
+#   message in case of failure.
+# STDERR:
+#   None
+# Status:
+#   0 - Assertion succeeded.
+#   1 - Assertion failed.
+#==============================================================================
+posix_adapter__test__assert_incompatible_call() {
+  ___status="$1"
+  ___error_message="$2"
+
+  ___expected="$POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL"
+
+  if [ "$___status" -eq "$___expected" ]
+  then
+    if [ "$POSIX_ADAPTER__TEST__SUPPRESS_RESULT_PRINTOUT" -eq '0' ]
+    then
+      _posix_adapter__test__test_case_succeeded
+    fi
+    printf '%s\n' "${DIM}${___error_message}${RESET}"
+
+  else
+    if [ "$POSIX_ADAPTER__TEST__SUPPRESS_RESULT_PRINTOUT" -eq '0' ]
+    then
+      _posix_adapter__test__test_case_failed
+    fi
+
+    printf '%s' "${BOLD}${RED}[ FAILURE ]${RESET}${RED} - "
+    printf '%s' "posix_adapter__test__assert_incompatible_call - "
+    printf '%s' "${RED}${BOLD}The tested tool should have reported an incompatible "
+    printf '%s\n' "call error.${RESET}"
+
+    printf '  %s' "${RED}expected exit status: "
+    printf '%s\n' "${BOLD}${___expected}${RESET}"
+
+    printf '  %s' "${RED}resulted exit status: "
+    printf '%s\n' "${BOLD}${___status}${RESET}"
+
+    exit 1
+  fi
+}
+
+#==============================================================================
+#
 # posix_adapter__test__test_case_failed <status>
 #
 #------------------------------------------------------------------------------

@@ -1,0 +1,138 @@
+#!/bin/sh
+#==============================================================================
+#   _               _
+#  | |_ _ __  _   _| |_
+#  | __| '_ \| | | | __|
+#  | |_| |_) | |_| | |_
+#   \__| .__/ \__,_|\__|
+#======|_|=====================================================================
+# TOOL: TPUT
+#==============================================================================
+
+TOOL_NAME='posix_adapter__tput'
+
+_print_help() {
+  >&2 echo '=============================================================================='
+  >&2 echo ''
+  >&2 echo '  posix_adapter__tput --help'
+  >&2 echo '  posix_adapter__tput --is-available'
+  >&2 echo '  posix_adapter__tput <tput_specification>..'
+  >&2 echo ''
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Execution mapping function for the "tput" command line tool. This is the only'
+  >&2 echo ' command mapping besides printf that is only a proxy because of the nature of'
+  >&2 echo ' tput. It also performs a fail-safe step and supresses not supported escape'
+  >&2 echo ' sequences by returnin an empty string in case of error.'
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Globals:'
+  >&2 echo '   None'
+  >&2 echo ' Options:'
+  >&2 echo '   --help - Prints out the help message and exits.'
+  >&2 echo '   --is-available - Runs a check if tput is actually available on the current'
+  >&2 echo '                    system and then exists with the status code.'
+  >&2 echo ' Arguments:'
+  >&2 echo '   [..] specification - tput compatible specification.'
+  >&2 echo ' STDIN:'
+  >&2 echo '   Input passed to the mapped command.'
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Output variables:'
+  >&2 echo '   None'
+  >&2 echo ' STDOUT:'
+  >&2 echo '   Output of the mapped command.'
+  >&2 echo ' STDERR:'
+  >&2 echo '   Error output of the mapped command.'
+  >&2 echo ' Status:'
+  >&2 echo '   0 - Normal execution output, or the success of the availability check.'
+  >&2 echo '   1 - Availability check failed.'
+  >&2 echo '=============================================================================='
+}
+
+_posix_adapter__tput() {
+  # This is a minimal non-fail-safe implementation for now..
+  if [ "$1" = '--is-available' ]
+  then
+    if command -v tput >/dev/null && tput init >/dev/null 2>&1
+    then
+      return 0
+    else
+      return 1
+    fi
+  elif [ "$1" = '--help' ]
+  then
+    _print_help
+    exit 0
+  fi
+
+  if ! tput "$@" 2>/dev/null
+  then
+    printf '%s' ''
+  fi
+}
+
+#==============================================================================
+# Invalid parameter error reporting helper function.
+#------------------------------------------------------------------------------
+# Globals:
+#   TOOL_NAME
+# Options:
+#   None
+# Arguments:
+#   [1] reason - Reason of the error.
+#   [2] details - More details about the error.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Reported error.
+# Status:
+#   98  - The function will terminate the execution.
+#==============================================================================
+_report_invalid_parameter() {
+  reason="$1"
+  details="$2"
+  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
+  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
+  _print_help
+  exit 98
+}
+
+#==============================================================================
+# Invalid parameter combination error reporting helper function.
+#------------------------------------------------------------------------------
+# Globals:
+#   TOOL_NAME
+# Options:
+#   None
+# Arguments:
+#   [1] reason - Reason of the error.
+#   [2] details - More details about the error.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Reported error.
+# Status:
+#   99  - The function will terminate the execution.
+#==============================================================================
+_report_invalid_parameter_combination() {
+  reason="$1"
+  details="$2"
+  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
+  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
+  _print_help
+  exit 99
+}
+
+#==============================================================================
+# ENTRY POINT
+#==============================================================================
+
+_posix_adapter__tput "$@"

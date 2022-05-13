@@ -8,48 +8,48 @@
 # TOOL: GREP
 #==============================================================================
 
-#==============================================================================
-#
-#  posix_adapter__grep
-#    [--extended]
-#    [--silent]
-#    [--invert-match]
-#    [--count]
-#    [--match-only]
-#    <pattern>
-#    [path]
-#
-#------------------------------------------------------------------------------
-# Execution mapping function for the 'echo' command line tool with a uniform
-# interface.
-#------------------------------------------------------------------------------
-# Globals:
-#   None
-# Options:
-#   --extended - Use extended regular expression.
-#   --silent - Use silent mode.
-#   --invert-match - Use the inverted match feature.
-#   --count - Use count feature.
-#   --match-only - Use the only matching feature.
-# Arguments:
-#   [1] pattern - grep compatible pattern.
-#   [2] [path] - Optional file path in which grep should operate.
-# STDIN:
-#   Input passed to the mapped command.
-#------------------------------------------------------------------------------
-# Output variables:
-#   None
-# STDOUT:
-#   Mapped command's output.
-# STDERR:
-#   Mapped command's error output. Mapping error output.
-# Status:
-#   0  - Call was successful.
-#   .. - Call failed with it's error status
-#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
-#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
-#==============================================================================
-posix_adapter__grep() {
+TOOL_NAME='posix_adapter__grep'
+
+_print_help() {
+  >&2 echo '=============================================================================='
+  >&2 echo ''
+  >&2 echo '  posix_adapter__grep --help'
+  >&2 echo '  posix_adapter__grep [--extended] [--silent] [--invert-match] [--count]'
+  >&2 echo '      [--match-only] <pattern> [path]'
+  >&2 echo ''
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Execution mapping function for the "echo" command line tool with a uniform'
+  >&2 echo ' interface.'
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Globals:'
+  >&2 echo '   None'
+  >&2 echo ' Options:'
+  >&2 echo '   --help - Prints out the help message and exits.'
+  >&2 echo '   --extended - Use extended regular expression.'
+  >&2 echo '   --silent - Use silent mode.'
+  >&2 echo '   --invert-match - Use the inverted match feature.'
+  >&2 echo '   --count - Use count feature.'
+  >&2 echo '   --match-only - Use the only matching feature.'
+  >&2 echo ' Arguments:'
+  >&2 echo '   [1] pattern - grep compatible pattern.'
+  >&2 echo '   [2] [path] - Optional file path in which grep should operate.'
+  >&2 echo ' STDIN:'
+  >&2 echo '   Input passed to the mapped command.'
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Output variables:'
+  >&2 echo '   None'
+  >&2 echo ' STDOUT:'
+  >&2 echo '   Output of the mapped command.'
+  >&2 echo ' STDERR:'
+  >&2 echo '   Error output of the mapped command.'
+  >&2 echo ' Status:'
+  >&2 echo '   0  - Call was successful.'
+  >&2 echo '   .. - Call failed with its error status.'
+  >&2 echo '   98 - Invalid parameter configuration.'
+  >&2 echo '   99 - No compatible call style was found.'
+  >&2 echo '=============================================================================='
+}
+_posix_adapter__grep() {
   posix_adapter__flag__extended='0'
   posix_adapter__flag__silent='0'
   posix_adapter__flag__invert_match='0'
@@ -86,14 +86,12 @@ posix_adapter__grep() {
         shift
         ;;
       --[!-]*)
-        posix_adapter__report_invalid_parameters \
-          'posix_adapter__grep' \
+        _report_invalid_parameter \
           "Unexpected option '${1}'!" \
-          'You can only use --extended --silent --invert-match --count --match-only.'
+          'You can only use the available options.'
         ;;
       -[!-]*)
-        posix_adapter__report_invalid_parameters \
-          'posix_adapter__grep' \
+        _report_invalid_parameter \
           "Invalid single dashed option '${1}'!" \
           "posix_adapter only uses double dashed options like '--option'."
         ;;
@@ -110,8 +108,7 @@ posix_adapter__grep() {
             posix_adapter__value__path="$1"
             shift
           else
-            posix_adapter__report_invalid_parameters \
-              'posix_adapter__grep' \
+            _report_invalid_parameter \
               'Unexpected parameter!' \
               "Parameter '${1}' is unexpected!"
           fi
@@ -122,8 +119,7 @@ posix_adapter__grep() {
 
   if [ "$posix_adapter__flag__pattern" -eq '0' ]
   then
-    posix_adapter__report_invalid_parameters \
-      'posix_adapter__grep' \
+    _report_invalid_parameter \
       'Missing <pattern> argument!' \
       'To be able to use grep, you need to specify at least a pattern.'
   fi
@@ -1268,10 +1264,77 @@ _posix_adapter__grep__common() {
 
       ;;
     *)
-      posix_adapter__report_invalid_parameters \
-        'posix_adapter__grep' \
+      _report_invalid_parameter_combination \
         'Unexpected parameter combination!' \
-        'You can only have (--delimiter --fields) or (--characters).'
+        'You can only use the available options.'
       ;;
   esac
 }
+
+#==============================================================================
+# Invalid parameter error reporting helper function.
+#------------------------------------------------------------------------------
+# Globals:
+#   TOOL_NAME
+# Options:
+#   None
+# Arguments:
+#   [1] reason - Reason of the error.
+#   [2] details - More details about the error.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Reported error.
+# Status:
+#   98  - The function will terminate the execution.
+#==============================================================================
+_report_invalid_parameter() {
+  reason="$1"
+  details="$2"
+  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
+  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
+  _print_help
+  exit 98
+}
+
+#==============================================================================
+# Invalid parameter combination error reporting helper function.
+#------------------------------------------------------------------------------
+# Globals:
+#   TOOL_NAME
+# Options:
+#   None
+# Arguments:
+#   [1] reason - Reason of the error.
+#   [2] details - More details about the error.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Reported error.
+# Status:
+#   99  - The function will terminate the execution.
+#==============================================================================
+_report_invalid_parameter_combination() {
+  reason="$1"
+  details="$2"
+  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
+  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
+  _print_help
+  exit 99
+}
+
+#==============================================================================
+# ENTRY POINT
+#==============================================================================
+
+_posix_adapter__grep "$@"

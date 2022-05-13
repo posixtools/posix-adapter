@@ -1,0 +1,261 @@
+#!/bin/sh
+#==============================================================================
+#   _
+#  | |_ _ __
+#  | __| '__|
+#  | |_| |
+#   \__|_|
+#==============================================================================
+# TOOL: TR
+#==============================================================================
+
+TOOL_NAME='posix_adapter__tr'
+
+_print_help() {
+  >&2 echo '=============================================================================='
+  >&2 echo ''
+  >&2 echo '  posix_adapter__tr --help'
+  >&2 echo '  posix_adapter__tr [--delete <char>] [--replace <target> <value>]'
+  >&2 echo '      [--squeeze-repeats <char>]'
+  >&2 echo ''
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Execution mapping function for the "tr" command line tool with a uniform'
+  >&2 echo ' interface.'
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Globals:'
+  >&2 echo '   None'
+  >&2 echo ' Options:'
+  >&2 echo '   --help - Prints out the help message and exits.'
+  >&2 echo '   --delete <char> - tr compatible --delete flag.'
+  >&2 echo '   --replace <target> <value> - Default tr functionality put behind an option'
+  >&2 echo '                                to make it more explicit.'
+  >&2 echo '   --squeeze-repeats <char> - Deletes repeated occurences of the given'
+  >&2 echo '                              character or character class.'
+  >&2 echo ' Arguments:'
+  >&2 echo '   None'
+  >&2 echo ' STDIN:'
+  >&2 echo '   Input passed to the mapped command.'
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Output variables:'
+  >&2 echo '   None'
+  >&2 echo ' STDOUT:'
+  >&2 echo '   Output of the mapped command.'
+  >&2 echo ' STDERR:'
+  >&2 echo '   Error output of the mapped command.'
+  >&2 echo ' Status:'
+  >&2 echo '   0  - Call was successful.'
+  >&2 echo '   .. - Call failed with its error status.'
+  >&2 echo '   98 - Invalid parameter configuration.'
+  >&2 echo '   99 - No compatible call style was found.'
+  >&2 echo '==============================================================================.'
+}
+
+_posix_adapter__tr() {
+  posix_adapter__flag__delete='0'
+  posix_adapter__value__delete=''
+
+  posix_adapter__flag__replace='0'
+  posix_adapter__value__replace__target=''
+  posix_adapter__value__replace__value=''
+
+  posix_adapter__flag__squeeze='0'
+  posix_adapter__value__squeeze=''
+
+  while [ "$#" -gt '0' ]
+  do
+    posix_adapter__param="$1"
+    case "$posix_adapter__param" in
+      --delete)
+        posix_adapter__flag__delete='1'
+        posix_adapter__value__delete="$2"
+        shift
+        shift
+        ;;
+      --replace)
+        posix_adapter__flag__replace='1'
+        posix_adapter__value__replace__target="$2"
+        posix_adapter__value__replace__value="$3"
+        shift
+        shift
+        shift
+        ;;
+      --squeeze-repeats)
+        posix_adapter__flag__squeeze='1'
+        posix_adapter__value__squeeze="$2"
+        shift
+        shift
+        ;;
+    --[!-]*)
+        _report_invalid_parameter \
+          "Unexpected option '${1}'!" \
+          'You can only use the available options.'
+        ;;
+    -[!-]*)
+        _report_invalid_parameter \
+          "Invalid single dashed option '${1}'!" \
+          "posix_adapter only uses double dashed options like '--option'."
+        ;;
+      *)
+        _report_invalid_parameter \
+          'Unexpected parameter!' \
+          'Only options are available.'
+        ;;
+    esac
+  done
+
+  # Assembling the decision string.
+  # ,---- delete
+  # |,--- replace
+  # ||,-- squeeze_repeats
+  # 000
+  posix_adapter__decision="${posix_adapter__flag__delete}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__replace}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__squeeze}"
+
+  _posix_adapter__tr__common \
+    "$posix_adapter__decision" \
+    "$posix_adapter__value__delete" \
+    "$posix_adapter__value__replace__target" \
+    "$posix_adapter__value__replace__value" \
+    "$posix_adapter__value__squeeze"
+}
+
+#==============================================================================
+# Common call mapping function.
+#------------------------------------------------------------------------------
+# Globals:
+#   None
+# Options:
+#   None
+# Arguments:
+#   [1] decision_string - String that decodes the optional parameter presence.
+#   [2] value_delete -  Value passed with the delete option.
+#   [3] value_replace_target -  Target value passed with the replace option.
+#   [4] value_replace_value -  Value passed with the replace option.
+#   [5] value_squeeze -  Value passed with the squeeze repeats option.
+# STDIN:
+#   Input passed to the mapped command.
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   Mapped command's output.
+# STDERR:
+#   Mapped command's error output. Mapping error output.
+# Status:
+#   0  - Call succeeded.
+#   .. - Call failed with it's error status
+#==============================================================================
+_posix_adapter__tr__common() {
+  posix_adapter__decision_string="$1"
+  posix_adapter__value__delete="$2"
+  posix_adapter__value__replace__target="$3"
+  posix_adapter__value__replace__value="$4"
+  posix_adapter__value__squeeze="$5"
+
+  case "$posix_adapter__decision_string" in
+  # ,---- delete
+  # |,--- replace
+  # ||,-- squeeze_repeats
+    001)
+      tr \
+        \
+        \
+        -s "$posix_adapter__value__squeeze" \
+
+      ;;
+  # ,---- delete
+  # |,--- replace
+  # ||,-- squeeze_repeats
+    010)
+      tr \
+        \
+        "$posix_adapter__value__replace__target" "$posix_adapter__value__replace__value" \
+        \
+
+      ;;
+  # ,---- delete
+  # |,--- replace
+  # ||,-- squeeze_repeats
+    100)
+      tr \
+        -d "$posix_adapter__value__delete" \
+        \
+        \
+
+      ;;
+    *)
+      _report_invalid_parameter_combination \
+        'Unexpected parameter combination!' \
+        'You can only use the available options.'
+      ;;
+  esac
+}
+
+#==============================================================================
+# Invalid parameter error reporting helper function.
+#------------------------------------------------------------------------------
+# Globals:
+#   TOOL_NAME
+# Options:
+#   None
+# Arguments:
+#   [1] reason - Reason of the error.
+#   [2] details - More details about the error.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Reported error.
+# Status:
+#   98  - The function will terminate the execution.
+#==============================================================================
+_report_invalid_parameter() {
+  reason="$1"
+  details="$2"
+  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
+  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
+  _print_help
+  exit 98
+}
+
+#==============================================================================
+# Invalid parameter combination error reporting helper function.
+#------------------------------------------------------------------------------
+# Globals:
+#   TOOL_NAME
+# Options:
+#   None
+# Arguments:
+#   [1] reason - Reason of the error.
+#   [2] details - More details about the error.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Reported error.
+# Status:
+#   99  - The function will terminate the execution.
+#==============================================================================
+_report_invalid_parameter_combination() {
+  reason="$1"
+  details="$2"
+  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
+  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
+  _print_help
+  exit 99
+}
+
+#==============================================================================
+# ENTRY POINT
+#==============================================================================
+
+_posix_adapter__tr "$@"

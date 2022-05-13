@@ -1,0 +1,223 @@
+#!/bin/sh
+#==============================================================================
+#             _       _ _
+#   _ __ ___ | | ____| (_)_ __
+#  | '_ ` _ \| |/ / _` | | '__|
+#  | | | | | |   < (_| | | |
+#  |_| |_| |_|_|\_\__,_|_|_|
+#==============================================================================
+# TOOL: MKDIR
+#==============================================================================
+
+TOOL_NAME='posix_adapter__mkdir'
+
+_print_help() {
+  >&2 echo '=============================================================================='
+  >&2 echo ''
+  >&2 echo '  posix_adapter__mkdir --help'
+  >&2 echo '  posix_adapter__mkdir [--parents] <path>'
+  >&2 echo ''
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Execution mapping function for the "mkdir" command line tool with a uniform'
+  >&2 echo ' interface.'
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Globals:'
+  >&2 echo '   None'
+  >&2 echo ' Options:'
+  >&2 echo '   --help - Prints out the help message and exits.'
+  >&2 echo '   --parents - mkdir compatible alias for the -p flag.'
+  >&2 echo ' Arguments:'
+  >&2 echo '   [1] path - Path that should be created.'
+  >&2 echo ' STDIN:'
+  >&2 echo '   Input passed to the mapped command.'
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Output variables:'
+  >&2 echo '   None'
+  >&2 echo ' STDOUT:'
+  >&2 echo '   Output of the mapped command.'
+  >&2 echo ' STDERR:'
+  >&2 echo '   Error output of the mapped command.'
+  >&2 echo ' Status:'
+  >&2 echo '   0  - Call was successful.'
+  >&2 echo '   .. - Call failed with its error status.'
+  >&2 echo '   98 - Invalid parameter configuration.'
+  >&2 echo '   99 - No compatible call style was found.'
+  >&2 echo '=============================================================================='
+}
+
+_posix_adapter__mkdir() {
+  posix_adapter__flag__parents='0'
+
+  posix_adapter__flag__path='0'
+  posix_adapter__value__path=''
+
+  while [ "$#" -gt '0' ]
+  do
+    case "$1" in
+      --help)
+        _posix_adapter__mkdir__help
+        exit 0
+        ;;
+      --parents)
+        posix_adapter__flag__parents='1'
+        shift
+        ;;
+      --[!-]*)
+        _report_invalid_parameter \
+          "Unexpected option '${1}'!" \
+          'You can only use --parents.'
+        ;;
+      -[!-]*)
+        _report_invalid_parameter \
+          "Invalid single dashed option '${1}'!" \
+          "posix_adapter only uses double dashed options like '--option'."
+        ;;
+      *)
+        if [ "$posix_adapter__flag__path" -eq '0' ]
+        then
+          posix_adapter__flag__path='1'
+          posix_adapter__value__path="$1"
+          shift
+        else
+          _report_invalid_parameter \
+            'Unexpected parameter!' \
+            "Parameter '${1}' is unexpected!"
+        fi
+        ;;
+    esac
+  done
+
+  if [ "$posix_adapter__flag__path" -eq '0' ]
+  then
+    _report_invalid_parameter \
+      'Missing <path> argument!' \
+      'A directory can only be created if you pass a path for it.'
+  fi
+
+  # Assembling the decision string.
+  # ,-- parents
+  # 0
+  posix_adapter__decision="${posix_adapter__flag__parents}"
+
+  _posix_adapter__mkdir__common \
+    "$posix_adapter__decision" \
+    "$posix_adapter__value__path"
+}
+
+#==============================================================================
+# Common call mapping function
+#------------------------------------------------------------------------------
+# Globals:
+#   None
+# Options:
+#   None
+# Arguments:
+#   [1] decision_string - String that decodes the optional parameter presence.
+#   [2] value_path - Path for the mkdir command.
+# STDIN:
+#   Input passed to the mapped command.
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   Mapped command's output.
+# STDERR:
+#   Mapped command's error output. Mapping error output.
+# Status:
+#   0  - Call succeeded.
+#   .. - Call failed with it's error status
+#==============================================================================
+_posix_adapter__mkdir__common() {
+  posix_adapter__decision_string="$1"
+  posix_adapter__value__path="$2"
+
+  case "$posix_adapter__decision_string" in
+  # ,-- parents
+    0)
+      mkdir \
+        \
+        "$posix_adapter__value__path" \
+
+      ;;
+  # ,-- parents
+    1)
+      mkdir \
+        -p \
+        "$posix_adapter__value__path" \
+
+      ;;
+    *)
+      _report_invalid_parameter_combination \
+        'Unexpected parameter combination!' \
+        'You can only have (--delimiter --fields) or (--characters).'
+      ;;
+  esac
+}
+
+#==============================================================================
+# Invalid parameter error reporting helper function.
+#------------------------------------------------------------------------------
+# Globals:
+#   TOOL_NAME
+# Options:
+#   None
+# Arguments:
+#   [1] reason - Reason of the error.
+#   [2] details - More details about the error.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Reported error.
+# Status:
+#   98  - The function will terminate the execution.
+#==============================================================================
+_report_invalid_parameter() {
+  reason="$1"
+  details="$2"
+  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
+  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
+  _print_help
+  exit 98
+}
+
+#==============================================================================
+# Invalid parameter combination error reporting helper function.
+#------------------------------------------------------------------------------
+# Globals:
+#   TOOL_NAME
+# Options:
+#   None
+# Arguments:
+#   [1] reason - Reason of the error.
+#   [2] details - More details about the error.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Reported error.
+# Status:
+#   99  - The function will terminate the execution.
+#==============================================================================
+_report_invalid_parameter_combination() {
+  reason="$1"
+  details="$2"
+  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
+  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
+  _print_help
+  exit 99
+}
+
+#==============================================================================
+# ENTRY POINT
+#==============================================================================
+
+_posix_adapter__mkdir "$@"

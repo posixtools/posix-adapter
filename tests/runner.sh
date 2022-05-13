@@ -154,11 +154,11 @@ posix_adapter__test__log_success 'Test suite finished'
 if command -v shellcheck >/dev/null
 then
   current_path="$(pwd)"
-  cd ../src
+  cd ../bin
   # Specifying shell type here to be able to omit the shebangs from the
   # modules.
   # More info: https://github.com/koalaman/shellcheck/wiki/SC2148
-  shellcheck --shell=sh -x ./*.sh
+  shellcheck --shell=sh -x ./*
   cd "$current_path"
 else
   echo "WARNING: shellcheck won't be executed as it cannot be found."

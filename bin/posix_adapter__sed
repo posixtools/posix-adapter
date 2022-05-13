@@ -9,42 +9,46 @@
 # TOOL: SED
 #==============================================================================
 
-#==============================================================================
-#
-#  posix_adapter__sed
-#    [--extended]
-#    [--in-place <suffix>]
-#    [--expression <expression>]
-#    [<path>]
-#
-#------------------------------------------------------------------------------
-# Execution mapping function for the 'sed' command line tool with a
-# uniform interface.
-#------------------------------------------------------------------------------
-# Globals:
-#   None
-# Options:
-#   --extended - Use the extended regexp engine.
-#   --in-place <suffix> - In place processing with optional backup with suffix.
-#   --expression <expression> - Expression that should be executed.
-# Arguments:
-#   [1] [path] - Optional file path.
-# STDIN:
-#   Input passed to the mapped command.
-#------------------------------------------------------------------------------
-# Output variables:
-#   None
-# STDOUT:
-#   Mapped command's output.
-# STDERR:
-#   Mapped command's error output. Mapping error output.
-# Status:
-#   0  - Call was successful.
-#   .. - Call failed with it's error status
-#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
-#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
-#==============================================================================
-posix_adapter__sed() {
+TOOL_NAME='posix_adapter__sed'
+
+_print_help() {
+  >&2 echo '=============================================================================='
+  >&2 echo ''
+  >&2 echo '  posix_adapter__sed --help'
+  >&2 echo '  posix_adapter__sed [--extended] [--in-place <suffix>]'
+  >&2 echo '      [--expression <expression>] [<path>]'
+  >&2 echo ''
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Execution mapping function for the "sed" command line tool with a'
+  >&2 echo ' uniform interface.'
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Globals:'
+  >&2 echo '   None'
+  >&2 echo ' Options:'
+  >&2 echo '   --help - Prints out the help message and exits.'
+  >&2 echo '   --extended - Use the extended regexp engine.'
+  >&2 echo '   --in-place <suffix> - In place processing with optional backup with suffix.'
+  >&2 echo '   --expression <expression> - Expression that should be executed.'
+  >&2 echo ' Arguments:'
+  >&2 echo '   [1] [path] - Optional file path.'
+  >&2 echo ' STDIN:'
+  >&2 echo '   Input passed to the mapped command.'
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Output variables:'
+  >&2 echo '   None'
+  >&2 echo ' STDOUT:'
+  >&2 echo '   Output of the mapped command.'
+  >&2 echo ' STDERR:'
+  >&2 echo '   Error output of the mapped command.'
+  >&2 echo ' Status:'
+  >&2 echo '   0  - Call was successful.'
+  >&2 echo '   .. - Call failed with its error status.'
+  >&2 echo '   98 - Invalid parameter configuration.'
+  >&2 echo '   99 - No compatible call style was found.'
+  >&2 echo '=============================================================================='
+}
+
+_posix_adapter__sed() {
   posix_adapter__flag__extended='0'
 
   posix_adapter__flag__in_place='0'
@@ -76,14 +80,12 @@ posix_adapter__sed() {
         shift
         ;;
       --[!-]*)
-        posix_adapter__report_invalid_parameters \
-          'posix_adapter__sed' \
+        _report_invalid_parameter \
           "Unexpected option '${1}'!" \
-          'You can only use --extended or --expression or --in-place.'
+          'You can only use the available options.'
         ;;
       -[!-]*)
-        posix_adapter__report_invalid_parameters \
-          'posix_adapter__sed' \
+        _report_invalid_parameter \
           "Invalid single dashed option '${1}'!" \
           "posix_adapter only uses double dashed options like '--option'."
         ;;
@@ -99,8 +101,7 @@ posix_adapter__sed() {
             printf '%s' 'probably forgot the --expression flag before '; \
             printf '%s\n' 'your expression which is mandatory in posix_adapter.' \
           )"
-          posix_adapter__report_invalid_parameters \
-            'posix_adapter__sed' \
+          _report_invalid_parameter \
             'Unexpected parameter!' \
             "$posix_adapter__error_details"
         fi
@@ -255,10 +256,77 @@ _posix_adapter__sed__common() {
 
       ;;
     *)
-      posix_adapter__report_invalid_parameters \
-        'posix_adapter__sed' \
+      _report_invalid_parameter_combination \
         'Unexpected parameter combination!' \
-        '--expression is mandatory, --extended and --in-place is optional'
+        'You can only use the available options.'
       ;;
   esac
 }
+
+#==============================================================================
+# Invalid parameter error reporting helper function.
+#------------------------------------------------------------------------------
+# Globals:
+#   TOOL_NAME
+# Options:
+#   None
+# Arguments:
+#   [1] reason - Reason of the error.
+#   [2] details - More details about the error.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Reported error.
+# Status:
+#   98  - The function will terminate the execution.
+#==============================================================================
+_report_invalid_parameter() {
+  reason="$1"
+  details="$2"
+  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
+  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
+  _print_help
+  exit 98
+}
+
+#==============================================================================
+# Invalid parameter combination error reporting helper function.
+#------------------------------------------------------------------------------
+# Globals:
+#   TOOL_NAME
+# Options:
+#   None
+# Arguments:
+#   [1] reason - Reason of the error.
+#   [2] details - More details about the error.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Reported error.
+# Status:
+#   99  - The function will terminate the execution.
+#==============================================================================
+_report_invalid_parameter_combination() {
+  reason="$1"
+  details="$2"
+  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
+  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
+  _print_help
+  exit 99
+}
+
+#==============================================================================
+# ENTRY POINT
+#==============================================================================
+
+_posix_adapter__sed "$@"

@@ -9,42 +9,46 @@
 # TOOL: XARGS
 #==============================================================================
 
-#==============================================================================
-#
-#  posix_adapter__xargs
-#    [--null]
-#    [--replace <replace_string>]
-#    [--max-args <arg_count>]
-#    [..]
-#
-#------------------------------------------------------------------------------
-# Execution mapping function for the 'xargs' command line tool with a uniform
-# interface.
-#------------------------------------------------------------------------------
-# Globals:
-#   None
-# Options:
-#   --null - xargs compatible -0 flag.
-#   --replace <replace_string> - xargs compatible -I flag.
-#   --max-args - xargs compatible -n flag.
-# Arguments:
-#   None
-# STDIN:
-#   Standard input for the command.
-#------------------------------------------------------------------------------
-# Output variables:
-#   None
-# STDOUT:
-#   Mapped command's output.
-# STDERR:
-#   Mapped command's error output. Mapping error output.
-# Status:
-#   0  - Call was successful.
-#   .. - Call failed with it's error status
-#   POSIX_ADAPTER__STATUS__INVALID_PARAMETERS - Invalid parameter configuration.
-#   POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL - No compatible call style was found.
-#==============================================================================
-posix_adapter__xargs() {
+TOOL_NAME='posix_adapter__xargs'
+
+_print_help() {
+  >&2 echo '=============================================================================='
+  >&2 echo ''
+  >&2 echo '  posix_adapter__xargs --help'
+  >&2 echo '  posix_adapter__xargs [--null] [--replace <replace_string>]'
+  >&2 echo '      [--max-args <arg_count>] [..]'
+  >&2 echo ''
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Execution mapping function for the "xargs" command line tool with a uniform'
+  >&2 echo ' interface.'
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Globals:'
+  >&2 echo '   None'
+  >&2 echo ' Options:'
+  >&2 echo '   --help - Prints out the help message and exits.'
+  >&2 echo '   --null - xargs compatible -0 flag.'
+  >&2 echo '   --replace <replace_string> - xargs compatible -I flag.'
+  >&2 echo '   --max-args - xargs compatible -n flag.'
+  >&2 echo ' Arguments:'
+  >&2 echo '   None'
+  >&2 echo ' STDIN:'
+  >&2 echo '   Standard input for the command.'
+  >&2 echo '------------------------------------------------------------------------------'
+  >&2 echo ' Output variables:'
+  >&2 echo '   None'
+  >&2 echo ' STDOUT:'
+  >&2 echo '   Output of the mapped command.'
+  >&2 echo ' STDERR:'
+  >&2 echo '   Error output of the mapped command.'
+  >&2 echo ' Status:'
+  >&2 echo '   0  - Call was successful.'
+  >&2 echo '   .. - Call failed with its error status.'
+  >&2 echo '   98 - Invalid parameter configuration.'
+  >&2 echo '   99 - No compatible call style was found.'
+  >&2 echo '=============================================================================='
+}
+
+_posix_adapter__xargs() {
   posix_adapter__flag__null='0'
 
   posix_adapter__flag__replace='0'
@@ -73,14 +77,12 @@ posix_adapter__xargs() {
         shift
         ;;
       --[!-]*)
-        posix_adapter__report_invalid_parameters \
-          'posix_adapter__xargs' \
+        _report_invalid_parameter \
           "Unexpected option '${1}'!" \
-          'You can only use --null --replace --max-args.'
+          'You can only use the available options.'
         ;;
       -[!-]*)
-        posix_adapter__report_invalid_parameters \
-          'posix_adapter__xargs' \
+        _report_invalid_parameter \
           "Invalid single dashed option '${1}'!" \
           "posix_adapter only uses double dashed options like '--option'."
         ;;
@@ -231,10 +233,77 @@ _posix_adapter__xargs__common() {
 
       ;;
     *)
-      posix_adapter__report_invalid_parameters \
-        'posix_adapter__xargs' \
+      _report_invalid_parameter_combination \
         'Unexpected parameter combination!' \
-        'You can only use --null --replace --max-args.'
+        'You can only use the available options.'
       ;;
   esac
 }
+
+#==============================================================================
+# Invalid parameter error reporting helper function.
+#------------------------------------------------------------------------------
+# Globals:
+#   TOOL_NAME
+# Options:
+#   None
+# Arguments:
+#   [1] reason - Reason of the error.
+#   [2] details - More details about the error.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Reported error.
+# Status:
+#   98  - The function will terminate the execution.
+#==============================================================================
+_report_invalid_parameter() {
+  reason="$1"
+  details="$2"
+  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
+  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
+  _print_help
+  exit 98
+}
+
+#==============================================================================
+# Invalid parameter combination error reporting helper function.
+#------------------------------------------------------------------------------
+# Globals:
+#   TOOL_NAME
+# Options:
+#   None
+# Arguments:
+#   [1] reason - Reason of the error.
+#   [2] details - More details about the error.
+# STDIN:
+#   None
+#------------------------------------------------------------------------------
+# Output variables:
+#   None
+# STDOUT:
+#   None
+# STDERR:
+#   Reported error.
+# Status:
+#   99  - The function will terminate the execution.
+#==============================================================================
+_report_invalid_parameter_combination() {
+  reason="$1"
+  details="$2"
+  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
+  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
+  _print_help
+  exit 99
+}
+
+#==============================================================================
+# ENTRY POINT
+#==============================================================================
+
+_posix_adapter__xargs "$@"

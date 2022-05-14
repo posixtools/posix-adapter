@@ -195,7 +195,7 @@ _posix_adapter__uname__common() {
 
       ;;
     *)
-      _report_invalid_parameter_combination \
+      _report_incompatible_call \
         'Unexpected parameter combination!' \
         'You can only use the available options.'
       ;;
@@ -234,7 +234,7 @@ _report_invalid_parameter() {
 }
 
 #==============================================================================
-# Invalid parameter combination error reporting helper function.
+# Incompatible call error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
 #   TOOL_NAME
@@ -255,7 +255,7 @@ _report_invalid_parameter() {
 # Status:
 #   99  - The function will terminate the execution.
 #==============================================================================
-_report_invalid_parameter_combination() {
+_report_incompatible_call() {
   reason="$1"
   details="$2"
   >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"

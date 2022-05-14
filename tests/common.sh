@@ -62,12 +62,12 @@ posix_adapter__test__log_failure() {
 
 posix_adapter__test__valid_case() {
   ___title="$1"
-  printf '%s' "[ ${BLUE}${DIM}VALID${RESET} ] ${BOLD}${___title}${RESET}"
+  printf '%s' "[ ${BLUE}${DIM}SHOULD PASS${RESET} ] ${BOLD}${___title}${RESET}"
 }
 
 posix_adapter__test__error_case() {
   ___title="$1"
-  printf '%s' "[ ${BLUE}${DIM}ERROR${RESET} ] ${BOLD}${___title}${RESET}"
+  printf '%s' "[ ${BLUE}${DIM}SHOULD FAIL${RESET} ] ${BOLD}${___title}${RESET}"
 }
 
 _posix_adapter__test__test_case_succeeded() {

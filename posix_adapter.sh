@@ -105,7 +105,10 @@ posix_adapter__path_prefix="${POSIX_ADAPTER__CONFIG__MANDATORY__SUBMODULE_PATH_P
 
 PATH="${PATH}:${posix_adapter__path_prefix}/bin"
 
+# These two status code variables will be used in the test cases.
+# shellcheck disable=SC2034
 POSIX_ADAPTER__STATUS__INVALID_PARAMETERS='98'
+# shellcheck disable=SC2034
 POSIX_ADAPTER__STATUS__INCOMPATIBLE_CALL='99'
 
 # This file will be sourced to the user code-base so exporting the variable is

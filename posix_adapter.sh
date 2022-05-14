@@ -109,8 +109,6 @@ posix_adapter__path_prefix="${POSIX_ADAPTER__CONFIG__MANDATORY__SUBMODULE_PATH_P
 . "${posix_adapter__path_prefix}/src/posix_adapter__date"
 # shellcheck source=./src/posix_adapter__dirname
 . "${posix_adapter__path_prefix}/src/posix_adapter__dirname"
-# shellcheck source=./src/posix_adapter__echo
-. "${posix_adapter__path_prefix}/src/posix_adapter__echo"
 # shellcheck source=./src/posix_adapter__find
 . "${posix_adapter__path_prefix}/src/posix_adapter__find"
 # shellcheck source=./src/posix_adapter__fold
@@ -127,8 +125,6 @@ posix_adapter__path_prefix="${POSIX_ADAPTER__CONFIG__MANDATORY__SUBMODULE_PATH_P
 . "${posix_adapter__path_prefix}/src/posix_adapter__mkfifo"
 # shellcheck source=./src/posix_adapter__mktemp
 . "${posix_adapter__path_prefix}/src/posix_adapter__mktemp"
-# shellcheck source=./src/posix_adapter__printf
-. "${posix_adapter__path_prefix}/src/posix_adapter__printf"
 # shellcheck source=./src/posix_adapter__readlink
 . "${posix_adapter__path_prefix}/src/posix_adapter__readlink"
 # shellcheck source=./src/posix_adapter__realpath

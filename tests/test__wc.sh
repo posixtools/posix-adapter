@@ -8,9 +8,9 @@ expected='3'
 
 if result="$( \
   ( \
-    posix_adapter__echo 'a'; \
-    posix_adapter__echo 'b'; \
-    posix_adapter__echo 'c' \
+    echo 'a'; \
+    echo 'b'; \
+    echo 'c' \
   ) | posix_adapter__wc --lines \
 )"
 then
@@ -39,7 +39,7 @@ posix_adapter__test__valid_case 'wc - [stdin] chars'
 
 expected='11'  # 10 numbers + newline
 
-if result="$( posix_adapter__echo '0123456789' | posix_adapter__wc --chars)"
+if result="$(echo '0123456789' | posix_adapter__wc --chars)"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else
@@ -66,7 +66,7 @@ posix_adapter__test__valid_case 'wc - [stdin] words'
 
 expected='3'  # 10 numbers + newline
 
-if result="$( posix_adapter__echo 'one two three' | posix_adapter__wc --words)"
+if result="$(echo 'one two three' | posix_adapter__wc --words)"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else

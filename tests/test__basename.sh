@@ -21,7 +21,7 @@ posix_adapter__test__valid_case 'basename - standard input can be used'
 data='/this/is/a/path'
 expected='path'
 
-if result="$(posix_adapter__echo "$data" | posix_adapter__basename)"
+if result="$(echo "$data" | posix_adapter__basename)"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else

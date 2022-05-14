@@ -8,9 +8,9 @@ expected='abc'
 
 if result="$( \
   ( \
-    posix_adapter__echo 'a'; \
-    posix_adapter__echo 'b'; \
-    posix_adapter__echo 'c' \
+    echo 'a'; \
+    echo 'b'; \
+    echo 'c' \
   ) | posix_adapter__tr --delete '\n' \
 )"
 then
@@ -27,9 +27,9 @@ expected='a b c '
 
 if result="$( \
   ( \
-    posix_adapter__echo 'a'; \
-    posix_adapter__echo 'b'; \
-    posix_adapter__echo 'c' \
+    echo 'a'; \
+    echo 'b'; \
+    echo 'c' \
   ) | posix_adapter__tr --replace '\n' ' ' \
 )"
 then
@@ -45,7 +45,7 @@ posix_adapter__test__valid_case 'tr - squeeze repeats - character'
 expected='abc'
 
 if result="$( \
-  posix_adapter__echo 'abbbc' | \
+  echo 'abbbc' | \
   posix_adapter__tr --squeeze-repeats 'b' \
 )"
 then
@@ -61,7 +61,7 @@ posix_adapter__test__valid_case 'tr - squeeze repeats - character class'
 expected='a b'
 
 if result="$( \
-  posix_adapter__echo 'a       b' | \
+  echo 'a       b' | \
   posix_adapter__tr --squeeze-repeats '[[:space:]]' \
 )"
 then

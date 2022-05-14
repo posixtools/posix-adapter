@@ -94,11 +94,9 @@ posix_adapter__test__line
 posix_adapter__test__line
 . './test__cut.sh'
 posix_adapter__test__line
-. './test__date.sh'
-posix_adapter__test__line
 . './test__dirname.sh'
 posix_adapter__test__line
-. './test__echo.sh'
+. './test__date.sh'
 posix_adapter__test__line
 . './test__find.sh'
 posix_adapter__test__line
@@ -115,8 +113,6 @@ posix_adapter__test__line
 . './test__mkfifo.sh'
 posix_adapter__test__line
 . './test__mktemp.sh'
-posix_adapter__test__line
-. './test__printf.sh'
 posix_adapter__test__line
 . './test__readlink.sh'
 posix_adapter__test__line
@@ -142,8 +138,7 @@ posix_adapter__test__line
 posix_adapter__test__line
 . './test__xxd.sh'
 
-posix_adapter__echo --no-newline '-------------------------------------------------'
-posix_adapter__echo '------------------------------'
+echo '-------------------------------------------------------------------------------'
 
 posix_adapter__test__log_success 'Test suite finished'
 

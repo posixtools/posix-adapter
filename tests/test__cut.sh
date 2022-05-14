@@ -8,7 +8,7 @@ data='one/two/three/four'
 expected='two/three/four'
 
 if result="$( \
-  posix_adapter__echo "$data" | posix_adapter__cut --delimiter '/' --fields '2-' \
+  echo "$data" | posix_adapter__cut --delimiter '/' --fields '2-' \
 )"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
@@ -23,7 +23,7 @@ posix_adapter__test__valid_case 'cut - character range selection'
 data='123456789'
 expected='12345'
 
-if result="$(posix_adapter__echo "$data" | posix_adapter__cut --characters '1-5')"
+if result="$(echo "$data" | posix_adapter__cut --characters '1-5')"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else

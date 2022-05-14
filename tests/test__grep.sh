@@ -6,7 +6,7 @@ posix_adapter__test__valid_case 'grep - [stdin] extended regexp mode'
 
 expected='hello'
 
-if result="$(posix_adapter__echo 'hello' | posix_adapter__grep --extended 'l+')"
+if result="$(echo 'hello' | posix_adapter__grep --extended 'l+')"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else
@@ -35,7 +35,7 @@ grep_file_path='./fixtures/grep/dummy_file_1'
 expected='hello'
 
 if result="$( \
-  posix_adapter__echo 'other' | posix_adapter__grep --extended 'l+' "$grep_file_path" \
+  echo 'other' | posix_adapter__grep --extended 'l+' "$grep_file_path" \
 )"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
@@ -50,7 +50,7 @@ posix_adapter__test__valid_case 'grep - [stdin] silent mode'
 
 expected=''
 
-if result="$(posix_adapter__echo 'hello' | posix_adapter__grep --silent '.')"
+if result="$(echo 'hello' | posix_adapter__grep --silent '.')"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else
@@ -77,7 +77,7 @@ posix_adapter__test__valid_case 'grep - [stdin] inverted mode'
 
 expected='hello'
 
-if result="$(posix_adapter__echo 'hello' | posix_adapter__grep --invert-match 'imre')"
+if result="$(echo 'hello' | posix_adapter__grep --invert-match 'imre')"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else
@@ -104,7 +104,7 @@ posix_adapter__test__valid_case 'grep - [stdin] count mode'
 
 expected='1'
 
-if result="$(posix_adapter__echo 'hello' | posix_adapter__grep --count 'l')"
+if result="$(echo 'hello' | posix_adapter__grep --count 'l')"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else
@@ -132,7 +132,7 @@ posix_adapter__test__valid_case 'grep - [stdin] only matching mode'
 expected='ll'
 
 if result="$( \
-  posix_adapter__echo 'imre hello' | posix_adapter__grep --match-only 'll' \
+  echo 'imre hello' | posix_adapter__grep --match-only 'll' \
 )"
 then
   posix_adapter__test__assert_equal "$expected" "$result"

@@ -6,7 +6,7 @@ posix_adapter__test__valid_case 'xargs - placeholder and additional parameters'
 
 expected='hello'
 
-if result="$(posix_adapter__echo 'hello' | posix_adapter__xargs --replace {} echo {} )"
+if result="$(echo 'hello' | posix_adapter__xargs --replace {} echo {} )"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else
@@ -19,7 +19,7 @@ posix_adapter__test__valid_case 'xargs - null terminated'
 
 expected='hello'
 
-if result="$(posix_adapter__echo 'hello' | posix_adapter__xargs --null)"
+if result="$(echo 'hello' | posix_adapter__xargs --null)"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else
@@ -33,7 +33,7 @@ posix_adapter__test__valid_case 'xargs - arg length 1 line will be broken up'
 expected='2'
 
 if result="$( \
-  posix_adapter__echo 'hello imre' | \
+  echo 'hello imre' | \
   posix_adapter__xargs --max-args 1 | \
   posix_adapter__wc --lines \
 )"

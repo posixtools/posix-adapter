@@ -6,7 +6,7 @@ posix_adapter__test__valid_case 'sed - [stdin] append prefix before line'
 
 expected='prefix - hello'
 
-if result="$(posix_adapter__echo 'hello' | posix_adapter__sed --expression 's/^/prefix - /')"
+if result="$(echo 'hello' | posix_adapter__sed --expression 's/^/prefix - /')"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else
@@ -34,7 +34,7 @@ posix_adapter__test__valid_case 'sed - [stdin] remove digits only'
 expected='and other text'
 
 if result="$( \
-  posix_adapter__echo '42 and other text' | \
+  echo '42 and other text' | \
   posix_adapter__sed --extended --expression 's/^[[:digit:]]+[[:space:]]*//' \
 )"
 then
@@ -67,9 +67,9 @@ expected='line 2'
 
 if result="$( \
   ( \
-    posix_adapter__echo 'line 1'; \
-    posix_adapter__echo 'line 2'; \
-    posix_adapter__echo 'line 3' \
+    echo 'line 1'; \
+    echo 'line 2'; \
+    echo 'line 3' \
   ) | posix_adapter__sed --expression '2q;d' \
 )"
 then
@@ -104,7 +104,7 @@ expected_original='hello'
 expected_edited='world'
 
 # Current content
-posix_adapter__echo "$expected_original" > "$path"
+echo "$expected_original" > "$path"
 
 if ! posix_adapter__sed --in-place '' --expression "s/hello/world/" "$path"
 then
@@ -126,7 +126,7 @@ expected_original='hello'
 expected_edited='world'
 
 # Current content
-posix_adapter__echo "$expected_original" > "$path"
+echo "$expected_original" > "$path"
 
 if ! posix_adapter__sed --in-place '.backup' --expression "s/hello/world/" "$path"
 then

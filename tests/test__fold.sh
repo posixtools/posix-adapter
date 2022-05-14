@@ -8,7 +8,7 @@ posix_adapter__test__valid_case 'fold - no parameters'
 input_line='value_1 value_2 value_3'
 expected='value_1 value_2 value_3'
 
-if result="$(posix_adapter__echo "$input_line" | posix_adapter__fold)"
+if result="$(echo "$input_line" | posix_adapter__fold)"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else
@@ -24,7 +24,7 @@ posix_adapter__test__valid_case 'fold - [w] line is shorter than the limit'
 input_line='value_1 value_2 value_3'
 expected='value_1 value_2 value_3'
 
-if result="$(posix_adapter__echo "$input_line" | posix_adapter__fold --width '24')"
+if result="$(echo "$input_line" | posix_adapter__fold --width '24')"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else
@@ -40,7 +40,7 @@ input_line='value_1 value_2 value_3'
 #                                 ^- limit is here
 expected='value_1 value_2 value_3'
 
-if result="$(posix_adapter__echo "$input_line" | posix_adapter__fold --width '23')"
+if result="$(echo "$input_line" | posix_adapter__fold --width '23')"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else
@@ -55,11 +55,11 @@ posix_adapter__test__valid_case 'fold - [w] line is longer than the limit'
 input_line='value_1 value_2 value_3'
 #                                ^- limit is here
 expected="$( \
-  posix_adapter__echo 'value_1 value_2 value_'; \
-  posix_adapter__echo '3'; \
+  echo 'value_1 value_2 value_'; \
+  echo '3'; \
 )"
 
-if result="$(posix_adapter__echo "$input_line" | posix_adapter__fold --width '22')"
+if result="$(echo "$input_line" | posix_adapter__fold --width '22')"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else
@@ -70,23 +70,23 @@ fi
 #==============================================================================
 posix_adapter__test__valid_case 'fold - [w] multiline input should be handled'
 
-#                |<-------20--------->|
+#      |<-------20--------->|
 input_line="$( \
-  posix_adapter__echo 'This is the first line.'; \
-  posix_adapter__echo 'And this is the second line.'; \
-  posix_adapter__echo 'Oh, we have another line too!'; \
+  echo 'This is the first line.'; \
+  echo 'And this is the second line.'; \
+  echo 'Oh, we have another line too!'; \
 )"
 expected="$( \
-  posix_adapter__echo 'This is the first li'; \
-  posix_adapter__echo 'ne.'; \
-  posix_adapter__echo 'And this is the seco'; \
-  posix_adapter__echo 'nd line.'; \
-  posix_adapter__echo 'Oh, we have another '; \
-  posix_adapter__echo 'line too!'; \
+  echo 'This is the first li'; \
+  echo 'ne.'; \
+  echo 'And this is the seco'; \
+  echo 'nd line.'; \
+  echo 'Oh, we have another '; \
+  echo 'line too!'; \
 )"
 # Note that the fold command does not remove trailing spaces!
 
-if result="$(posix_adapter__echo "$input_line" | posix_adapter__fold --width '20')"
+if result="$(echo "$input_line" | posix_adapter__fold --width '20')"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else
@@ -103,7 +103,7 @@ input_line='value_1 value_2 value_3'
 expected='value_1 value_2 value_3'
 
 if result="$( \
-  posix_adapter__echo "$input_line" | posix_adapter__fold --spaces --width '24' \
+  echo "$input_line" | posix_adapter__fold --spaces --width '24' \
 )"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
@@ -121,7 +121,7 @@ input_line='value_1 value_2 value_3'
 expected='value_1 value_2 value_3'
 
 if result="$( \
-  posix_adapter__echo "$input_line" | posix_adapter__fold --spaces --width '23' \
+  echo "$input_line" | posix_adapter__fold --spaces --width '23' \
 )"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
@@ -137,13 +137,13 @@ posix_adapter__test__valid_case 'fold - [w,s] line is longer than the limit'
 input_line='value_1 value_2 value_3'
 #                                ^- limit is here
 expected="$( \
-  posix_adapter__echo 'value_1 value_2 '; \
-  posix_adapter__echo 'value_3'; \
+  echo 'value_1 value_2 '; \
+  echo 'value_3'; \
 )"
 # Note that the fold command does not remove trailing spaces!
 
 if result="$( \
-  posix_adapter__echo "$input_line" | posix_adapter__fold --spaces --width '22' \
+  echo "$input_line" | posix_adapter__fold --spaces --width '22' \
 )"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
@@ -156,22 +156,22 @@ fi
 posix_adapter__test__valid_case 'fold - [w,s] multiline input should be handled'
 
 input_line="$( \
-  posix_adapter__echo 'This is the first line.'; \
-  posix_adapter__echo 'And this is the second line.'; \
-  posix_adapter__echo 'Oh, we have another line too!'; \
+  echo 'This is the first line.'; \
+  echo 'And this is the second line.'; \
+  echo 'Oh, we have another line too!'; \
 )"
 expected="$( \
-  posix_adapter__echo 'This is the first '; \
-  posix_adapter__echo 'line.'; \
-  posix_adapter__echo 'And this is the '; \
-  posix_adapter__echo 'second line.'; \
-  posix_adapter__echo 'Oh, we have another '; \
-  posix_adapter__echo 'line too!'; \
+  echo 'This is the first '; \
+  echo 'line.'; \
+  echo 'And this is the '; \
+  echo 'second line.'; \
+  echo 'Oh, we have another '; \
+  echo 'line too!'; \
 )"
 # Note that the fold command does not remove trailing spaces!
 
 if result="$( \
-  posix_adapter__echo "$input_line" | posix_adapter__fold --spaces --width '20' \
+  echo "$input_line" | posix_adapter__fold --spaces --width '20' \
 )"
 then
   posix_adapter__test__assert_equal "$expected" "$result"

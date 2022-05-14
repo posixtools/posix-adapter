@@ -20,7 +20,7 @@ posix_adapter__test__valid_case 'cat - standard input can be used'
 
 expected='dummy content'
 
-if result="$(posix_adapter__echo "$expected" | posix_adapter__cat)"
+if result="$(echo "$expected" | posix_adapter__cat)"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else

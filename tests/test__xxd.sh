@@ -6,7 +6,7 @@ posix_adapter__test__valid_case 'xxd - encode'
 
 expected='68656c6c6f0a'
 
-if result="$( posix_adapter__echo 'hello' | posix_adapter__xxd --plain)"
+if result="$(echo 'hello' | posix_adapter__xxd --plain)"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else
@@ -19,7 +19,7 @@ posix_adapter__test__valid_case 'xxd - decode'
 
 expected='hello'
 
-if result="$( posix_adapter__echo '68656c6c6f0a' | posix_adapter__xxd --plain --revert)"
+if result="$(echo '68656c6c6f0a' | posix_adapter__xxd --plain --revert)"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
 else

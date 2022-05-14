@@ -6,7 +6,7 @@ posix_adapter__test__valid_case 'date - generated timestamp is numbers only'
 
 if result="$(posix_adapter__date '+%s%N')"
 then
-  if posix_adapter__echo "$result" | posix_adapter__grep --silent --extended '[[:digit:]]+'
+  if echo "$result" | posix_adapter__grep --silent --extended '[[:digit:]]+'
   then
     posix_adapter__test__test_case_passed
   else

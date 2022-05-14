@@ -5,7 +5,7 @@
 posix_adapter__test__valid_case 'sort - parameter checking 1'
 
 if ( \
-  posix_adapter__echo 'hello' | \
+  echo 'hello' | \
   posix_adapter__sort >/dev/null \
 )
 then
@@ -19,7 +19,7 @@ fi
 posix_adapter__test__valid_case 'sort - parameter checking 2'
 
 if ( \
-  posix_adapter__echo 'hello' | posix_adapter__sort --dictionary-order >/dev/null \
+  echo 'hello' | posix_adapter__sort --dictionary-order >/dev/null \
 )
 then
   posix_adapter__test__test_case_passed
@@ -45,7 +45,7 @@ fi
 posix_adapter__test__valid_case 'sort - parameter checking 4'
 
 if ( \
-  posix_adapter__echo 'hello' | \
+  echo 'hello' | \
   posix_adapter__sort --zero-terminated --dictionary-order >/dev/null \
 )
 then

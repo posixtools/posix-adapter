@@ -5,17 +5,17 @@
 posix_adapter__test__valid_case 'ln - link can be created'
 
 base_path='./fixtures/ln'
-target="${base_path}/target"
-link_name="${base_path}/dummy_link"
+path_to_file="${base_path}/target"
+path_to_link="${base_path}/dummy_link"
 
-posix_adapter__rm --force "$link_name"
+posix_adapter__rm --force "$path_to_link"
 
-if posix_adapter__ln --target "$target" --link-name "$link_name"
+if posix_adapter__ln --path-to-file "$path_to_file" --path-to-link "$path_to_link"
 then
   # With the hard link there should be two matches.
   expected='2'
   result="$( \
-    posix_adapter__find "$base_path" --type 'f' --same-file "$target" | \
+    posix_adapter__find "$base_path" --type 'f' --same-file "$path_to_file" | \
     posix_adapter__wc --lines \
   )"
   posix_adapter__test__assert_equal "$expected" "$result"
@@ -24,18 +24,18 @@ else
   posix_adapter__test__test_case_failed "$status"
 fi
 
-posix_adapter__rm --force "$link_name"
+posix_adapter__rm --force "$path_to_link"
 
 #==============================================================================
 posix_adapter__test__valid_case 'ln - symbolic link can be created'
 
 base_path='./fixtures/ln'
-target="${base_path}/target"
-link_name="${base_path}/dummy_link"
+path_to_file="${base_path}/target"
+path_to_link="${base_path}/dummy_link"
 
-posix_adapter__rm --force "$link_name"
+posix_adapter__rm --force "$path_to_link"
 
-if posix_adapter__ln --symbolic --target "$target" --link-name "$link_name"
+if posix_adapter__ln --symbolic --path-to-file "$path_to_file" --path-to-link "$path_to_link"
 then
   # One symbolic link should be created.
   expected='1'
@@ -49,7 +49,7 @@ else
   posix_adapter__test__test_case_failed "$status"
 fi
 
-posix_adapter__rm --force "$link_name"
+posix_adapter__rm --force "$path_to_link"
 
 #==============================================================================
 # ERROR CASES

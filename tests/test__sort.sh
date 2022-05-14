@@ -32,7 +32,7 @@ fi
 posix_adapter__test__valid_case 'sort - parameter checking 3'
 
 if ( \
-  posix_adapter__printf 'hello' | posix_adapter__sort --zero-terminated >/dev/null \
+  printf 'hello' | posix_adapter__sort --zero-terminated >/dev/null \
 )
 then
   posix_adapter__test__test_case_passed

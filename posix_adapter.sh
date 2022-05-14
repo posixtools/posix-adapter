@@ -154,7 +154,8 @@ posix_adapter__path_prefix="${POSIX_ADAPTER__CONFIG__MANDATORY__SUBMODULE_PATH_P
 # GLOBAL VARIABLES
 #==============================================================================
 
-PATH="${PATH}:${posix_adapter__path_prefix}/src"
+posix_adapter__absolute_path_prefix="$(posix_adapter__realpath "$posix_adapter__path_prefix")"
+PATH="${PATH}:${posix_adapter__absolute_path_prefix}/src"
 
 # These two status code variables will be used in the test cases.
 # shellcheck disable=SC2034

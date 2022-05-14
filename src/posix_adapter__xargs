@@ -9,9 +9,7 @@
 # TOOL: XARGS
 #==============================================================================
 
-TOOL_NAME='posix_adapter__xargs'
-
-_print_help() {
+_posix_adapter__xargs__print_help() {
   >&2 echo '=============================================================================='
   >&2 echo ''
   >&2 echo '  posix_adapter__xargs --help'
@@ -48,7 +46,7 @@ _print_help() {
   >&2 echo '=============================================================================='
 }
 
-_posix_adapter__xargs() {
+posix_adapter__xargs() {
   posix_adapter__flag__null='0'
 
   posix_adapter__flag__replace='0'
@@ -77,12 +75,12 @@ _posix_adapter__xargs() {
         shift
         ;;
       --[!-]*)
-        _report_invalid_parameter \
+        _posix_adapter__xargs__report_invalid_parameter \
           "Unexpected option '${1}'!" \
           'You can only use the available options.'
         ;;
       -[!-]*)
-        _report_invalid_parameter \
+        _posix_adapter__xargs__report_invalid_parameter \
           "Invalid single dashed option '${1}'!" \
           "posix_adapter only uses double dashed options like '--option'."
         ;;
@@ -233,7 +231,7 @@ _posix_adapter__xargs__common() {
 
       ;;
     *)
-      _report_incompatible_call \
+      _posix_adapter__xargs__report_incompatible_call \
         'Unexpected parameter combination!' \
         'You can only use the available options.'
       ;;
@@ -244,7 +242,7 @@ _posix_adapter__xargs__common() {
 # Invalid parameter error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -262,12 +260,12 @@ _posix_adapter__xargs__common() {
 # Status:
 #   98  - The function will terminate the execution.
 #==============================================================================
-_report_invalid_parameter() {
+_posix_adapter__xargs__report_invalid_parameter() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__xargs | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__xargs | details | ${details}"
+  _posix_adapter__xargs__print_help
   exit 98
 }
 
@@ -275,7 +273,7 @@ _report_invalid_parameter() {
 # Incompatible call error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -293,12 +291,12 @@ _report_invalid_parameter() {
 # Status:
 #   99  - The function will terminate the execution.
 #==============================================================================
-_report_incompatible_call() {
+_posix_adapter__xargs__report_incompatible_call() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__xargs | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__xargs | details | ${details}"
+  _posix_adapter__xargs__print_help
   exit 99
 }
 
@@ -306,4 +304,9 @@ _report_incompatible_call() {
 # ENTRY POINT
 #==============================================================================
 
-_posix_adapter__xargs "$@"
+# If the script is called directly, call the internal function.
+case $0 in
+  *posix_adapter__xargs)
+    posix_adapter__xargs "$@"
+    ;;
+esac

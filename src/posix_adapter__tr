@@ -9,9 +9,7 @@
 # TOOL: TR
 #==============================================================================
 
-TOOL_NAME='posix_adapter__tr'
-
-_print_help() {
+_posix_adapter__tr__print_help() {
   >&2 echo '=============================================================================='
   >&2 echo ''
   >&2 echo '  posix_adapter__tr --help'
@@ -50,7 +48,7 @@ _print_help() {
   >&2 echo '==============================================================================.'
 }
 
-_posix_adapter__tr() {
+posix_adapter__tr() {
   posix_adapter__flag__delete='0'
   posix_adapter__value__delete=''
 
@@ -86,17 +84,17 @@ _posix_adapter__tr() {
         shift
         ;;
     --[!-]*)
-        _report_invalid_parameter \
+        _posix_adapter__tr__report_invalid_parameter \
           "Unexpected option '${1}'!" \
           'You can only use the available options.'
         ;;
     -[!-]*)
-        _report_invalid_parameter \
+        _posix_adapter__tr__report_invalid_parameter \
           "Invalid single dashed option '${1}'!" \
           "posix_adapter only uses double dashed options like '--option'."
         ;;
       *)
-        _report_invalid_parameter \
+        _posix_adapter__tr__report_invalid_parameter \
           'Unexpected parameter!' \
           'Only options are available.'
         ;;
@@ -185,7 +183,7 @@ _posix_adapter__tr__common() {
 
       ;;
     *)
-      _report_incompatible_call \
+      _posix_adapter__tr__report_incompatible_call \
         'Unexpected parameter combination!' \
         'You can only use the available options.'
       ;;
@@ -196,7 +194,7 @@ _posix_adapter__tr__common() {
 # Invalid parameter error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -214,12 +212,12 @@ _posix_adapter__tr__common() {
 # Status:
 #   98  - The function will terminate the execution.
 #==============================================================================
-_report_invalid_parameter() {
+_posix_adapter__tr__report_invalid_parameter() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__tr | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__tr | details | ${details}"
+  _posix_adapter__tr__print_help
   exit 98
 }
 
@@ -227,7 +225,7 @@ _report_invalid_parameter() {
 # Incompatible call error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -245,12 +243,12 @@ _report_invalid_parameter() {
 # Status:
 #   99  - The function will terminate the execution.
 #==============================================================================
-_report_incompatible_call() {
+_posix_adapter__tr__report_incompatible_call() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__tr | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__tr | details | ${details}"
+  _posix_adapter__tr__print_help
   exit 99
 }
 
@@ -258,4 +256,9 @@ _report_incompatible_call() {
 # ENTRY POINT
 #==============================================================================
 
-_posix_adapter__tr "$@"
+# If the script is called directly, call the internal function.
+case $0 in
+  *posix_adapter__tr)
+    posix_adapter__tr "$@"
+    ;;
+esac

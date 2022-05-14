@@ -1,35 +1,33 @@
 #!/bin/sh
 #==============================================================================
 #
-#   _ __ _ __ ___
-#  | '__| '_ ` _ \
-#  | |  | | | | | |
-#  |_|  |_| |_| |_|
+# __      _____
+# \ \ /\ / / __|
+#  \ V  V / (__
+#   \_/\_/ \___|
 #==============================================================================
-# TOOL: RM
+# TOOL: WC
 #==============================================================================
 
-TOOL_NAME='posix_adapter__rm'
-
-_print_help() {
+_posix_adapter__wc__print_help() {
   >&2 echo '=============================================================================='
   >&2 echo ''
-  >&2 echo '  posix_adapter__rm --help'
-  >&2 echo '  posix_adapter__rm [--recursive] [--force] <path>'
+  >&2 echo '  posix_adapter__wc --help'
+  >&2 echo '  posix_adapter__wc [--chars] [--lines] [--words] [<path>]'
   >&2 echo ''
   >&2 echo '------------------------------------------------------------------------------'
-  >&2 echo ' Execution mapping function for the "rm" command line tool with a uniform'
-  >&2 echo ' interface.'
+  >&2 echo ' Execution mapping function for the "wc" command line tool with a'
+  >&2 echo ' uniform interface.'
   >&2 echo '------------------------------------------------------------------------------'
   >&2 echo ' Globals:'
   >&2 echo '   None'
   >&2 echo ' Options:'
   >&2 echo '   --help - Prints out the help message and exits.'
-  >&2 echo '   --recursive - rm compatible flag for the -r flag.'
-  >&2 echo '   --force - rm compatible flag for the -f flag.'
-  >&2 echo '   --verbose - rm compatible flag for the -v flag.'
+  >&2 echo '   --chars - Use the wc compatible -c flag.'
+  >&2 echo '   --lines - Use the wc compatible -l flag.'
+  >&2 echo '   --words - Use the wc compatible -w flag.'
   >&2 echo ' Arguments:'
-  >&2 echo '   [1] path - Path that should be removed.'
+  >&2 echo '   [1] [path] - Optional file path.'
   >&2 echo ' STDIN:'
   >&2 echo '   Input passed to the mapped command.'
   >&2 echo '------------------------------------------------------------------------------'
@@ -47,10 +45,10 @@ _print_help() {
   >&2 echo '=============================================================================='
 }
 
-_posix_adapter__rm() {
-  posix_adapter__flag__recursive='0'
-  posix_adapter__flag__force='0'
-  posix_adapter__flag__verbose='0'
+posix_adapter__wc() {
+  posix_adapter__flag__chars='0'
+  posix_adapter__flag__lines='0'
+  posix_adapter__flag__words='0'
 
   posix_adapter__flag__path='0'
   posix_adapter__value__path=''
@@ -58,25 +56,25 @@ _posix_adapter__rm() {
   while [ "$#" -gt '0' ]
   do
     case "$1" in
-      --recursive)
-        posix_adapter__flag__recursive='1'
+      --chars)
+        posix_adapter__flag__chars='1'
         shift
         ;;
-      --force)
-        posix_adapter__flag__force='1'
+      --lines)
+        posix_adapter__flag__lines='1'
         shift
         ;;
-      --verbose)
-        posix_adapter__flag__verbose='1'
+      --words)
+        posix_adapter__flag__words='1'
         shift
         ;;
       --[!-]*)
-        _report_invalid_parameter \
+        _posix_adapter__wc__report_invalid_parameter \
           "Unexpected option '${1}'!" \
           'You can only use the available options.'
         ;;
       -[!-]*)
-        _report_invalid_parameter \
+        _posix_adapter__wc__report_invalid_parameter \
           "Invalid single dashed option '${1}'!" \
           "posix_adapter only uses double dashed options like '--option'."
         ;;
@@ -87,7 +85,7 @@ _posix_adapter__rm() {
           posix_adapter__value__path="$1"
           shift
         else
-          _report_invalid_parameter \
+          _posix_adapter__wc__report_invalid_parameter \
             'Unexpected parameter!' \
             "Parameter '${1}' is unexpected!"
         fi
@@ -95,25 +93,48 @@ _posix_adapter__rm() {
     esac
   done
 
-  if [ "$posix_adapter__flag__path" -eq '0' ]
-  then
-    _report_invalid_parameter \
-      'Missing <path> argument!' \
-      'To be able to use rm, you need to specify a path to work with.'
-  fi
-
   # Assembling the decision string.
-  # ,---- recursive
-  # |,--- force
-  # ||,-- verbose
-  # 000
-  posix_adapter__decision="${posix_adapter__flag__recursive}"
-  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__force}"
-  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__verbose}"
+  # ,----- chars
+  # |,---- lines
+  # ||,--- words
+  # |||,-- path
+  # 0000
+  posix_adapter__decision="${posix_adapter__flag__chars}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__lines}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__words}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__path}"
 
-  _posix_adapter__rm__common \
-    "$posix_adapter__decision" \
-    "$posix_adapter__value__path"
+  case "$(uname -s)" in
+    Linux)
+      _posix_adapter__wc__common \
+        "$posix_adapter__decision" \
+        "$posix_adapter__value__path"
+      ;;
+
+    Darwin)
+      # This if else construction is needed because POSIX does not have the
+      # pipefail feature.
+      if posix_adapter__result="$( \
+        _posix_adapter__wc__common \
+          "$posix_adapter__decision" \
+          "$posix_adapter__value__path" \
+      )"
+      then
+        # Some old BSD based wc implementations pads these results with empty
+        # spaces, hence the additional xargs call.
+        echo "$posix_adapter__result" | xargs
+      else
+        posix_adapter__status="$?"
+        exit "$posix_adapter__status"
+      fi
+      ;;
+
+    *)
+      _posix_adapter__wc__report_incompatible_call \
+        "Unsupported platform '$(uname -s)'!" \
+        'The tool is only implemented for Linux and Darwin so far.'
+      ;;
+  esac
 }
 
 #==============================================================================
@@ -125,7 +146,7 @@ _posix_adapter__rm() {
 #   None
 # Arguments:
 #   [1] decision_string - String that decodes the optional parameter presence.
-#   [2] value_path - Path value.
+#   [2] value_path - Value for the positional path argument.
 # STDIN:
 #   Input passed to the mapped command.
 #------------------------------------------------------------------------------
@@ -139,109 +160,109 @@ _posix_adapter__rm() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_posix_adapter__rm__common() {
+_posix_adapter__wc__common() {
   posix_adapter__decision_string="$1"
   posix_adapter__value__path="$2"
 
   case "$posix_adapter__decision_string" in
-  # ,---- recursive
-  # |,--- force
-  # ||,-- verbose
-  # 000
-    000)
-      rm \
+  # ,----- chars
+  # |,---- lines
+  # ||,--- words
+  # |||,-- path
+    0000)
+      wc \
+        \
+        \
+        \
+        \
+
+      ;;
+  # ,----- chars
+  # |,---- lines
+  # ||,--- words
+  # |||,-- path
+    0001)
+      wc \
         \
         \
         \
         "$posix_adapter__value__path" \
 
       ;;
-  # ,---- recursive
-  # |,--- force
-  # ||,-- verbose
-  # 000
-    001)
-      rm \
+  # ,----- chars
+  # |,---- lines
+  # ||,--- words
+  # |||,-- path
+    0010)
+      wc \
         \
         \
-        -v \
+        -w \
+        \
+
+      ;;
+  # ,----- chars
+  # |,---- lines
+  # ||,--- words
+  # |||,-- path
+    0011)
+      wc \
+        \
+        \
+        -w \
         "$posix_adapter__value__path" \
 
       ;;
-  # ,---- recursive
-  # |,--- force
-  # ||,-- verbose
-  # 000
-    010)
-      rm \
+  # ,----- chars
+  # |,---- lines
+  # ||,--- words
+  # |||,-- path
+    0100)
+      wc \
         \
-        -f \
+        -l \
         \
-        "$posix_adapter__value__path" \
+        \
 
       ;;
-  # ,---- recursive
-  # |,--- force
-  # ||,-- verbose
-  # 000
-    011)
-      rm \
+  # ,----- chars
+  # |,---- lines
+  # ||,--- words
+  # |||,-- path
+    0101)
+      wc \
         \
-        -f \
-        -v \
-        "$posix_adapter__value__path" \
-
-      ;;
-  # ,---- recursive
-  # |,--- force
-  # ||,-- verbose
-  # 000
-    100)
-      rm \
-        -r \
-        \
-        \
-        "$posix_adapter__value__path" \
-
-      ;;
-  # ,---- recursive
-  # |,--- force
-  # ||,-- verbose
-  # 000
-    101)
-      rm \
-        -r \
-        \
-        -v \
-        "$posix_adapter__value__path" \
-
-      ;;
-  # ,---- recursive
-  # |,--- force
-  # ||,-- verbose
-  # 000
-    110)
-      rm \
-        -r \
-        -f \
+        -l \
         \
         "$posix_adapter__value__path" \
 
       ;;
-  # ,---- recursive
-  # |,--- force
-  # ||,-- verbose
-  # 000
-    111)
-      rm \
-        -r \
-        -f \
-        -v \
+  # ,----- chars
+  # |,---- lines
+  # ||,--- words
+  # |||,-- path
+    1000)
+      wc \
+        -c \
+        \
+        \
+        \
+
+      ;;
+  # ,----- chars
+  # |,---- lines
+  # ||,--- words
+  # |||,-- path
+    1001)
+      wc \
+        -c \
+        \
+        \
         "$posix_adapter__value__path" \
 
       ;;
     *)
-      _report_incompatible_call \
+      _posix_adapter__wc__report_incompatible_call \
         'Unexpected parameter combination!' \
         'You can only use the available options.'
       ;;
@@ -252,7 +273,7 @@ _posix_adapter__rm__common() {
 # Invalid parameter error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -270,12 +291,12 @@ _posix_adapter__rm__common() {
 # Status:
 #   98  - The function will terminate the execution.
 #==============================================================================
-_report_invalid_parameter() {
+_posix_adapter__wc__report_invalid_parameter() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__wc | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__wc | details | ${details}"
+  _posix_adapter__wc__print_help
   exit 98
 }
 
@@ -283,7 +304,7 @@ _report_invalid_parameter() {
 # Incompatible call error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -301,12 +322,12 @@ _report_invalid_parameter() {
 # Status:
 #   99  - The function will terminate the execution.
 #==============================================================================
-_report_incompatible_call() {
+_posix_adapter__wc__report_incompatible_call() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__wc | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__wc | details | ${details}"
+  _posix_adapter__wc__print_help
   exit 99
 }
 
@@ -314,4 +335,9 @@ _report_incompatible_call() {
 # ENTRY POINT
 #==============================================================================
 
-_posix_adapter__rm "$@"
+# If the script is called directly, call the internal function.
+case $0 in
+  *posix_adapter__wc)
+    posix_adapter__wc "$@"
+    ;;
+esac

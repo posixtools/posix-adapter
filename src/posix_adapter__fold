@@ -1,40 +1,35 @@
 #!/bin/sh
 #==============================================================================
-#   _
-#  | |_ __
-#  | | '_ \
-#  | | | | |
-#  |_|_| |_|
 #
+#   __       _     _
+#  / _| ___ | | __| |
+# | |_ / _ \| |/ _` |
+# |  _| (_) | | (_| |
+# |_|  \___/|_|\__,_|
 #==============================================================================
-# TOOL: LN
+# TOOL: FOLD
 #==============================================================================
 
-TOOL_NAME='posix_adapter__ln'
-
-_print_help() {
+_posix_adapter__fold__print_help() {
   >&2 echo '=============================================================================='
   >&2 echo ''
-  >&2 echo '  posix_adapter__ln --help'
-  >&2 echo '  posix_adapter__ln [--symbolic] [--verbose] --target <target_path>'
-  >&2 echo '      --link-name <link_name>'
+  >&2 echo '  posix_adapter__fold --help'
+  >&2 echo '  posix_adapter__fold [--spaces] --width <line_width>'
   >&2 echo ''
   >&2 echo '------------------------------------------------------------------------------'
-  >&2 echo ' Execution mapping function for the "ln" command line tool with a uniform'
-  >&2 echo ' interface.'
+  >&2 echo ' Execution mapping function for the "fold" command line tool with a'
+  >&2 echo ' uniform interface.'
   >&2 echo '------------------------------------------------------------------------------'
   >&2 echo ' Globals:'
   >&2 echo '   None'
   >&2 echo ' Options:'
   >&2 echo '   --help - Prints out the help message and exits.'
-  >&2 echo '   --symbolic - Optional flag that should make the created link symbolic.'
-  >&2 echo '   --symbolic - Optional flag that makes the execution verbose.'
-  >&2 echo '   --target <target_path> - Mandatory target path option.'
-  >&2 echo '   --link-name <link_name> - Mandatory link name option.'
+  >&2 echo '   --spaces - Use the fold compatible -s flag to break at spaces'
+  >&2 echo '   --width <line_width> - Use the fold compatible -w flag.'
   >&2 echo ' Arguments:'
   >&2 echo '   None'
   >&2 echo ' STDIN:'
-  >&2 echo '   None'
+  >&2 echo '   Input passed to the mapped command.'
   >&2 echo '------------------------------------------------------------------------------'
   >&2 echo ' Output variables:'
   >&2 echo '   None'
@@ -50,76 +45,57 @@ _print_help() {
   >&2 echo '=============================================================================='
 }
 
-_posix_adapter__ln() {
-  posix_adapter__flag__symbolic='0'
-  posix_adapter__flag__verbose='0'
+posix_adapter__fold() {
+  posix_adapter__flag__spaces='0'
 
-  posix_adapter__flag__target='0'
-  posix_adapter__value__target=''
-
-  posix_adapter__flag__link_name='0'
-  posix_adapter__value__link_name=''
+  posix_adapter__flag__width='0'
+  posix_adapter__value__width=''
 
   while [ "$#" -gt '0' ]
   do
     case "$1" in
-      --symbolic)
-        posix_adapter__flag__symbolic='1'
+      --spaces)
+        posix_adapter__flag__spaces='1'
         shift
         ;;
-      --verbose)
-        posix_adapter__flag__verbose='1'
-        shift
-        ;;
-      --target)
-        posix_adapter__flag__target='1'
-        posix_adapter__value__target="$2"
-        shift
-        shift
-        ;;
-      --link-name)
-        posix_adapter__flag__link_name='1'
-        posix_adapter__value__link_name="$2"
+      --width)
+        posix_adapter__flag__width='1'
+        posix_adapter__value__width="$2"
         shift
         shift
         ;;
       --[!-]*)
-        _report_invalid_parameter \
+        _posix_adapter__fold__report_invalid_parameter \
           "Unexpected option '${1}'!" \
           'You can only use the available options.'
         ;;
       -[!-]*)
-        _report_invalid_parameter \
+        _posix_adapter__fold__report_invalid_parameter \
           "Invalid single dashed option '${1}'!" \
           "posix_adapter only uses double dashed options like '--option'."
         ;;
       *)
-        _report_invalid_parameter \
+        _posix_adapter__fold__report_invalid_parameter \
           'Unexpected parameter!' \
-          'This function does not take positional arguments.'
+          "Parameter '${1}' is unexpected!"
         ;;
     esac
   done
 
   # Assembling the decision string.
-  # ,----- symbolic
-  # |,---- verbose
-  # ||,--- target
-  # |||,-- link_name
-  # 0000
-  posix_adapter__decision="${posix_adapter__flag__symbolic}"
-  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__verbose}"
-  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__target}"
-  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__link_name}"
+  # ,----- spaces
+  # |,---- width
+  # 00
+  posix_adapter__decision="${posix_adapter__flag__spaces}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__width}"
 
-  _posix_adapter__ln__common \
+  _posix_adapter__fold__common \
     "$posix_adapter__decision" \
-    "$posix_adapter__value__target" \
-    "$posix_adapter__value__link_name"
+    "$posix_adapter__value__width"
 }
 
 #==============================================================================
-# Common call mapping function.
+# Common based call mapping function.
 #------------------------------------------------------------------------------
 # Globals:
 #   None
@@ -127,8 +103,7 @@ _posix_adapter__ln() {
 #   None
 # Arguments:
 #   [1] decision_string - String that decodes the optional parameter presence.
-#   [2] value__target_path -  Target path passed to the command.
-#   [3] value__link_name -  Link name passed to the command.
+#   [2] value_width - Value for optional width parameter.
 # STDIN:
 #   Input passed to the mapped command.
 #------------------------------------------------------------------------------
@@ -142,62 +117,45 @@ _posix_adapter__ln() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_posix_adapter__ln__common() {
+_posix_adapter__fold__common() {
   posix_adapter__decision_string="$1"
-  posix_adapter__value__target_path="$2"
-  posix_adapter__value__link_name="$3"
+  posix_adapter__value__width="$2"
 
   case "$posix_adapter__decision_string" in
-  # ,----- symbolic
-  # |,---- verbose
-  # ||,--- target
-  # |||,-- link_name
-    0011)
-      ln \
+  # ,----- spaces
+  # |,---- width
+    00)
+      fold \
         \
         \
-        "$posix_adapter__value__target_path" \
-        "$posix_adapter__value__link_name" \
 
       ;;
-  # ,----- symbolic
-  # |,---- verbose
-  # ||,--- target
-  # |||,-- link_name
-    0111)
-      ln \
+  # ,----- spaces
+  # |,---- width
+    01)
+      fold \
         \
-        -v \
-        "$posix_adapter__value__target_path" \
-        "$posix_adapter__value__link_name" \
+        -w "$posix_adapter__value__width" \
 
       ;;
-  # ,----- symbolic
-  # |,---- verbose
-  # ||,--- target
-  # |||,-- link_name
-    1011)
-      ln \
+  # ,----- spaces
+  # |,---- width
+    10)
+      fold \
         -s \
         \
-        "$posix_adapter__value__target_path" \
-        "$posix_adapter__value__link_name" \
 
       ;;
-  # ,----- symbolic
-  # |,---- verbose
-  # ||,--- target
-  # |||,-- link_name
-    1111)
-      ln \
+  # ,----- spaces
+  # |,---- width
+    11)
+      fold \
         -s \
-        -v \
-        "$posix_adapter__value__target_path" \
-        "$posix_adapter__value__link_name" \
+        -w "$posix_adapter__value__width" \
 
       ;;
     *)
-      _report_incompatible_call \
+      _posix_adapter__fold__report_incompatible_call \
         'Unexpected parameter combination!' \
         'You can only use the available options.'
       ;;
@@ -208,7 +166,7 @@ _posix_adapter__ln__common() {
 # Invalid parameter error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -226,12 +184,12 @@ _posix_adapter__ln__common() {
 # Status:
 #   98  - The function will terminate the execution.
 #==============================================================================
-_report_invalid_parameter() {
+_posix_adapter__fold__report_invalid_parameter() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__fold | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__fold | details | ${details}"
+  _posix_adapter__fold__print_help
   exit 98
 }
 
@@ -239,7 +197,7 @@ _report_invalid_parameter() {
 # Incompatible call error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -257,12 +215,12 @@ _report_invalid_parameter() {
 # Status:
 #   99  - The function will terminate the execution.
 #==============================================================================
-_report_incompatible_call() {
+_posix_adapter__fold__report_incompatible_call() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__fold | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__fold | details | ${details}"
+  _posix_adapter__fold__print_help
   exit 99
 }
 
@@ -270,4 +228,9 @@ _report_incompatible_call() {
 # ENTRY POINT
 #==============================================================================
 
-_posix_adapter__ln "$@"
+# If the script is called directly, call the internal function.
+case $0 in
+  *posix_adapter__fold)
+    posix_adapter__fold "$@"
+    ;;
+esac

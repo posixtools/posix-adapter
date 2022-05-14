@@ -1,34 +1,34 @@
 #!/bin/sh
 #==============================================================================
-#   _
-#  | |___
-#  | / __|
-#  | \__ \
-#  |_|___/
+#                _
+#   ___  ___  __| |
+#  / __|/ _ \/ _` |
+#  \__ \  __/ (_| |
+#  |___/\___|\__,_|
 #==============================================================================
-# TOOL: LS
+# TOOL: SED
 #==============================================================================
 
-TOOL_NAME='posix_adapter__ls'
-
-_print_help() {
+_posix_adapter__sed__print_help() {
   >&2 echo '=============================================================================='
   >&2 echo ''
-  >&2 echo '  posix_adapter__ls --help'
-  >&2 echo '  posix_adapter__ls [--all] [--almost-all] <path>'
+  >&2 echo '  posix_adapter__sed --help'
+  >&2 echo '  posix_adapter__sed [--extended] [--in-place <suffix>]'
+  >&2 echo '      [--expression <expression>] [<path>]'
   >&2 echo ''
   >&2 echo '------------------------------------------------------------------------------'
-  >&2 echo ' Execution mapping function for the "ls" command line tool with a'
+  >&2 echo ' Execution mapping function for the "sed" command line tool with a'
   >&2 echo ' uniform interface.'
   >&2 echo '------------------------------------------------------------------------------'
   >&2 echo ' Globals:'
   >&2 echo '   None'
   >&2 echo ' Options:'
   >&2 echo '   --help - Prints out the help message and exits.'
-  >&2 echo '   --all - ls compatible -a flag equivavelent.'
-  >&2 echo '   --almost-all - ls compatible -A flag equivavelent.'
+  >&2 echo '   --extended - Use the extended regexp engine.'
+  >&2 echo '   --in-place <suffix> - In place processing with optional backup with suffix.'
+  >&2 echo '   --expression <expression> - Expression that should be executed.'
   >&2 echo ' Arguments:'
-  >&2 echo '   [1] path - Path that should be listed.'
+  >&2 echo '   [1] [path] - Optional file path.'
   >&2 echo ' STDIN:'
   >&2 echo '   Input passed to the mapped command.'
   >&2 echo '------------------------------------------------------------------------------'
@@ -46,9 +46,14 @@ _print_help() {
   >&2 echo '=============================================================================='
 }
 
-_posix_adapter__ls() {
-  posix_adapter__flag__all='0'
-  posix_adapter__flag__almost_all='0'
+posix_adapter__sed() {
+  posix_adapter__flag__extended='0'
+
+  posix_adapter__flag__in_place='0'
+  posix_adapter__value__in_place_suffix=''
+
+  posix_adapter__flag__expression='0'
+  posix_adapter__value__expression=''
 
   posix_adapter__flag__path='0'
   posix_adapter__value__path=''
@@ -56,21 +61,29 @@ _posix_adapter__ls() {
   while [ "$#" -gt '0' ]
   do
     case "$1" in
-      --all)
-        posix_adapter__flag__all='1'
+      --extended)
+        posix_adapter__flag__extended='1'
         shift
         ;;
-      --almost-all)
-        posix_adapter__flag__almost_all='1'
+      --in-place)
+        posix_adapter__flag__in_place='1'
+        posix_adapter__value__in_place_suffix="$2"
+        shift
+        shift
+        ;;
+      --expression)
+        posix_adapter__flag__expression='1'
+        posix_adapter__value__expression="$2"
+        shift
         shift
         ;;
       --[!-]*)
-        _report_invalid_parameter \
+        _posix_adapter__sed__report_invalid_parameter \
           "Unexpected option '${1}'!" \
           'You can only use the available options.'
         ;;
       -[!-]*)
-        _report_invalid_parameter \
+        _posix_adapter__sed__report_invalid_parameter \
           "Invalid single dashed option '${1}'!" \
           "posix_adapter only uses double dashed options like '--option'."
         ;;
@@ -81,30 +94,34 @@ _posix_adapter__ls() {
           posix_adapter__value__path="$1"
           shift
         else
-          _report_invalid_parameter \
+          posix_adapter__error_details="$( \
+            printf '%s' 'You have already passed a path argument, you '; \
+            printf '%s' 'probably forgot the --expression flag before '; \
+            printf '%s\n' 'your expression which is mandatory in posix_adapter.' \
+          )"
+          _posix_adapter__sed__report_invalid_parameter \
             'Unexpected parameter!' \
-            "Parameter '${1}' is unexpected!"
+            "$posix_adapter__error_details"
         fi
         ;;
     esac
   done
 
-  if [ "$posix_adapter__flag__path" -eq '0' ]
-  then
-    _report_invalid_parameter \
-      'Missing <path> argument!' \
-      'To be able to use ls, you need to specify a path to work with.'
-  fi
-
   # Assembling the decision string.
-  # ,-- all
-  # |,- almost_all
-  # 00
-  posix_adapter__decision="${posix_adapter__flag__all}"
-  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__almost_all}"
+  # ,----- extended
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+  # 0000
+  posix_adapter__decision="${posix_adapter__flag__extended}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__in_place}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__expression}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__path}"
 
-  _posix_adapter__ls__common \
+  _posix_adapter__sed__common \
     "$posix_adapter__decision" \
+    "$posix_adapter__value__in_place_suffix" \
+    "$posix_adapter__value__expression" \
     "$posix_adapter__value__path"
 }
 
@@ -117,7 +134,9 @@ _posix_adapter__ls() {
 #   None
 # Arguments:
 #   [1] decision_string - String that decodes the optional parameter presence.
-#   [2] value_path - Path value.
+#   [2] value_in_place_suffix - Value passed with the expression flag.
+#   [3] value_expression - Value passed with the expression flag.
+#   [4] value_path - Value for the positional path argument.
 # STDIN:
 #   Input passed to the mapped command.
 #------------------------------------------------------------------------------
@@ -131,40 +150,111 @@ _posix_adapter__ls() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_posix_adapter__ls__common() {
+_posix_adapter__sed__common() {
   posix_adapter__decision_string="$1"
-  posix_adapter__value__path="$2"
+  posix_adapter__value__in_place_suffix="$2"
+  posix_adapter__value__expression="$3"
+  posix_adapter__value__path="$4"
 
   case "$posix_adapter__decision_string" in
-  # ,-- all
-  # |,- almost_all
-    00)
-      ls \
+  # ,----- extended
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+    0010)
+      sed \
         \
         \
+        -e "$posix_adapter__value__expression" \
+        \
+
+      ;;
+  # ,----- extended
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+    0011)
+      sed \
+        \
+        \
+        -e "$posix_adapter__value__expression" \
         "$posix_adapter__value__path" \
 
       ;;
-  # ,-- all
-  # |,- almost_all
-    01)
-      ls \
+  # ,----- extended
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+    0110)
+      sed \
         \
-        -A \
+        -i"$posix_adapter__value__in_place_suffix" \
+        -e "$posix_adapter__value__expression" \
+        \
+
+      ;;
+  # ,----- extended
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+    0111)
+      sed \
+        \
+        -i"$posix_adapter__value__in_place_suffix" \
+        -e "$posix_adapter__value__expression" \
         "$posix_adapter__value__path" \
 
       ;;
-  # ,-- all
-  # |,- almost_all
-    10)
-      ls \
-        -a \
+  # ,----- extended
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+    1010)
+      sed \
+        -E \
         \
+        -e "$posix_adapter__value__expression" \
+        \
+
+      ;;
+  # ,----- extended
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+    1011)
+      sed \
+        -E \
+        \
+        -e "$posix_adapter__value__expression" \
+        "$posix_adapter__value__path" \
+
+      ;;
+  # ,----- extended
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+    1110)
+      sed \
+        -E \
+        -i"$posix_adapter__value__in_place_suffix" \
+        -e "$posix_adapter__value__expression" \
+        \
+
+      ;;
+  # ,----- extended
+  # |,---- in_place
+  # ||,--- expression
+  # |||,-- path
+    1111)
+      sed \
+        -E \
+        -i"$posix_adapter__value__in_place_suffix" \
+        -e "$posix_adapter__value__expression" \
         "$posix_adapter__value__path" \
 
       ;;
     *)
-      _report_incompatible_call \
+      _posix_adapter__sed__report_incompatible_call \
         'Unexpected parameter combination!' \
         'You can only use the available options.'
       ;;
@@ -175,7 +265,7 @@ _posix_adapter__ls__common() {
 # Invalid parameter error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -193,12 +283,12 @@ _posix_adapter__ls__common() {
 # Status:
 #   98  - The function will terminate the execution.
 #==============================================================================
-_report_invalid_parameter() {
+_posix_adapter__sed__report_invalid_parameter() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__sed | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__sed | details | ${details}"
+  _posix_adapter__sed__print_help
   exit 98
 }
 
@@ -206,7 +296,7 @@ _report_invalid_parameter() {
 # Incompatible call error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -224,12 +314,12 @@ _report_invalid_parameter() {
 # Status:
 #   99  - The function will terminate the execution.
 #==============================================================================
-_report_incompatible_call() {
+_posix_adapter__sed__report_incompatible_call() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__sed | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__sed | details | ${details}"
+  _posix_adapter__sed__print_help
   exit 99
 }
 
@@ -237,4 +327,9 @@ _report_incompatible_call() {
 # ENTRY POINT
 #==============================================================================
 
-_posix_adapter__ls "$@"
+# If the script is called directly, call the internal function.
+case $0 in
+  *posix_adapter__sed)
+    posix_adapter__sed "$@"
+    ;;
+esac

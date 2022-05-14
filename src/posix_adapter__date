@@ -1,33 +1,30 @@
 #!/bin/sh
 #==============================================================================
-#              _       _    __
-#   _ __  _ __(_)_ __ | |_ / _|
-#  | '_ \| '__| | '_ \| __| |_
-#  | |_) | |  | | | | | |_|  _|
-#  | .__/|_|  |_|_| |_|\__|_|
-#==|_|=========================================================================
-# TOOL: PRINTF
+#      _       _
+#   __| | __ _| |_ ___
+#  / _` |/ _` | __/ _ \
+# | (_| | (_| | ||  __/
+#  \__,_|\__,_|\__\___|
+#==============================================================================
+# TOOL: DATE
 #==============================================================================
 
-TOOL_NAME='posix_adapter__printf'
-
-_print_help() {
+_posix_adapter__date__print_help() {
   >&2 echo '=============================================================================='
   >&2 echo ''
-  >&2 echo '  posix_adapter__printf --help'
-  >&2 echo '  posix_adapter__printf <printf_specification>..'
+  >&2 echo '  posix_adapter__date --help'
+  >&2 echo '  posix_adapter__date <format_string>'
   >&2 echo ''
   >&2 echo '------------------------------------------------------------------------------'
-  >&2 echo ' Execution mapping function for the "printf" command line tool with a uniform'
-  >&2 echo ' interface. This is the only command mapping besides tput that is only a proxy'
-  >&2 echo ' because of the nature of printf.'
+  >&2 echo ' Execution mapping function for the "date" command line tool with a uniform'
+  >&2 echo ' interface.'
   >&2 echo '------------------------------------------------------------------------------'
   >&2 echo ' Globals:'
   >&2 echo '   None'
   >&2 echo ' Options:'
   >&2 echo '   --help - Prints out the help message and exits.'
   >&2 echo ' Arguments:'
-  >&2 echo '   [..] specification - printf compatible specification.'
+  >&2 echo '   [1] format_string - Format string the date should be generated from.'
   >&2 echo ' STDIN:'
   >&2 echo '   Input passed to the mapped command.'
   >&2 echo '------------------------------------------------------------------------------'
@@ -45,23 +42,40 @@ _print_help() {
   >&2 echo '=============================================================================='
 }
 
-_posix_adapter__printf() {
-  if [ "$1" = '--help' ]
+posix_adapter__date() {
+  if [ "$#" -eq 0 ]
   then
-    _print_help
-    exit 0
+    _posix_adapter__date__report_invalid_parameter \
+      'Missing parameter!' \
+      'A singular <format> parameter was expected!'
+  elif [ "$#" -ne 1 ]
+  then
+    _posix_adapter__date__report_invalid_parameter \
+      'Unexpected parameter count!' \
+      "Only 1 parameter is expected, got ${#}!"
   fi
 
-  # We are proxying all the parameters here, hence ignoring the warning.
-  # shellcheck disable=SC2059
-  printf "$@"
+  case "$1" in
+    --[!-]*)
+      _posix_adapter__date__report_invalid_parameter \
+        "Unexpected option '${1}'!" \
+        'This function does not take options.'
+      ;;
+    -[!-]*)
+      _posix_adapter__date__report_invalid_parameter \
+        "Invalid single dashed option '${1}'!" \
+        "posix_adapter only uses double dashed options like '--option'."
+      ;;
+  esac
+
+  date "$1"
 }
 
 #==============================================================================
 # Invalid parameter error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -79,12 +93,12 @@ _posix_adapter__printf() {
 # Status:
 #   98  - The function will terminate the execution.
 #==============================================================================
-_report_invalid_parameter() {
+_posix_adapter__date__report_invalid_parameter() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__date | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__date | details | ${details}"
+  _posix_adapter__date__print_help
   exit 98
 }
 
@@ -92,7 +106,7 @@ _report_invalid_parameter() {
 # Incompatible call error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -110,12 +124,12 @@ _report_invalid_parameter() {
 # Status:
 #   99  - The function will terminate the execution.
 #==============================================================================
-_report_incompatible_call() {
+_posix_adapter__date__report_incompatible_call() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__date | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__date | details | ${details}"
+  _posix_adapter__date__print_help
   exit 99
 }
 
@@ -123,4 +137,9 @@ _report_incompatible_call() {
 # ENTRY POINT
 #==============================================================================
 
-_posix_adapter__printf "$@"
+# If the script is called directly, call the internal function.
+case $0 in
+  *posix_adapter__date)
+    posix_adapter__date "$@"
+    ;;
+esac

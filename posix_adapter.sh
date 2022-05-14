@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin
 #==============================================================================
 #                  _                   _             _                _
 #  _ __   ___  ___(_)_  __    __ _  __| | __ _ _ __ | |_ ___ _ __ ___| |__
@@ -84,7 +84,7 @@ posix_adapter__report_error_and_exit() {
 # For better readability, posix_adapter.sh is composed  out of smaller scripts
 # that are sourced into it dynamically. As posix_adapter.sh is imported to the
 # user codebase by sourcing, the conventional path determination cannot be
-# used. The '$0' variable contains the the host script's path posix_adapter.sh
+# used. The '$0' variable contains the the host script's path posix_adapter
 # is sourced from. Hence, a global variable needs to be set by the calling code
 # that contains the path prefix posix_adapter.sh is called from.
 #==============================================================================
@@ -99,11 +99,66 @@ fi
 
 posix_adapter__path_prefix="${POSIX_ADAPTER__CONFIG__MANDATORY__SUBMODULE_PATH_PREFIX}"
 
+# shellcheck source=./src/posix_adapter__basename
+. "${posix_adapter__path_prefix}/src/posix_adapter__basename"
+# shellcheck source=./src/posix_adapter__cat
+. "${posix_adapter__path_prefix}/src/posix_adapter__cat"
+# shellcheck source=./src/posix_adapter__cut
+. "${posix_adapter__path_prefix}/src/posix_adapter__cut"
+# shellcheck source=./src/posix_adapter__date
+. "${posix_adapter__path_prefix}/src/posix_adapter__date"
+# shellcheck source=./src/posix_adapter__dirname
+. "${posix_adapter__path_prefix}/src/posix_adapter__dirname"
+# shellcheck source=./src/posix_adapter__echo
+. "${posix_adapter__path_prefix}/src/posix_adapter__echo"
+# shellcheck source=./src/posix_adapter__find
+. "${posix_adapter__path_prefix}/src/posix_adapter__find"
+# shellcheck source=./src/posix_adapter__fold
+. "${posix_adapter__path_prefix}/src/posix_adapter__fold"
+# shellcheck source=./src/posix_adapter__grep
+. "${posix_adapter__path_prefix}/src/posix_adapter__grep"
+# shellcheck source=./src/posix_adapter__ln
+. "${posix_adapter__path_prefix}/src/posix_adapter__ln"
+# shellcheck source=./src/posix_adapter__ls
+. "${posix_adapter__path_prefix}/src/posix_adapter__ls"
+# shellcheck source=./src/posix_adapter__mkdir
+. "${posix_adapter__path_prefix}/src/posix_adapter__mkdir"
+# shellcheck source=./src/posix_adapter__mkfifo
+. "${posix_adapter__path_prefix}/src/posix_adapter__mkfifo"
+# shellcheck source=./src/posix_adapter__mktemp
+. "${posix_adapter__path_prefix}/src/posix_adapter__mktemp"
+# shellcheck source=./src/posix_adapter__printf
+. "${posix_adapter__path_prefix}/src/posix_adapter__printf"
+# shellcheck source=./src/posix_adapter__readlink
+. "${posix_adapter__path_prefix}/src/posix_adapter__readlink"
+# shellcheck source=./src/posix_adapter__realpath
+. "${posix_adapter__path_prefix}/src/posix_adapter__realpath"
+# shellcheck source=./src/posix_adapter__rm
+. "${posix_adapter__path_prefix}/src/posix_adapter__rm"
+# shellcheck source=./src/posix_adapter__sed
+. "${posix_adapter__path_prefix}/src/posix_adapter__sed"
+# shellcheck source=./src/posix_adapter__sort
+. "${posix_adapter__path_prefix}/src/posix_adapter__sort"
+# shellcheck source=./src/posix_adapter__touch
+. "${posix_adapter__path_prefix}/src/posix_adapter__touch"
+# shellcheck source=./src/posix_adapter__tput
+. "${posix_adapter__path_prefix}/src/posix_adapter__tput"
+# shellcheck source=./src/posix_adapter__tr
+. "${posix_adapter__path_prefix}/src/posix_adapter__tr"
+# shellcheck source=./src/posix_adapter__uname
+. "${posix_adapter__path_prefix}/src/posix_adapter__uname"
+# shellcheck source=./src/posix_adapter__wc
+. "${posix_adapter__path_prefix}/src/posix_adapter__wc"
+# shellcheck source=./src/posix_adapter__xargs
+. "${posix_adapter__path_prefix}/src/posix_adapter__xargs"
+# shellcheck source=./src/posix_adapter__xxd
+. "${posix_adapter__path_prefix}/src/posix_adapter__xxd"
+
 #==============================================================================
 # GLOBAL VARIABLES
 #==============================================================================
 
-PATH="${PATH}:${posix_adapter__path_prefix}/bin"
+PATH="${PATH}:${posix_adapter__path_prefix}/src"
 
 # These two status code variables will be used in the test cases.
 # shellcheck disable=SC2034

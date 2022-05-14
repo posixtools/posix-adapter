@@ -1,34 +1,37 @@
 #!/bin/sh
 #==============================================================================
-#   _
-#  | |__   __ _ ___  ___ _ __   __ _ _ __ ___   ___
-#  | '_ \ / _` / __|/ _ \ '_ \ / _` | '_ ` _ \ / _ \
-#  | |_) | (_| \__ \  __/ | | | (_| | | | | | |  __/
-#  |_.__/ \__,_|___/\___|_| |_|\__,_|_| |_| |_|\___|
-#==============================================================================
-# TOOL: BASENAME
+#   _               _
+#  | |_ _ __  _   _| |_
+#  | __| '_ \| | | | __|
+#  | |_| |_) | |_| | |_
+#   \__| .__/ \__,_|\__|
+#======|_|=====================================================================
+# TOOL: TPUT
 #==============================================================================
 
-TOOL_NAME='posix_adapter__basename'
-
-_print_help() {
+_posix_adapter__tput__print_help() {
   >&2 echo '=============================================================================='
   >&2 echo ''
-  >&2 echo '  posix_adapter__basename --help'
-  >&2 echo '  posix_adapter__basename <path>'
+  >&2 echo '  posix_adapter__tput --help'
+  >&2 echo '  posix_adapter__tput --is-available'
+  >&2 echo '  posix_adapter__tput <tput_specification>..'
   >&2 echo ''
   >&2 echo '------------------------------------------------------------------------------'
-  >&2 echo ' Execution mapping function for the "basename" command line tool with a'
-  >&2 echo ' uniform interface.'
+  >&2 echo ' Execution mapping function for the "tput" command line tool. This is the only'
+  >&2 echo ' command mapping besides printf that is only a proxy because of the nature of'
+  >&2 echo ' tput. It also performs a fail-safe step and supresses not supported escape'
+  >&2 echo ' sequences by returnin an empty string in case of error.'
   >&2 echo '------------------------------------------------------------------------------'
   >&2 echo ' Globals:'
   >&2 echo '   None'
   >&2 echo ' Options:'
-  >&2 echo '   None'
+  >&2 echo '   --help - Prints out the help message and exits.'
+  >&2 echo '   --is-available - Runs a check if tput is actually available on the current'
+  >&2 echo '                    system and then exists with the status code.'
   >&2 echo ' Arguments:'
-  >&2 echo '   [1] path - Path from which the basename should be separated.'
+  >&2 echo '   [..] specification - tput compatible specification.'
   >&2 echo ' STDIN:'
-  >&2 echo '   Standard input can be used to pass a path.'
+  >&2 echo '   Input passed to the mapped command.'
   >&2 echo '------------------------------------------------------------------------------'
   >&2 echo ' Output variables:'
   >&2 echo '   None'
@@ -37,45 +40,30 @@ _print_help() {
   >&2 echo ' STDERR:'
   >&2 echo '   Error output of the mapped command.'
   >&2 echo ' Status:'
-  >&2 echo '   0  - Call was successful.'
-  >&2 echo '   .. - Call failed with its error status.'
-  >&2 echo '   98 - Invalid parameter configuration.'
-  >&2 echo '   99 - No compatible call style was found.'
+  >&2 echo '   0 - Normal execution output, or the success of the availability check.'
+  >&2 echo '   1 - Availability check failed.'
   >&2 echo '=============================================================================='
 }
 
-_posix_adapter__basename() {
-  if [ "$#" -eq 0 ]
+posix_adapter__tput() {
+  # This is a minimal non-fail-safe implementation for now..
+  if [ "$1" = '--is-available' ]
   then
-    # basename does not support the standard input by it's own, so helping it
-    # out with xargs..
-    xargs basename
-  else
-    if [ "$#" -gt 1 ]
+    if command -v tput >/dev/null && tput init >/dev/null 2>&1
     then
-      _report_invalid_parameter \
-        'Unexpected parameter count!' \
-        "Only 1 parameter is expected, got ${#}!"
+      return 0
+    else
+      return 1
     fi
+  elif [ "$1" = '--help' ]
+  then
+    _posix_adapter__tput__print_help
+    exit 0
+  fi
 
-    case "$1" in
-      --help)
-        _print_help
-        exit 0
-        ;;
-      --[!-]*)
-        _report_invalid_parameter \
-          "Unexpected option '${1}'!" \
-          'This function does not take options.'
-        ;;
-      -[!-]*)
-        _report_invalid_parameter \
-          "Invalid single dashed option '${1}'!" \
-          "posix_adapter only uses double dashed options like '--option'."
-        ;;
-    esac
-
-    basename "$1"
+  if ! tput "$@" 2>/dev/null
+  then
+    printf '%s' ''
   fi
 }
 
@@ -83,7 +71,7 @@ _posix_adapter__basename() {
 # Invalid parameter error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -101,12 +89,12 @@ _posix_adapter__basename() {
 # Status:
 #   98  - The function will terminate the execution.
 #==============================================================================
-_report_invalid_parameter() {
+_posix_adapter__tput__report_invalid_parameter() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__tput | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__tput | details | ${details}"
+  _posix_adapter__tput__print_help
   exit 98
 }
 
@@ -114,7 +102,7 @@ _report_invalid_parameter() {
 # Incompatible call error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -132,12 +120,12 @@ _report_invalid_parameter() {
 # Status:
 #   99  - The function will terminate the execution.
 #==============================================================================
-_report_incompatible_call() {
+_posix_adapter__tput__report_incompatible_call() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__tput | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__tput | details | ${details}"
+  _posix_adapter__tput__print_help
   exit 99
 }
 
@@ -145,4 +133,9 @@ _report_incompatible_call() {
 # ENTRY POINT
 #==============================================================================
 
-_posix_adapter__basename "$@"
+# If the script is called directly, call the internal function.
+case $0 in
+  *posix_adapter__tput)
+    posix_adapter__tput "$@"
+    ;;
+esac

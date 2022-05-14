@@ -1,35 +1,31 @@
 #!/bin/sh
 #==============================================================================
-#
-#   __       _     _
-#  / _| ___ | | __| |
-# | |_ / _ \| |/ _` |
-# |  _| (_) | | (_| |
-# |_|  \___/|_|\__,_|
+#            _
+#   ___  ___| |__   ___
+#  / _ \/ __| '_ \ / _ \
+# |  __/ (__| | | | (_) |
+#  \___|\___|_| |_|\___/
 #==============================================================================
-# TOOL: FOLD
+# TOOL: ECHO
 #==============================================================================
 
-TOOL_NAME='posix_adapter__fold'
-
-_print_help() {
+_posix_adapter__echo__print_help() {
   >&2 echo '=============================================================================='
   >&2 echo ''
-  >&2 echo '  posix_adapter__fold --help'
-  >&2 echo '  posix_adapter__fold [--spaces] --width <line_width>'
+  >&2 echo '  posix_adapter__echo --help'
+  >&2 echo '  posix_adapter__echo [--no-newline] <string>'
   >&2 echo ''
   >&2 echo '------------------------------------------------------------------------------'
-  >&2 echo ' Execution mapping function for the "fold" command line tool with a'
-  >&2 echo ' uniform interface.'
+  >&2 echo ' Execution mapping function for the "echo" command line tool with a uniform'
+  >&2 echo ' interface.'
   >&2 echo '------------------------------------------------------------------------------'
   >&2 echo ' Globals:'
   >&2 echo '   None'
   >&2 echo ' Options:'
   >&2 echo '   --help - Prints out the help message and exits.'
-  >&2 echo '   --spaces - Use the fold compatible -s flag to break at spaces'
-  >&2 echo '   --width <line_width> - Use the fold compatible -w flag.'
+  >&2 echo '   --no-newline - Flag that should prevent printing the trailing new line.'
   >&2 echo ' Arguments:'
-  >&2 echo '   None'
+  >&2 echo '   [1] string - String that should be printed.'
   >&2 echo ' STDIN:'
   >&2 echo '   Input passed to the mapped command.'
   >&2 echo '------------------------------------------------------------------------------'
@@ -47,57 +43,61 @@ _print_help() {
   >&2 echo '=============================================================================='
 }
 
-_posix_adapter__fold() {
-  posix_adapter__flag__spaces='0'
+posix_adapter__echo() {
+  posix_adapter__flag__no_newline='0'
 
-  posix_adapter__flag__width='0'
-  posix_adapter__value__width=''
+  posix_adapter__value__string=''
+
+  if [ "$#" -eq 0 ]
+  then
+    _posix_adapter__echo__report_invalid_parameter \
+      'Missing string parameter!' \
+      'A singular <string> parameter was expected!'
+  fi
 
   while [ "$#" -gt '0' ]
   do
     case "$1" in
-      --spaces)
-        posix_adapter__flag__spaces='1'
-        shift
-        ;;
-      --width)
-        posix_adapter__flag__width='1'
-        posix_adapter__value__width="$2"
-        shift
+      --no-newline)
+        posix_adapter__flag__no_newline='1'
         shift
         ;;
       --[!-]*)
-        _report_invalid_parameter \
+        _posix_adapter__echo__report_invalid_parameter \
           "Unexpected option '${1}'!" \
           'You can only use the available options.'
         ;;
       -[!-]*)
-        _report_invalid_parameter \
+        _posix_adapter__echo__report_invalid_parameter \
           "Invalid single dashed option '${1}'!" \
           "posix_adapter only uses double dashed options like '--option'."
         ;;
       *)
-        _report_invalid_parameter \
-          'Unexpected parameter!' \
-          "Parameter '${1}' is unexpected!"
+        posix_adapter__value__string="$1"
+        shift
+        if [ "$#" -gt '0' ]
+        then
+          _posix_adapter__echo__report_invalid_parameter \
+            'Unexpected parameter!' \
+            'Multiple separated strings passed only one is expected!'
+        fi
+        break
         ;;
     esac
   done
 
   # Assembling the decision string.
-  # ,----- spaces
-  # |,---- width
-  # 00
-  posix_adapter__decision="${posix_adapter__flag__spaces}"
-  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__width}"
+  # ,-- no_newline
+  # 0
+  posix_adapter__decision="${posix_adapter__flag__no_newline}"
 
-  _posix_adapter__fold__common \
+  _posix_adapter__echo__common \
     "$posix_adapter__decision" \
-    "$posix_adapter__value__width"
+    "$posix_adapter__value__string"
 }
 
 #==============================================================================
-# Common based call mapping function.
+# Common call mapping function.
 #------------------------------------------------------------------------------
 # Globals:
 #   None
@@ -105,7 +105,7 @@ _posix_adapter__fold() {
 #   None
 # Arguments:
 #   [1] decision_string - String that decodes the optional parameter presence.
-#   [2] value_width - Value for optional width parameter.
+#   [2] value_string -  String passed to the echo command.
 # STDIN:
 #   Input passed to the mapped command.
 #------------------------------------------------------------------------------
@@ -119,45 +119,21 @@ _posix_adapter__fold() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_posix_adapter__fold__common() {
+_posix_adapter__echo__common() {
   posix_adapter__decision_string="$1"
-  posix_adapter__value__width="$2"
+  posix_adapter__value__string="$2"
 
   case "$posix_adapter__decision_string" in
-  # ,----- spaces
-  # |,---- width
-    00)
-      fold \
-        \
-        \
-
+  # ,-- no_newline
+    0)
+      echo "$posix_adapter__value__string"
       ;;
-  # ,----- spaces
-  # |,---- width
-    01)
-      fold \
-        \
-        -w "$posix_adapter__value__width" \
-
-      ;;
-  # ,----- spaces
-  # |,---- width
-    10)
-      fold \
-        -s \
-        \
-
-      ;;
-  # ,----- spaces
-  # |,---- width
-    11)
-      fold \
-        -s \
-        -w "$posix_adapter__value__width" \
-
+  # ,-- no_newline
+    1)
+      printf '%s' "$posix_adapter__value__string"
       ;;
     *)
-      _report_incompatible_call \
+      _posix_adapter__echo__report_incompatible_call \
         'Unexpected parameter combination!' \
         'You can only use the available options.'
       ;;
@@ -168,7 +144,7 @@ _posix_adapter__fold__common() {
 # Invalid parameter error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -186,12 +162,12 @@ _posix_adapter__fold__common() {
 # Status:
 #   98  - The function will terminate the execution.
 #==============================================================================
-_report_invalid_parameter() {
+_posix_adapter__echo__report_invalid_parameter() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__echo | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__echo | details | ${details}"
+  _posix_adapter__echo__print_help
   exit 98
 }
 
@@ -199,7 +175,7 @@ _report_invalid_parameter() {
 # Incompatible call error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -217,12 +193,12 @@ _report_invalid_parameter() {
 # Status:
 #   99  - The function will terminate the execution.
 #==============================================================================
-_report_incompatible_call() {
+_posix_adapter__echo__report_incompatible_call() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__echo | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__echo | details | ${details}"
+  _posix_adapter__echo__print_help
   exit 99
 }
 
@@ -230,4 +206,9 @@ _report_incompatible_call() {
 # ENTRY POINT
 #==============================================================================
 
-_posix_adapter__fold "$@"
+# If the script is called directly, call the internal function.
+case $0 in
+  *posix_adapter__echo)
+    posix_adapter__echo "$@"
+    ;;
+esac

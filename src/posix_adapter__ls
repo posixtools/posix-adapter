@@ -1,36 +1,34 @@
 #!/bin/sh
 #==============================================================================
-#                _
-# __  ____  ____| |
-# \ \/ /\ \/ / _` |
-#  >  <  >  < (_| |
-# /_/\_\/_/\_\__,_|
+#   _
+#  | |___
+#  | / __|
+#  | \__ \
+#  |_|___/
 #==============================================================================
-# TOOL: XXD
+# TOOL: LS
 #==============================================================================
 
-TOOL_NAME='posix_adapter__xxd'
-
-_print_help() {
+_posix_adapter__ls__print_help() {
   >&2 echo '=============================================================================='
   >&2 echo ''
-  >&2 echo '  posix_adapter__xxd --help'
-  >&2 echo '  posix_adapter__xxd [--plain] [--revert]'
+  >&2 echo '  posix_adapter__ls --help'
+  >&2 echo '  posix_adapter__ls [--all] [--almost-all] <path>'
   >&2 echo ''
   >&2 echo '------------------------------------------------------------------------------'
-  >&2 echo ' Execution mapping function for the "xxd" command line tool with a uniform'
-  >&2 echo ' interface.'
+  >&2 echo ' Execution mapping function for the "ls" command line tool with a'
+  >&2 echo ' uniform interface.'
   >&2 echo '------------------------------------------------------------------------------'
   >&2 echo ' Globals:'
   >&2 echo '   None'
   >&2 echo ' Options:'
   >&2 echo '   --help - Prints out the help message and exits.'
-  >&2 echo '   --plain - xxd compatible plain hexdump flag -p.'
-  >&2 echo '   --revert - xxd compatible revert flag -r.'
+  >&2 echo '   --all - ls compatible -a flag equivavelent.'
+  >&2 echo '   --almost-all - ls compatible -A flag equivavelent.'
   >&2 echo ' Arguments:'
-  >&2 echo '   None'
+  >&2 echo '   [1] path - Path that should be listed.'
   >&2 echo ' STDIN:'
-  >&2 echo '   Value is read from the standard input.'
+  >&2 echo '   Input passed to the mapped command.'
   >&2 echo '------------------------------------------------------------------------------'
   >&2 echo ' Output variables:'
   >&2 echo '   None'
@@ -46,48 +44,66 @@ _print_help() {
   >&2 echo '=============================================================================='
 }
 
-_posix_adapter__xxd() {
-  posix_adapter__flag__plain='0'
-  posix_adapter__flag__revert='0'
+posix_adapter__ls() {
+  posix_adapter__flag__all='0'
+  posix_adapter__flag__almost_all='0'
+
+  posix_adapter__flag__path='0'
+  posix_adapter__value__path=''
 
   while [ "$#" -gt '0' ]
   do
     case "$1" in
-      --plain)
-        posix_adapter__flag__plain='1'
+      --all)
+        posix_adapter__flag__all='1'
         shift
         ;;
-      --revert)
-        posix_adapter__flag__revert='1'
+      --almost-all)
+        posix_adapter__flag__almost_all='1'
         shift
         ;;
       --[!-]*)
-        _report_invalid_parameter \
+        _posix_adapter__ls__report_invalid_parameter \
           "Unexpected option '${1}'!" \
           'You can only use the available options.'
         ;;
       -[!-]*)
-        _report_invalid_parameter \
+        _posix_adapter__ls__report_invalid_parameter \
           "Invalid single dashed option '${1}'!" \
           "posix_adapter only uses double dashed options like '--option'."
         ;;
       *)
-        _report_invalid_parameter \
-          'Unexpected parameter!' \
-          "Parameter '${1}' is unexpected!"
+        if [ "$posix_adapter__flag__path" -eq '0' ]
+        then
+          posix_adapter__flag__path='1'
+          posix_adapter__value__path="$1"
+          shift
+        else
+          _posix_adapter__ls__report_invalid_parameter \
+            'Unexpected parameter!' \
+            "Parameter '${1}' is unexpected!"
+        fi
         ;;
     esac
   done
 
-  # Assembling the decision string.
-  # ,------ plain
-  # |,----- revert
-  # 00
-  posix_adapter__decision="${posix_adapter__flag__plain}"
-  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__revert}"
+  if [ "$posix_adapter__flag__path" -eq '0' ]
+  then
+    _posix_adapter__ls__report_invalid_parameter \
+      'Missing <path> argument!' \
+      'To be able to use ls, you need to specify a path to work with.'
+  fi
 
-  _posix_adapter__xxd__common \
-    "$posix_adapter__decision"
+  # Assembling the decision string.
+  # ,-- all
+  # |,- almost_all
+  # 00
+  posix_adapter__decision="${posix_adapter__flag__all}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__almost_all}"
+
+  _posix_adapter__ls__common \
+    "$posix_adapter__decision" \
+    "$posix_adapter__value__path"
 }
 
 #==============================================================================
@@ -99,6 +115,7 @@ _posix_adapter__xxd() {
 #   None
 # Arguments:
 #   [1] decision_string - String that decodes the optional parameter presence.
+#   [2] value_path - Path value.
 # STDIN:
 #   Input passed to the mapped command.
 #------------------------------------------------------------------------------
@@ -112,60 +129,40 @@ _posix_adapter__xxd() {
 #   0  - Call succeeded.
 #   .. - Call failed with it's error status
 #==============================================================================
-_posix_adapter__xxd__common() {
+_posix_adapter__ls__common() {
   posix_adapter__decision_string="$1"
+  posix_adapter__value__path="$2"
 
   case "$posix_adapter__decision_string" in
-  # ,------ plain
-  # |,----- revert
-    10)
-      if command -v xxd >/dev/null
-      then
-        xxd -p
-      else
-        # Since xxd is not a common tool and for linux it is mostly shipped
-        # with vim, we are replacing its functionality with python as a last
-        # resort.
-        if command -v python >/dev/null
-        then
-          python -c 'import sys;print("".join([line.encode().hex() for line in sys.stdin]))'
+  # ,-- all
+  # |,- almost_all
+    00)
+      ls \
+        \
+        \
+        "$posix_adapter__value__path" \
 
-        elif command -v python3 >/dev/null
-        then
-          python3 -c 'import sys;print("".join([line.encode().hex() for line in sys.stdin]))'
-
-        else
-          _report_incompatible_call \
-            'No python nor python3 executable was found.' \
-            'Posix adapter is out of options to provide the desired functionality..'
-        fi
-      fi
       ;;
-  # ,------ plain
-  # |,----- revert
-    11)
-      if command -v xxd >/dev/null
-      then
-        xxd -p -r
-      else
-        # See the explanation one case up for the usage of python.
-        if command -v python >/dev/null
-        then
-          python -c 'import sys;print("".join([bytearray.fromhex(line).decode() for line in sys.stdin]).rstrip())'
+  # ,-- all
+  # |,- almost_all
+    01)
+      ls \
+        \
+        -A \
+        "$posix_adapter__value__path" \
 
-        elif command -v python3 >/dev/null
-        then
-          python3 -c 'import sys;print("".join([bytearray.fromhex(line).decode() for line in sys.stdin]).rstrip())'
+      ;;
+  # ,-- all
+  # |,- almost_all
+    10)
+      ls \
+        -a \
+        \
+        "$posix_adapter__value__path" \
 
-        else
-          _report_incompatible_call \
-            'No python nor python3 executable was found.' \
-            'Posix adapter is out of options to provide the desired functionality..'
-        fi
-      fi
       ;;
     *)
-      _report_incompatible_call \
+      _posix_adapter__ls__report_incompatible_call \
         'Unexpected parameter combination!' \
         'You can only use the available options.'
       ;;
@@ -176,7 +173,7 @@ _posix_adapter__xxd__common() {
 # Invalid parameter error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -194,12 +191,12 @@ _posix_adapter__xxd__common() {
 # Status:
 #   98  - The function will terminate the execution.
 #==============================================================================
-_report_invalid_parameter() {
+_posix_adapter__ls__report_invalid_parameter() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__ls | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__ls | details | ${details}"
+  _posix_adapter__ls__print_help
   exit 98
 }
 
@@ -207,7 +204,7 @@ _report_invalid_parameter() {
 # Incompatible call error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -225,12 +222,12 @@ _report_invalid_parameter() {
 # Status:
 #   99  - The function will terminate the execution.
 #==============================================================================
-_report_incompatible_call() {
+_posix_adapter__ls__report_incompatible_call() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__ls | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__ls | details | ${details}"
+  _posix_adapter__ls__print_help
   exit 99
 }
 
@@ -238,4 +235,9 @@ _report_incompatible_call() {
 # ENTRY POINT
 #==============================================================================
 
-_posix_adapter__xxd "$@"
+# If the script is called directly, call the internal function.
+case $0 in
+  *posix_adapter__ls)
+    posix_adapter__ls "$@"
+    ;;
+esac

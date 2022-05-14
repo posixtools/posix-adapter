@@ -1,32 +1,30 @@
 #!/bin/sh
 #==============================================================================
-#      _ _
-#   __| (_)_ __ _ __   __ _ _ __ ___   ___
-#  / _` | | '__| '_ \ / _` | '_ ` _ \ / _ \
-# | (_| | | |  | | | | (_| | | | | | |  __/
-#  \__,_|_|_|  |_| |_|\__,_|_| |_| |_|\___|
+#   _
+#  | |__   __ _ ___  ___ _ __   __ _ _ __ ___   ___
+#  | '_ \ / _` / __|/ _ \ '_ \ / _` | '_ ` _ \ / _ \
+#  | |_) | (_| \__ \  __/ | | | (_| | | | | | |  __/
+#  |_.__/ \__,_|___/\___|_| |_|\__,_|_| |_| |_|\___|
 #==============================================================================
-# TOOL: DIRNAME
+# TOOL: BASENAME
 #==============================================================================
 
-TOOL_NAME='posix_adapter__dirname'
-
-_print_help() {
+_posix_adapter__basename__help() {
   >&2 echo '=============================================================================='
   >&2 echo ''
-  >&2 echo '  posix_adapter__dirname --help'
-  >&2 echo '  posix_adapter__dirname <path>'
+  >&2 echo '  posix_adapter__basename --help'
+  >&2 echo '  posix_adapter__basename <path>'
   >&2 echo ''
   >&2 echo '------------------------------------------------------------------------------'
-  >&2 echo ' Execution mapping function for the "dirname" command line tool with a uniform'
-  >&2 echo ' interface.'
+  >&2 echo ' Execution mapping function for the "basename" command line tool with a'
+  >&2 echo ' uniform interface.'
   >&2 echo '------------------------------------------------------------------------------'
   >&2 echo ' Globals:'
   >&2 echo '   None'
   >&2 echo ' Options:'
-  >&2 echo '   --help - Prints out the help message and exits.'
+  >&2 echo '   None'
   >&2 echo ' Arguments:'
-  >&2 echo '   [1] path - Path from which the directory name should be separated.'
+  >&2 echo '   [1] path - Path from which the basename should be separated.'
   >&2 echo ' STDIN:'
   >&2 echo '   Standard input can be used to pass a path.'
   >&2 echo '------------------------------------------------------------------------------'
@@ -44,34 +42,38 @@ _print_help() {
   >&2 echo '=============================================================================='
 }
 
-_posix_adapter__dirname() {
+posix_adapter__basename() {
   if [ "$#" -eq 0 ]
   then
-    # dirname does not support the standard input by it's own, so helping it
+    # basename does not support the standard input by it's own, so helping it
     # out with xargs..
-    xargs dirname
+    xargs basename
   else
     if [ "$#" -gt 1 ]
     then
-      _report_invalid_parameter \
+      _posix_adapter__basename__report_invalid_parameter \
         'Unexpected parameter count!' \
         "Only 1 parameter is expected, got ${#}!"
     fi
 
     case "$1" in
+      --help)
+        _posix_adapter__basename__help
+        exit 0
+        ;;
       --[!-]*)
-        _report_invalid_parameter \
+        _posix_adapter__basename__report_invalid_parameter \
           "Unexpected option '${1}'!" \
           'This function does not take options.'
         ;;
       -[!-]*)
-        _report_invalid_parameter \
+        _posix_adapter__basename__report_invalid_parameter \
           "Invalid single dashed option '${1}'!" \
           "posix_adapter only uses double dashed options like '--option'."
         ;;
     esac
 
-    dirname "$1"
+    basename "$1"
   fi
 }
 
@@ -79,7 +81,7 @@ _posix_adapter__dirname() {
 # Invalid parameter error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -97,12 +99,12 @@ _posix_adapter__dirname() {
 # Status:
 #   98  - The function will terminate the execution.
 #==============================================================================
-_report_invalid_parameter() {
+_posix_adapter__basename__report_invalid_parameter() {
   reason="$1"
   details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+  >&2 echo "ERROR | posix_adapter__basename | reason  | ${reason}"
+  >&2 echo "ERROR | posix_adapter__basename | details | ${details}"
+  _posix_adapter__basename__help
   exit 98
 }
 
@@ -110,7 +112,7 @@ _report_invalid_parameter() {
 # Incompatible call error reporting helper function.
 #------------------------------------------------------------------------------
 # Globals:
-#   TOOL_NAME
+#   None
 # Options:
 #   None
 # Arguments:
@@ -128,12 +130,12 @@ _report_invalid_parameter() {
 # Status:
 #   99  - The function will terminate the execution.
 #==============================================================================
-_report_incompatible_call() {
-  reason="$1"
-  details="$2"
-  >&2 echo "ERROR | ${TOOL_NAME} | reason  | ${reason}"
-  >&2 echo "ERROR | ${TOOL_NAME} | details | ${details}"
-  _print_help
+_posix_adapter__basename__report_incompatible_call() {
+  ___reason="$1"
+  ___details="$2"
+  >&2 echo "ERROR | posix_adapter__basename | reason  | ${___reason}"
+  >&2 echo "ERROR | posix_adapter__basename | details | ${___details}"
+  _posix_adapter__basename__help
   exit 99
 }
 
@@ -141,4 +143,9 @@ _report_incompatible_call() {
 # ENTRY POINT
 #==============================================================================
 
-_posix_adapter__dirname "$@"
+# If the script is called directly, call the internal function.
+case $0 in
+  *posix_adapter__basename)
+    posix_adapter__basename "$@"
+    ;;
+esac

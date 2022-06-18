@@ -13,8 +13,8 @@ _posix_adapter__find__print_help() {
   >&2 echo '=============================================================================='
   >&2 echo ''
   >&2 echo '  posix_adapter__find --help'
-  >&2 echo '  posix_adapter__find <path> [--type <type>] [--name <name>]  [--name <name>]'
-  >&2 echo '    [--max-depth <depth>] [--print0]'
+  >&2 echo '  posix_adapter__find <path> [--type <type>] [--name <name>] [--name <name>]'
+  >&2 echo '    [--min-depth <min-depth>] [--max-depth <max-depth>] [--print0]'
   >&2 echo ''
   >&2 echo '------------------------------------------------------------------------------'
   >&2 echo ' Execution mapping function for the "find" command line tool with a uniform'
@@ -26,7 +26,8 @@ _posix_adapter__find__print_help() {
   >&2 echo '   --help - Prints out the help message and exits.'
   >&2 echo '   --type <type> - find compatible type specifier string.'
   >&2 echo '   --name <name> - find compatible name specifier string.'
-  >&2 echo '   --max-depth <depth> - find compatible search depth specifier.'
+  >&2 echo '   --min-depth <depth> - find compatible search min depth specifier.'
+  >&2 echo '   --max-depth <depth> - find compatible search max depth specifier.'
   >&2 echo '   --same-file <path> - find compatible same file parameter.'
   >&2 echo '   --print0 - print null separated results.'
   >&2 echo ' Arguments:'
@@ -55,6 +56,9 @@ posix_adapter__find() {
   posix_adapter__flag__name='0'
   posix_adapter__value__name=''
 
+  posix_adapter__flag__min_depth='0'
+  posix_adapter__value__min_depth=''
+
   posix_adapter__flag__max_depth='0'
   posix_adapter__value__max_depth=''
 
@@ -82,6 +86,12 @@ posix_adapter__find() {
       --name)
         posix_adapter__flag__name='1'
         posix_adapter__value__name="$2"
+        shift
+        shift
+        ;;
+      --min-depth)
+        posix_adapter__flag__min_depth='1'
+        posix_adapter__value__min_depth="$2"
         shift
         shift
         ;;
@@ -130,13 +140,15 @@ posix_adapter__find() {
   # Assembling the decision string. Max depth sohuld be the first as find
   # processes its parameters sequentially. MAx-depth - type - name should be
   # the priority order.
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-  # 00000
-  posix_adapter__decision="${posix_adapter__flag__max_depth}"
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+  # 000000
+  posix_adapter__decision="${posix_adapter__flag__min_depth}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__max_depth}"
   posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__type}"
   posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__name}"
   posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__same_file}"
@@ -146,6 +158,7 @@ posix_adapter__find() {
     "$posix_adapter__decision" \
     "$posix_adapter__value__type" \
     "$posix_adapter__value__name" \
+    "$posix_adapter__value__min_depth" \
     "$posix_adapter__value__max_depth" \
     "$posix_adapter__value__same_file" \
     "$posix_adapter__value__path"
@@ -162,9 +175,10 @@ posix_adapter__find() {
 #   [1] decision_string - String that decodes the optional parameter presence.
 #   [2] value_type -  Value passed with the type flag.
 #   [3] value_name - Value passed with the name flag.
-#   [4] value_max_depth - Value passed with the max_depth flag.
-#   [5] value_same_file - Value passed with the same_file flag.
-#   [6] value_path - Path that should be the base of the search.
+#   [4] value_min_depth - Value passed with the max_depth flag.
+#   [5] value_max_depth - Value passed with the max_depth flag.
+#   [6] value_same_file - Value passed with the same_file flag.
+#   [7] value_path - Path that should be the base of the search.
 # STDIN:
 #   Input passed to the mapped command.
 #------------------------------------------------------------------------------
@@ -182,19 +196,22 @@ _posix_adapter__find__common() {
   posix_adapter__decision_string="$1"
   posix_adapter__value__type="$2"
   posix_adapter__value__name="$3"
-  posix_adapter__value__max_depth="$4"
-  posix_adapter__value__same_file="$5"
-  posix_adapter__value__path="$6"
+  posix_adapter__value__min_depth="$4"
+  posix_adapter__value__max_depth="$5"
+  posix_adapter__value__same_file="$6"
+  posix_adapter__value__path="$7"
 
   case "$posix_adapter__decision_string" in
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    00000)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    000000)
       find \
         "$posix_adapter__value__path" \
+        \
         \
         \
         \
@@ -202,14 +219,16 @@ _posix_adapter__find__common() {
         \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    00001)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    000001)
       find \
         "$posix_adapter__value__path" \
+        \
         \
         \
         \
@@ -217,14 +236,16 @@ _posix_adapter__find__common() {
         -print0 \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    00010)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    000010)
       find \
         "$posix_adapter__value__path" \
+        \
         \
         \
         \
@@ -232,14 +253,560 @@ _posix_adapter__find__common() {
         \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    00011)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    000011)
       find \
         "$posix_adapter__value__path" \
+        \
+        \
+        \
+        \
+        -samefile "$posix_adapter__value__same_file" \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    000100)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        \
+        \
+        -name "$posix_adapter__value__name" \
+        \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    000101)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        \
+        \
+        -name "$posix_adapter__value__name" \
+        \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    000110)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        \
+        \
+        -name "$posix_adapter__value__name" \
+        -samefile "$posix_adapter__value__same_file" \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    000111)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        \
+        \
+        -name "$posix_adapter__value__name" \
+        -samefile "$posix_adapter__value__same_file" \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    001000)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        \
+        -type "$posix_adapter__value__type" \
+        \
+        \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    001001)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        \
+        -type "$posix_adapter__value__type" \
+        \
+        \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    001010)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        \
+        -type "$posix_adapter__value__type" \
+        \
+        -samefile "$posix_adapter__value__same_file" \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    001011)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        \
+        -type "$posix_adapter__value__type" \
+        \
+        -samefile "$posix_adapter__value__same_file" \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    001100)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        \
+        -type "$posix_adapter__value__type" \
+        -name "$posix_adapter__value__name" \
+        \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    001101)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        \
+        -type "$posix_adapter__value__type" \
+        -name "$posix_adapter__value__name" \
+        \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    001110)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        \
+        -type "$posix_adapter__value__type" \
+        -name "$posix_adapter__value__name" \
+        -samefile "$posix_adapter__value__same_file" \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    001111)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        \
+        -type "$posix_adapter__value__type" \
+        -name "$posix_adapter__value__name" \
+        -samefile "$posix_adapter__value__same_file" \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    010000)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        \
+        \
+        \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    010001)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        \
+        \
+        \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    010010)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        \
+        \
+        -samefile "$posix_adapter__value__same_file" \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    010011)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        \
+        \
+        -samefile "$posix_adapter__value__same_file" \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    010100)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        \
+        -name "$posix_adapter__value__name" \
+        \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    010101)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        \
+        -name "$posix_adapter__value__name" \
+        \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    010110)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        \
+        -name "$posix_adapter__value__name" \
+        -samefile "$posix_adapter__value__same_file" \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    010111)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        \
+        -name "$posix_adapter__value__name" \
+        -samefile "$posix_adapter__value__same_file" \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    011000)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        -type "$posix_adapter__value__type" \
+        \
+        \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    011001)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        -type "$posix_adapter__value__type" \
+        \
+        \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    011010)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        -type "$posix_adapter__value__type" \
+        \
+        -samefile "$posix_adapter__value__same_file" \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    011011)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        -type "$posix_adapter__value__type" \
+        \
+        -samefile "$posix_adapter__value__same_file" \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    011100)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        -type "$posix_adapter__value__type" \
+        -name "$posix_adapter__value__name" \
+        \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    011101)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        -type "$posix_adapter__value__type" \
+        -name "$posix_adapter__value__name" \
+        \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    011110)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        -type "$posix_adapter__value__type" \
+        -name "$posix_adapter__value__name" \
+        -samefile "$posix_adapter__value__same_file" \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    011111)
+      find \
+        "$posix_adapter__value__path" \
+        \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        -type "$posix_adapter__value__type" \
+        -name "$posix_adapter__value__name" \
+        -samefile "$posix_adapter__value__same_file" \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    100000)
+      find \
+        "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
+        \
+        \
+        \
+        \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    100001)
+      find \
+        "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
+        \
+        \
+        \
+        \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    100010)
+      find \
+        "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
+        \
+        \
+        \
+        -samefile "$posix_adapter__value__same_file" \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    100011)
+      find \
+        "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         \
         \
         \
@@ -247,14 +814,16 @@ _posix_adapter__find__common() {
         -print0 \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    00100)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    100100)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         \
         \
         -name "$posix_adapter__value__name" \
@@ -262,14 +831,16 @@ _posix_adapter__find__common() {
         \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    00101)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    100101)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         \
         \
         -name "$posix_adapter__value__name" \
@@ -277,14 +848,16 @@ _posix_adapter__find__common() {
         -print0 \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    00110)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    100110)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         \
         \
         -name "$posix_adapter__value__name" \
@@ -292,14 +865,16 @@ _posix_adapter__find__common() {
         \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    00111)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    100111)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         \
         \
         -name "$posix_adapter__value__name" \
@@ -307,14 +882,16 @@ _posix_adapter__find__common() {
         -print0 \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    01000)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    101000)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         \
         -type "$posix_adapter__value__type" \
         \
@@ -322,14 +899,16 @@ _posix_adapter__find__common() {
         \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    01001)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    101001)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         \
         -type "$posix_adapter__value__type" \
         \
@@ -337,14 +916,16 @@ _posix_adapter__find__common() {
         -print0 \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    01010)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    101010)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         \
         -type "$posix_adapter__value__type" \
         \
@@ -352,14 +933,16 @@ _posix_adapter__find__common() {
         \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    01011)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    101011)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         \
         -type "$posix_adapter__value__type" \
         \
@@ -367,14 +950,16 @@ _posix_adapter__find__common() {
         -print0 \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    01100)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    101100)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         \
         -type "$posix_adapter__value__type" \
         -name "$posix_adapter__value__name" \
@@ -382,14 +967,16 @@ _posix_adapter__find__common() {
         \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    01101)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    101101)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         \
         -type "$posix_adapter__value__type" \
         -name "$posix_adapter__value__name" \
@@ -397,14 +984,16 @@ _posix_adapter__find__common() {
         -print0 \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    01110)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    101110)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         \
         -type "$posix_adapter__value__type" \
         -name "$posix_adapter__value__name" \
@@ -412,14 +1001,16 @@ _posix_adapter__find__common() {
         \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    01111)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    101111)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         \
         -type "$posix_adapter__value__type" \
         -name "$posix_adapter__value__name" \
@@ -427,14 +1018,16 @@ _posix_adapter__find__common() {
         -print0 \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    10000)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    110000)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         -maxdepth "$posix_adapter__value__max_depth" \
         \
         \
@@ -442,14 +1035,16 @@ _posix_adapter__find__common() {
         \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    10001)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    110001)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         -maxdepth "$posix_adapter__value__max_depth" \
         \
         \
@@ -457,14 +1052,16 @@ _posix_adapter__find__common() {
         -print0 \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    10010)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    110010)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         -maxdepth "$posix_adapter__value__max_depth" \
         \
         \
@@ -472,149 +1069,169 @@ _posix_adapter__find__common() {
         \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    10011)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    110011)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         -maxdepth "$posix_adapter__value__max_depth" \
         \
-        \
-        -samefile "$posix_adapter__value__same_file" \
-        -print0 \
-
-      ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    10100)
-      find \
-        "$posix_adapter__value__path" \
-        -maxdepth "$posix_adapter__value__max_depth" \
-        \
-        -name "$posix_adapter__value__name" \
-        \
-        \
-
-      ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    10101)
-      find \
-        "$posix_adapter__value__path" \
-        -maxdepth "$posix_adapter__value__max_depth" \
-        \
-        -name "$posix_adapter__value__name" \
-        \
-        -print0 \
-
-      ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    10110)
-      find \
-        "$posix_adapter__value__path" \
-        -maxdepth "$posix_adapter__value__max_depth" \
-        \
-        -name "$posix_adapter__value__name" \
-        -samefile "$posix_adapter__value__same_file" \
-        \
-
-      ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    10111)
-      find \
-        "$posix_adapter__value__path" \
-        -maxdepth "$posix_adapter__value__max_depth" \
-        \
-        -name "$posix_adapter__value__name" \
-        -samefile "$posix_adapter__value__same_file" \
-        -print0 \
-
-      ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    11000)
-      find \
-        "$posix_adapter__value__path" \
-        -maxdepth "$posix_adapter__value__max_depth" \
-        -type "$posix_adapter__value__type" \
-        \
-        \
-        \
-
-      ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    11001)
-      find \
-        "$posix_adapter__value__path" \
-        -maxdepth "$posix_adapter__value__max_depth" \
-        -type "$posix_adapter__value__type" \
-        \
-        \
-        -print0 \
-
-      ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    11010)
-      find \
-        "$posix_adapter__value__path" \
-        -maxdepth "$posix_adapter__value__max_depth" \
-        -type "$posix_adapter__value__type" \
-        \
-        -samefile "$posix_adapter__value__same_file" \
-        \
-
-      ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    11011)
-      find \
-        "$posix_adapter__value__path" \
-        -maxdepth "$posix_adapter__value__max_depth" \
-        -type "$posix_adapter__value__type" \
         \
         -samefile "$posix_adapter__value__same_file" \
         -print0 \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    11100)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    110100)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        \
+        -name "$posix_adapter__value__name" \
+        \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    110101)
+      find \
+        "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        \
+        -name "$posix_adapter__value__name" \
+        \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    110110)
+      find \
+        "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        \
+        -name "$posix_adapter__value__name" \
+        -samefile "$posix_adapter__value__same_file" \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    110111)
+      find \
+        "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        \
+        -name "$posix_adapter__value__name" \
+        -samefile "$posix_adapter__value__same_file" \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    111000)
+      find \
+        "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        -type "$posix_adapter__value__type" \
+        \
+        \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    111001)
+      find \
+        "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        -type "$posix_adapter__value__type" \
+        \
+        \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    111010)
+      find \
+        "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        -type "$posix_adapter__value__type" \
+        \
+        -samefile "$posix_adapter__value__same_file" \
+        \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    111011)
+      find \
+        "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
+        -maxdepth "$posix_adapter__value__max_depth" \
+        -type "$posix_adapter__value__type" \
+        \
+        -samefile "$posix_adapter__value__same_file" \
+        -print0 \
+
+      ;;
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    111100)
+      find \
+        "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         -maxdepth "$posix_adapter__value__max_depth" \
         -type "$posix_adapter__value__type" \
         -name "$posix_adapter__value__name" \
@@ -622,14 +1239,16 @@ _posix_adapter__find__common() {
         \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    11101)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    111101)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         -maxdepth "$posix_adapter__value__max_depth" \
         -type "$posix_adapter__value__type" \
         -name "$posix_adapter__value__name" \
@@ -637,14 +1256,16 @@ _posix_adapter__find__common() {
         -print0 \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    11110)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    111110)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         -maxdepth "$posix_adapter__value__max_depth" \
         -type "$posix_adapter__value__type" \
         -name "$posix_adapter__value__name" \
@@ -652,14 +1273,16 @@ _posix_adapter__find__common() {
         \
 
       ;;
-  # ,------ max_depth
-  # |,----- type
-  # ||,---- name
-  # |||,--- same_file
-  # ||||,-- print0
-    11111)
+  # ,------- min_depth
+  # |,------ max_depth
+  # ||,----- type
+  # |||,---- name
+  # ||||,--- same_file
+  # |||||,-- print0
+    111111)
       find \
         "$posix_adapter__value__path" \
+        -mindepth "$posix_adapter__value__min_depth" \
         -maxdepth "$posix_adapter__value__max_depth" \
         -type "$posix_adapter__value__type" \
         -name "$posix_adapter__value__name" \

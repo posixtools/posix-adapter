@@ -1,6 +1,6 @@
 """
 Speedup tool for full parameter space generation. As posix_adapter does not use
-the eval command to execute the mapped commands it needs to define all the
+the eval command to execute the mapped commands so it needs to define all the
 possible parameter combinations that can be executed. As these parameter
 combinations can be pretty long an automated way is needed to aid the
 development. The parameter combination selection is implemented as a shell

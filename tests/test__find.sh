@@ -191,7 +191,7 @@ else
 fi
 
 #==============================================================================
-posix_adapter__test__valid_case 'find - full parameter space - case 0000'
+posix_adapter__test__valid_case 'find - full parameter space - case 000000'
 
 find_base_dir='./fixtures/find'
 
@@ -203,18 +203,20 @@ find_base_dir='./fixtures/find'
 # └── file_b_1          1
 expected='6'
 
-# ,----- max_depth
-# |,---- type
-# ||,--- name
-# |||,-- print0
-# 0000
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 000000
 if result="$( \
   posix_adapter__find "$find_base_dir" 2>&1 \
     \
     \
     \
     \
-  | posix_adapter__wc --lines 2>&1 \
+    \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
@@ -224,7 +226,7 @@ else
 fi
 
 #==============================================================================
-posix_adapter__test__valid_case 'find - full parameter space - case 0001'
+posix_adapter__test__valid_case 'find - full parameter space - case 00001'
 
 find_base_dir='./fixtures/find'
 
@@ -236,13 +238,15 @@ find_base_dir='./fixtures/find'
 # └── file_b_1          1
 expected='6'
 
-# ,----- max_depth
-# |,---- type
-# ||,--- name
-# |||,-- print0
-# 0001
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 00001
 if result="$( \
   posix_adapter__find "$find_base_dir" 2>&1 \
+    \
     \
     \
     \
@@ -257,7 +261,7 @@ else
 fi
 
 #==============================================================================
-posix_adapter__test__valid_case 'find - full parameter space - case 0010'
+posix_adapter__test__valid_case 'find - full parameter space - case 00010'
 
 find_base_dir='./fixtures/find'
 
@@ -269,18 +273,20 @@ find_base_dir='./fixtures/find'
 # └── file_b_1          0
 expected='2'
 
-# ,----- max_depth
-# |,---- type
-# ||,--- name
-# |||,-- print0
-# 0010
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 00010
 if result="$( \
   posix_adapter__find "$find_base_dir" 2>&1 \
     \
     \
+    \
     --name 'file_a*' \
     \
-  | posix_adapter__wc --lines 2>&1 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
@@ -290,7 +296,7 @@ else
 fi
 
 #==============================================================================
-posix_adapter__test__valid_case 'find - full parameter space - case 0011'
+posix_adapter__test__valid_case 'find - full parameter space - case 00011'
 
 find_base_dir='./fixtures/find'
 
@@ -302,13 +308,15 @@ find_base_dir='./fixtures/find'
 # └── file_b_1          0
 expected='2'
 
-# ,----- max_depth
-# |,---- type
-# ||,--- name
-# |||,-- print0
-# 0011
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 00011
 if result="$( \
   posix_adapter__find "$find_base_dir" 2>&1 \
+    \
     \
     \
     --name 'file_a*' \
@@ -323,7 +331,7 @@ else
 fi
 
 #==============================================================================
-posix_adapter__test__valid_case 'find - full parameter space - case 0100'
+posix_adapter__test__valid_case 'find - full parameter space - case 00100'
 
 find_base_dir='./fixtures/find'
 
@@ -335,18 +343,20 @@ find_base_dir='./fixtures/find'
 # └── file_b_1          1
 expected='4'
 
-# ,----- max_depth
-# |,---- type
-# ||,--- name
-# |||,-- print0
-# 0100
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 00100
 if result="$( \
   posix_adapter__find "$find_base_dir" 2>&1 \
+    \
     \
     --type 'f' \
     \
     \
-  | posix_adapter__wc --lines 2>&1 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
@@ -356,7 +366,7 @@ else
 fi
 
 #==============================================================================
-posix_adapter__test__valid_case 'find - full parameter space - case 0101'
+posix_adapter__test__valid_case 'find - full parameter space - case 00101'
 
 find_base_dir='./fixtures/find'
 
@@ -368,13 +378,15 @@ find_base_dir='./fixtures/find'
 # └── file_b_1          1
 expected='4'
 
-# ,----- max_depth
-# |,---- type
-# ||,--- name
-# |||,-- print0
-# 0101
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 00101
 if result="$( \
   posix_adapter__find "$find_base_dir" 2>&1 \
+    \
     \
     --type 'f' \
     \
@@ -389,7 +401,7 @@ else
 fi
 
 #==============================================================================
-posix_adapter__test__valid_case 'find - full parameter space - case 0110'
+posix_adapter__test__valid_case 'find - full parameter space - case 00110'
 
 find_base_dir='./fixtures/find'
 
@@ -401,18 +413,20 @@ find_base_dir='./fixtures/find'
 # └── file_b_1          0
 expected='2'
 
-# ,----- max_depth
-# |,---- type
-# ||,--- name
-# |||,-- print0
-# 0110
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 00110
 if result="$( \
   posix_adapter__find "$find_base_dir" 2>&1 \
+    \
     \
     --type 'f' \
     --name 'file_a*' \
     \
-  | posix_adapter__wc --lines 2>&1 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
@@ -422,7 +436,7 @@ else
 fi
 
 #==============================================================================
-posix_adapter__test__valid_case 'find - full parameter space - case 0111'
+posix_adapter__test__valid_case 'find - full parameter space - case 00111'
 
 find_base_dir='./fixtures/find'
 
@@ -434,13 +448,15 @@ find_base_dir='./fixtures/find'
 # └── file_b_1          0
 expected='2'
 
-# ,----- max_depth
-# |,---- type
-# ||,--- name
-# |||,-- print0
-# 0111
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 00111
 if result="$( \
   posix_adapter__find "$find_base_dir" 2>&1 \
+    \
     \
     --type 'f' \
     --name 'file_a*' \
@@ -455,7 +471,7 @@ else
 fi
 
 #==============================================================================
-posix_adapter__test__valid_case 'find - full parameter space - case 1000'
+posix_adapter__test__valid_case 'find - full parameter space - case 01000'
 
 find_base_dir='./fixtures/find'
 
@@ -467,18 +483,20 @@ find_base_dir='./fixtures/find'
 # └── file_b_1          1
 expected='5'
 
-# ,----- max_depth
-# |,---- type
-# ||,--- name
-# |||,-- print0
-# 1000
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 01000
 if result="$( \
   posix_adapter__find "$find_base_dir" 2>&1 \
+    \
     --max-depth '1' \
     \
     \
     \
-  | posix_adapter__wc --lines 2>&1 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
@@ -488,7 +506,7 @@ else
 fi
 
 #==============================================================================
-posix_adapter__test__valid_case 'find - full parameter space - case 1001'
+posix_adapter__test__valid_case 'find - full parameter space - case 01001'
 
 find_base_dir='./fixtures/find'
 
@@ -500,13 +518,15 @@ find_base_dir='./fixtures/find'
 # └── file_b_1          1
 expected='5'
 
-# ,----- max_depth
-# |,---- type
-# ||,--- name
-# |||,-- print0
-# 1001
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 01001
 if result="$( \
   posix_adapter__find "$find_base_dir" 2>&1 \
+    \
     --max-depth '1' \
     \
     \
@@ -521,7 +541,7 @@ else
 fi
 
 #==============================================================================
-posix_adapter__test__valid_case 'find - full parameter space - case 1010'
+posix_adapter__test__valid_case 'find - full parameter space - case 01010'
 
 find_base_dir='./fixtures/find'
 
@@ -533,18 +553,20 @@ find_base_dir='./fixtures/find'
 # └── file_b_1          0
 expected='2'
 
-# ,----- max_depth
-# |,---- type
-# ||,--- name
-# |||,-- print0
-# 1010
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 01010
 if result="$( \
   posix_adapter__find "$find_base_dir" 2>&1 \
+    \
     --max-depth '1' \
     \
     --name 'file_a*' \
     \
-  | posix_adapter__wc --lines 2>&1 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
@@ -554,7 +576,7 @@ else
 fi
 
 #==============================================================================
-posix_adapter__test__valid_case 'find - full parameter space - case 1011'
+posix_adapter__test__valid_case 'find - full parameter space - case 01011'
 
 find_base_dir='./fixtures/find'
 
@@ -566,13 +588,15 @@ find_base_dir='./fixtures/find'
 # └── file_b_1          0
 expected='2'
 
-# ,----- max_depth
-# |,---- type
-# ||,--- name
-# |||,-- print0
-# 1011
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 01011
 if result="$( \
   posix_adapter__find "$find_base_dir" 2>&1 \
+    \
     --max-depth '1' \
     \
     --name 'file_a*' \
@@ -587,7 +611,7 @@ else
 fi
 
 #==============================================================================
-posix_adapter__test__valid_case 'find - full parameter space - case 1100'
+posix_adapter__test__valid_case 'find - full parameter space - case 01100'
 
 find_base_dir='./fixtures/find'
 
@@ -599,18 +623,20 @@ find_base_dir='./fixtures/find'
 # └── file_b_1          1
 expected='3'
 
-# ,----- max_depth
-# |,---- type
-# ||,--- name
-# |||,-- print0
-# 1100
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 01100
 if result="$( \
   posix_adapter__find "$find_base_dir" 2>&1 \
+    \
     --max-depth '1' \
     --type 'f' \
     \
     \
-  | posix_adapter__wc --lines 2>&1 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
@@ -620,7 +646,7 @@ else
 fi
 
 #==============================================================================
-posix_adapter__test__valid_case 'find - full parameter space - case 1101'
+posix_adapter__test__valid_case 'find - full parameter space - case 01101'
 
 find_base_dir='./fixtures/find'
 
@@ -632,13 +658,15 @@ find_base_dir='./fixtures/find'
 # └── file_b_1          1
 expected='3'
 
-# ,----- max_depth
-# |,---- type
-# ||,--- name
-# |||,-- print0
-# 1101
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 01101
 if result="$( \
   posix_adapter__find "$find_base_dir" 2>&1 \
+    \
     --max-depth '1' \
     --type 'f' \
     \
@@ -653,7 +681,7 @@ else
 fi
 
 #==============================================================================
-posix_adapter__test__valid_case 'find - full parameter space - case 1110'
+posix_adapter__test__valid_case 'find - full parameter space - case 01110'
 
 find_base_dir='./fixtures/find'
 
@@ -665,18 +693,20 @@ find_base_dir='./fixtures/find'
 # └── file_b_1          0
 expected='2'
 
-# ,----- max_depth
-# |,---- type
-# ||,--- name
-# |||,-- print0
-# 1110
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 01110
 if result="$( \
   posix_adapter__find "$find_base_dir" 2>&1 \
+    \
     --max-depth '1' \
     --type 'f' \
     --name 'file_a*' \
     \
-  | posix_adapter__wc --lines 2>&1 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"
 then
   posix_adapter__test__assert_equal "$expected" "$result"
@@ -686,7 +716,7 @@ else
 fi
 
 #==============================================================================
-posix_adapter__test__valid_case 'find - full parameter space - case 1111'
+posix_adapter__test__valid_case 'find - full parameter space - case 01111'
 
 find_base_dir='./fixtures/find'
 
@@ -698,16 +728,578 @@ find_base_dir='./fixtures/find'
 # └── file_b_1          0
 expected='2'
 
-# ,----- max_depth
-# |,---- type
-# ||,--- name
-# |||,-- print0
-# 1111
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 01111
 if result="$( \
   posix_adapter__find "$find_base_dir" 2>&1 \
+    \
     --max-depth '1' \
     --type 'f' \
     --name 'file_a*' \
+    --print0 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
+)"
+then
+  posix_adapter__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  posix_adapter__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+posix_adapter__test__valid_case 'find - full parameter space - case 10000'
+
+find_base_dir='./fixtures/find'
+
+# tests/fixtures/find/  0
+# ├── dir               0
+# │   └── file_c_1      1
+# ├── file_a_1          0
+# ├── file_a_2          0
+# └── file_b_1          0
+expected='1'
+
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 10000
+if result="$( \
+  posix_adapter__find "$find_base_dir" 2>&1 \
+    --min-depth '2' \
+    \
+    \
+    \
+    \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
+)"
+then
+  posix_adapter__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  posix_adapter__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+posix_adapter__test__valid_case 'find - full parameter space - case 10001'
+
+find_base_dir='./fixtures/find'
+
+# tests/fixtures/find/  0
+# ├── dir               0
+# │   └── file_c_1      1
+# ├── file_a_1          0
+# ├── file_a_2          0
+# └── file_b_1          0
+expected='1'
+
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 10001
+if result="$( \
+  posix_adapter__find "$find_base_dir" 2>&1 \
+    --min-depth '2' \
+    \
+    \
+    \
+    --print0 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
+)"
+then
+  posix_adapter__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  posix_adapter__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+posix_adapter__test__valid_case 'find - full parameter space - case 10010'
+
+find_base_dir='./fixtures/find'
+
+# tests/fixtures/find/  0
+# ├── dir               0
+# │   └── file_c_1      1
+# ├── file_a_1          0
+# ├── file_a_2          0
+# └── file_b_1          0
+expected='1'
+
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 10010
+if result="$( \
+  posix_adapter__find "$find_base_dir" 2>&1 \
+    --min-depth '2' \
+    \
+    \
+    --name 'file_c*' \
+    \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
+)"
+then
+  posix_adapter__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  posix_adapter__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+posix_adapter__test__valid_case 'find - full parameter space - case 10011'
+
+find_base_dir='./fixtures/find'
+
+# tests/fixtures/find/  0
+# ├── dir               0
+# │   └── file_c_1      1
+# ├── file_a_1          0
+# ├── file_a_2          0
+# └── file_b_1          0
+expected='1'
+
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 10011
+if result="$( \
+  posix_adapter__find "$find_base_dir" 2>&1 \
+    --min-depth '2' \
+    \
+    \
+    --name 'file_c*' \
+    --print0 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
+)"
+then
+  posix_adapter__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  posix_adapter__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+posix_adapter__test__valid_case 'find - full parameter space - case 10100'
+
+find_base_dir='./fixtures/find'
+
+# tests/fixtures/find/  0
+# ├── dir               0
+# │   └── file_c_1      1
+# ├── file_a_1          0
+# ├── file_a_2          0
+# └── file_b_1          0
+expected='1'
+
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 10100
+if result="$( \
+  posix_adapter__find "$find_base_dir" 2>&1 \
+    --min-depth '2' \
+    \
+    --type 'f' \
+    \
+    \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
+)"
+then
+  posix_adapter__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  posix_adapter__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+posix_adapter__test__valid_case 'find - full parameter space - case 10101'
+
+find_base_dir='./fixtures/find'
+
+# tests/fixtures/find/  0
+# ├── dir               0
+# │   └── file_c_1      1
+# ├── file_a_1          0
+# ├── file_a_2          0
+# └── file_b_1          0
+expected='1'
+
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 10101
+if result="$( \
+  posix_adapter__find "$find_base_dir" 2>&1 \
+    --min-depth '2' \
+    \
+    --type 'f' \
+    \
+    --print0 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
+)"
+then
+  posix_adapter__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  posix_adapter__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+posix_adapter__test__valid_case 'find - full parameter space - case 10110'
+
+find_base_dir='./fixtures/find'
+
+# tests/fixtures/find/  0
+# ├── dir               0
+# │   └── file_c_1      1
+# ├── file_a_1          0
+# ├── file_a_2          0
+# └── file_b_1          0
+expected='1'
+
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 10110
+if result="$( \
+  posix_adapter__find "$find_base_dir" 2>&1 \
+    --min-depth '2' \
+    \
+    --type 'f' \
+    --name 'file_c*' \
+    \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
+)"
+then
+  posix_adapter__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  posix_adapter__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+posix_adapter__test__valid_case 'find - full parameter space - case 10111'
+
+find_base_dir='./fixtures/find'
+
+# tests/fixtures/find/  0
+# ├── dir               0
+# │   └── file_c_1      1
+# ├── file_a_1          0
+# ├── file_a_2          0
+# └── file_b_1          0
+expected='1'
+
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 10111
+if result="$( \
+  posix_adapter__find "$find_base_dir" 2>&1 \
+    --min-depth '2' \
+    \
+    --type 'f' \
+    --name 'file_c*' \
+    --print0 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
+)"
+then
+  posix_adapter__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  posix_adapter__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+posix_adapter__test__valid_case 'find - full parameter space - case 11000'
+
+find_base_dir='./fixtures/find'
+
+# tests/fixtures/find/  0
+# ├── dir               0
+# │   └── file_c_1      1
+# ├── file_a_1          0
+# ├── file_a_2          0
+# └── file_b_1          0
+expected='1'
+
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 11000
+if result="$( \
+  posix_adapter__find "$find_base_dir" 2>&1 \
+    --min-depth '2' \
+    --max-depth '2' \
+    \
+    \
+    \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
+)"
+then
+  posix_adapter__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  posix_adapter__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+posix_adapter__test__valid_case 'find - full parameter space - case 11001'
+
+find_base_dir='./fixtures/find'
+
+# tests/fixtures/find/  0
+# ├── dir               0
+# │   └── file_c_1      1
+# ├── file_a_1          0
+# ├── file_a_2          0
+# └── file_b_1          0
+expected='1'
+
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 11001
+if result="$( \
+  posix_adapter__find "$find_base_dir" 2>&1 \
+    --min-depth '2' \
+    --max-depth '2' \
+    \
+    \
+    --print0 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
+)"
+then
+  posix_adapter__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  posix_adapter__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+posix_adapter__test__valid_case 'find - full parameter space - case 11010'
+
+find_base_dir='./fixtures/find'
+
+# tests/fixtures/find/  0
+# ├── dir               0
+# │   └── file_c_1      1
+# ├── file_a_1          0
+# ├── file_a_2          0
+# └── file_b_1          0
+expected='1'
+
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 11010
+if result="$( \
+  posix_adapter__find "$find_base_dir" 2>&1 \
+    --min-depth '2' \
+    --max-depth '2' \
+    \
+    --name 'file_c*' \
+    \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
+)"
+then
+  posix_adapter__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  posix_adapter__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+posix_adapter__test__valid_case 'find - full parameter space - case 11011'
+
+find_base_dir='./fixtures/find'
+
+# tests/fixtures/find/  0
+# ├── dir               0
+# │   └── file_c_1      1
+# ├── file_a_1          0
+# ├── file_a_2          0
+# └── file_b_1          0
+expected='1'
+
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 11011
+if result="$( \
+  posix_adapter__find "$find_base_dir" 2>&1 \
+    --min-depth '2' \
+    --max-depth '2' \
+    \
+    --name 'file_c*' \
+    --print0 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
+)"
+then
+  posix_adapter__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  posix_adapter__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+posix_adapter__test__valid_case 'find - full parameter space - case 11100'
+
+find_base_dir='./fixtures/find'
+
+# tests/fixtures/find/  0
+# ├── dir               0
+# │   └── file_c_1      1
+# ├── file_a_1          0
+# ├── file_a_2          0
+# └── file_b_1          0
+expected='1'
+
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 11100
+if result="$( \
+  posix_adapter__find "$find_base_dir" 2>&1 \
+    --min-depth '2' \
+    --max-depth '2' \
+    --type 'f' \
+    \
+    \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
+)"
+then
+  posix_adapter__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  posix_adapter__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+posix_adapter__test__valid_case 'find - full parameter space - case 11101'
+
+find_base_dir='./fixtures/find'
+
+# tests/fixtures/find/  0
+# ├── dir               0
+# │   └── file_c_1      1
+# ├── file_a_1          0
+# ├── file_a_2          0
+# └── file_b_1          0
+expected='1'
+
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 11101
+if result="$( \
+  posix_adapter__find "$find_base_dir" 2>&1 \
+    --min-depth '2' \
+    --max-depth '2' \
+    --type 'f' \
+    \
+    --print0 \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
+)"
+then
+  posix_adapter__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  posix_adapter__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+posix_adapter__test__valid_case 'find - full parameter space - case 11110'
+
+find_base_dir='./fixtures/find'
+
+# tests/fixtures/find/  0
+# ├── dir               0
+# │   └── file_c_1      1
+# ├── file_a_1          0
+# ├── file_a_2          0
+# └── file_b_1          0
+expected='1'
+
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 11110
+if result="$( \
+  posix_adapter__find "$find_base_dir" 2>&1 \
+    --min-depth '2' \
+    --max-depth '2' \
+    --type 'f' \
+    --name 'file_c*' \
+    \
+  | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
+)"
+then
+  posix_adapter__test__assert_equal "$expected" "$result"
+else
+  status="$?"
+  posix_adapter__test__test_case_failed "$status"
+fi
+
+#==============================================================================
+posix_adapter__test__valid_case 'find - full parameter space - case 11111'
+
+find_base_dir='./fixtures/find'
+
+# tests/fixtures/find/  0
+# ├── dir               0
+# │   └── file_c_1      1
+# ├── file_a_1          0
+# ├── file_a_2          0
+# └── file_b_1          0
+expected='1'
+
+# ,------- min_depth
+# |,------ max_depth
+# ||,----- type
+# |||,---- name
+# |||||,-- print0
+# 11111
+if result="$( \
+  posix_adapter__find "$find_base_dir" 2>&1 \
+    --min-depth '2' \
+    --max-depth '2' \
+    --type 'f' \
+    --name 'file_c*' \
     --print0 \
   | posix_adapter__tr --replace '\0' ' ' 2>&1 | posix_adapter__wc --words 2>&1 \
 )"

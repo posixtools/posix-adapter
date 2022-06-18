@@ -14,7 +14,7 @@ _posix_adapter__ln__print_help() {
   >&2 echo '=============================================================================='
   >&2 echo ''
   >&2 echo '  posix_adapter__ln --help'
-  >&2 echo '  posix_adapter__ln [--symbolic] [--verbose] --path-to-file <path_to_file>'
+  >&2 echo '  posix_adapter__ln [--symbolic] [--verbose] --path-to-target <path_to_target>'
   >&2 echo '      --path-to-link <path_to_link>'
   >&2 echo ''
   >&2 echo '------------------------------------------------------------------------------'
@@ -27,8 +27,8 @@ _posix_adapter__ln__print_help() {
   >&2 echo '   --help - Prints out the help message and exits.'
   >&2 echo '   --symbolic - Optional flag that should make the created link symbolic.'
   >&2 echo '   --verbose - Optional flag that makes the execution verbose.'
-  >&2 echo '   --path-to-file <path_to_file> - Mandatory path to file.'
-  >&2 echo '   --path-to-link <path_to_link> - Mandatory path_to_link.'
+  >&2 echo '   --path-to-target <path_to_target> - Mandatory path to the target.'
+  >&2 echo '   --path-to-link <path_to_link> - Mandatory path to the link itself.'
   >&2 echo ' Arguments:'
   >&2 echo '   None'
   >&2 echo ' STDIN:'
@@ -52,8 +52,8 @@ posix_adapter__ln() {
   posix_adapter__flag__symbolic='0'
   posix_adapter__flag__verbose='0'
 
-  posix_adapter__flag__path_to_file='0'
-  posix_adapter__value__path_to_file=''
+  posix_adapter__flag__path_to_target='0'
+  posix_adapter__value__path_to_target=''
 
   posix_adapter__flag__path_to_link='0'
   posix_adapter__value__path_to_link=''
@@ -69,9 +69,9 @@ posix_adapter__ln() {
         posix_adapter__flag__verbose='1'
         shift
         ;;
-      --path-to-file)
-        posix_adapter__flag__path_to_file='1'
-        posix_adapter__value__path_to_file="$2"
+      --path-to-target)
+        posix_adapter__flag__path_to_target='1'
+        posix_adapter__value__path_to_target="$2"
         shift
         shift
         ;;
@@ -102,17 +102,17 @@ posix_adapter__ln() {
   # Assembling the decision string.
   # ,----- symbolic
   # |,---- verbose
-  # ||,--- target
-  # |||,-- link_name
+  # ||,--- path_to_target
+  # |||,-- path_to_link
   # 0000
   posix_adapter__decision="${posix_adapter__flag__symbolic}"
   posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__verbose}"
-  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__path_to_file}"
+  posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__path_to_target}"
   posix_adapter__decision="${posix_adapter__decision}${posix_adapter__flag__path_to_link}"
 
   _posix_adapter__ln__common \
     "$posix_adapter__decision" \
-    "$posix_adapter__value__path_to_file" \
+    "$posix_adapter__value__path_to_target" \
     "$posix_adapter__value__path_to_link"
 }
 
@@ -125,8 +125,8 @@ posix_adapter__ln() {
 #   None
 # Arguments:
 #   [1] decision_string - String that decodes the optional parameter presence.
-#   [2] value__target_path -  Target path passed to the command.
-#   [3] value__link_name -  Link name passed to the command.
+#   [2] value__path_to_target -  Target path passed to the command.
+#   [3] value__path_to_link -  Link name passed to the command.
 # STDIN:
 #   Input passed to the mapped command.
 #------------------------------------------------------------------------------
@@ -142,55 +142,55 @@ posix_adapter__ln() {
 #==============================================================================
 _posix_adapter__ln__common() {
   posix_adapter__decision_string="$1"
-  posix_adapter__value__path_to_file_path="$2"
+  posix_adapter__value__path_to_target="$2"
   posix_adapter__value__path_to_link="$3"
 
   case "$posix_adapter__decision_string" in
   # ,----- symbolic
   # |,---- verbose
-  # ||,--- path_to_file
+  # ||,--- path_to_target
   # |||,-- path_to_link
     0011)
       ln \
         \
         \
-        "$posix_adapter__value__path_to_file_path" \
+        "$posix_adapter__value__path_to_target" \
         "$posix_adapter__value__path_to_link" \
 
       ;;
   # ,----- symbolic
   # |,---- verbose
-  # ||,--- path_to_file
+  # ||,--- path_to_target
   # |||,-- path_to_link
     0111)
       ln \
         \
         -v \
-        "$posix_adapter__value__path_to_file_path" \
+        "$posix_adapter__value__path_to_target" \
         "$posix_adapter__value__path_to_link" \
 
       ;;
   # ,----- symbolic
   # |,---- verbose
-  # ||,--- path_to_file
+  # ||,--- path_to_target
   # |||,-- path_to_link
     1011)
       ln \
         -s \
         \
-        "$posix_adapter__value__path_to_file_path" \
+        "$posix_adapter__value__path_to_target" \
         "$posix_adapter__value__path_to_link" \
 
       ;;
   # ,----- symbolic
   # |,---- verbose
-  # ||,--- path_to_file
+  # ||,--- path_to_target
   # |||,-- path_to_link
     1111)
       ln \
         -s \
         -v \
-        "$posix_adapter__value__path_to_file_path" \
+        "$posix_adapter__value__path_to_target" \
         "$posix_adapter__value__path_to_link" \
 
       ;;
